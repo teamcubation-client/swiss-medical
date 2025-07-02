@@ -1,0 +1,21 @@
+### GET Patients
+
+GET http://localhost:8000/api/patients?name=jo
+
+### GET Patient by DNI 
+
+GET http://localhost:8000/api/patients/40128095
+
+### POST Create Patient
+
+POST http://localhost:8000/api/patients
+Content-Type: application/json
+
+{
+  "firstName": "John",
+  "lastName": "Doe",
+  "dni": "40128095",
+  "email": "john@gmail.com",
+  "phoneNumber": "1234567890",
+  "socialSecurity": "Swiss Medical"
+}
