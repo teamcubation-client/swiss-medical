@@ -134,6 +134,13 @@ public class PacienteServiceImpl implements PacienteService {
         if (paciente.getTelefono() != null) {
             existente.setTelefono(paciente.getTelefono());
         }
+        if (paciente.getTipoPlanObraSocial() != null) {
+            existente.setTipoPlanObraSocial(paciente.getTipoPlanObraSocial());
+        }
+        if (paciente.getFechaAlta() != null) {
+            existente.setFechaAlta(paciente.getFechaAlta());
+        }
+        existente.setEstado(paciente.isEstado());
         return pacienteRepository.save(existente);
     }
 } 

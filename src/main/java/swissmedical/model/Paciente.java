@@ -24,6 +24,12 @@ public class Paciente {
     private String email;
     /** Telefono de contacto del paciente */
     private String telefono;
+    /** Tipo de plan de la obra social */
+    private String tipoPlanObraSocial;
+    /** Fecha de alta del paciente en el sistema */
+    private java.time.LocalDate fechaAlta;
+    /** Estado del paciente (true=activo, false=inactivo) */
+    private boolean estado;
 
     /**
      * Constructor vacio requerido por JPA
@@ -39,8 +45,11 @@ public class Paciente {
      * @param obraSocial Obra social
      * @param email Correo electronico
      * @param telefono Telefono de contacto
+     * @param tipoPlanObraSocial Tipo de plan de la obra social
+     * @param fechaAlta Fecha de alta del paciente
+     * @param estado Estado del paciente (true=activo, false=inactivo)
      */
-    public Paciente(Long id, String nombre, String apellido, String dni, String obraSocial, String email, String telefono) {
+    public Paciente(Long id, String nombre, String apellido, String dni, String obraSocial, String email, String telefono, String tipoPlanObraSocial, java.time.LocalDate fechaAlta, boolean estado) {
         this.id = id;
         this.nombre = nombre;
         this.apellido = apellido;
@@ -48,6 +57,9 @@ public class Paciente {
         this.obraSocial = obraSocial;
         this.email = email;
         this.telefono = telefono;
+        this.tipoPlanObraSocial = tipoPlanObraSocial;
+        this.fechaAlta = fechaAlta;
+        this.estado = estado;
     }
 
     /**
@@ -160,5 +172,53 @@ public class Paciente {
      */
     public void setTelefono(String telefono) {
         this.telefono = telefono;
+    }
+
+    /**
+     * Obtiene el tipo de plan de la obra social
+     * @return tipo de plan de la obra social
+     */
+    public String getTipoPlanObraSocial() {
+        return tipoPlanObraSocial;
+    }
+
+    /**
+     * Establece el tipo de plan de la obra social
+     * @param tipoPlanObraSocial tipo de plan de la obra social
+     */
+    public void setTipoPlanObraSocial(String tipoPlanObraSocial) {
+        this.tipoPlanObraSocial = tipoPlanObraSocial;
+    }
+
+    /**
+     * Obtiene la fecha de alta del paciente
+     * @return fecha de alta
+     */
+    public java.time.LocalDate getFechaAlta() {
+        return fechaAlta;
+    }
+
+    /**
+     * Establece la fecha de alta del paciente
+     * @param fechaAlta fecha de alta
+     */
+    public void setFechaAlta(java.time.LocalDate fechaAlta) {
+        this.fechaAlta = fechaAlta;
+    }
+
+    /**
+     * Obtiene el estado del paciente
+     * @return true si activo, false si inactivo
+     */
+    public boolean isEstado() {
+        return estado;
+    }
+
+    /**
+     * Establece el estado del paciente
+     * @param estado true si activo, false si inactivo
+     */
+    public void setEstado(boolean estado) {
+        this.estado = estado;
     }
 } 
