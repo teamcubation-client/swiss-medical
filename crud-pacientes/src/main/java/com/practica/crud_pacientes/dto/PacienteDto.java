@@ -2,6 +2,7 @@ package com.practica.crud_pacientes.dto;
 
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 
 
 @NoArgsConstructor
@@ -13,6 +14,33 @@ public class PacienteDto {
     private String obraSocial;
     private String email;
     private String telefono;
+    private String domicilio;
+    private LocalDate fechaNacimiento;
+    private String estadoCivil;
+
+    public String getEstadoCivil() {
+        return estadoCivil;
+    }
+
+    public void setEstadoCivil(String estadoCivil) {
+        this.estadoCivil = estadoCivil;
+    }
+
+    public String getDomicilio() {
+        return domicilio;
+    }
+
+    public void setDomicilio(String domicilio) {
+        this.domicilio = domicilio;
+    }
+
+    public LocalDate getFechaNacimiento() {
+        return fechaNacimiento;
+    }
+
+    public void setFechaNacimiento(LocalDate fechaNacimiento) {
+        this.fechaNacimiento = fechaNacimiento;
+    }
 
     public void setNombre(String nombre) {
         this.nombre = nombre;
