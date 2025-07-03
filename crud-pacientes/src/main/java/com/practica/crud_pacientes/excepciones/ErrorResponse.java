@@ -1,10 +1,9 @@
 package com.practica.crud_pacientes.excepciones;
 
-import lombok.AllArgsConstructor;
 
 import java.time.LocalDateTime;
 
-@AllArgsConstructor
+
 public class ErrorResponse {
 
     private LocalDateTime fechaHora;
@@ -12,6 +11,14 @@ public class ErrorResponse {
     private String mensaje;
     private String error;
     private String path;
+
+    public ErrorResponse(LocalDateTime fechaHora, int status, String mensaje, String error, String path) {
+        this.fechaHora = fechaHora;
+        this.status = status;
+        this.mensaje = mensaje;
+        this.error = error;
+        this.path = path;
+    }
 
     public String getPath() {
         return path;
