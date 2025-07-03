@@ -19,3 +19,21 @@ Content-Type: application/json
   "phoneNumber": "1234567890",
   "socialSecurity": "Swiss Medical"
 }
+
+### PUT Update Patient
+
+PUT http://localhost:8000/api/patients/1
+Content-Type: application/json
+
+{
+  "firstName": "Albert",
+  "lastName": "Doe",
+  "dni": "40128095",
+  "email": "john123@gmail.com",
+  "phoneNumber": "1234567890",
+  "socialSecurity": "Swiss Medical"
+}
+
+### DELETE Patient
+
+DELETE http://localhost:8000/api/patients/1

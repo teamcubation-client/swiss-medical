@@ -63,3 +63,11 @@ Dividir el proyecto en al menos tres capas:
 - Debe utilizar Spring Boot (versión mínima compatible con Java 11).
 - Se valora el uso de @RestController, @Service, @Repository, DTOs y validaciones simples.
 - El código debe ser claro, legible y estar organizado por paquetes.
+
+# 📝 Check List
+
+- [ x ] Implementar operaciones CRUD a pacientes
+- [ x ] Manejo de excepciones personalizadas
+- [ x ] Dividir el proyecto en capas (Modelo, Controlador, Servicio, Repositorio)
+- [ x ] Uso de DTOs y Mappers
+- [ ] Crear requests de prueba
