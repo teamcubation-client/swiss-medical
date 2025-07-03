@@ -8,14 +8,25 @@ import org.springframework.stereotype.Service;
 import swissmedical.exception.PacienteDuplicadoException;
 import swissmedical.exception.PacienteNotFoundException;
 
+/**
+ * Implementacion del servicio de pacientes
+ * Contiene la logica de negocio para crear, consultar, actualizar y eliminar pacientes
+ */
 @Service
 public class PacienteServiceImpl implements PacienteService {
+
     private final PacienteRepository pacienteRepository;
 
     public PacienteServiceImpl(PacienteRepository pacienteRepository) {
         this.pacienteRepository = pacienteRepository;
     }
 
+    /**
+     * Crea un nuevo paciente en el sistema, con excepcion si el DNI ya existe
+     * @param paciente entidad Paciente a crear
+     * @return paciente creado
+     * @throws PacienteDuplicadoException si ya existe un paciente con el mismo DNI
+     */
     @Override
     public Paciente crearPaciente(Paciente paciente) {
         Paciente pacienteExistente = pacienteRepository.findByDni(paciente.getDni()).orElse(null);
@@ -26,6 +37,12 @@ public class PacienteServiceImpl implements PacienteService {
         return pacienteRepository.save(paciente);
     }
 
+    /**
+     * Obtiene un paciente por su identificador unico, con excepcion si no existe
+     * @param id identificador del paciente
+     * @return paciente encontrado
+     * @throws PacienteNotFoundException si no se encuentra el paciente
+     */
     @Override
     public Paciente obtenerPacientePorId(Long id) {
         Paciente paciente = pacienteRepository.findById(id).orElse(null);
@@ -37,11 +54,20 @@ public class PacienteServiceImpl implements PacienteService {
         return paciente;
     }
 
+    /**
+     * Lista todos los pacientes registrados en el sistema
+     * @return lista de pacientes
+     */
     @Override
     public List<Paciente> listarPacientes() {
         return pacienteRepository.findAll();
     }
 
+    /**
+     * Elimina un paciente por su identificador unico, con excepcion si no existe
+     * @param id identificador del paciente a eliminar
+     * @throws PacienteNotFoundException si no se encuentra el paciente
+     */
     @Override
     public void eliminarPaciente(Long id) {
         boolean existe = pacienteRepository.existsById(id);
@@ -53,12 +79,22 @@ public class PacienteServiceImpl implements PacienteService {
         pacienteRepository.deleteById(id);
     }
 
+    /**
+     * Busca un paciente por su DNI
+     * @param dni Documento Nacional de Identidad
+     * @return paciente encontrado o null si no existe
+     */
     @Override
     public Paciente buscarPorDni(String dni) {
         Paciente paciente = pacienteRepository.findByDni(dni).orElse(null);
         return paciente;
     }
 
+    /**
+     * Busca pacientes cuyo nombre contenga el string especificado
+     * @param nombre parte o nombre completo a buscar
+     * @return lista de pacientes que coinciden con el parametro
+     */
     @Override
     public List<Paciente> buscarPorNombreParcial(String nombre) {
 
@@ -66,6 +102,13 @@ public class PacienteServiceImpl implements PacienteService {
         return pacientes;
     }
 
+    /**
+     * Actualiza los datos de un paciente existente, con excepcion si no existe
+     * @param id identificador del paciente a actualizar
+     * @param paciente entidad Paciente con los nuevos datos
+     * @return paciente actualizado
+     * @throws PacienteNotFoundException si no se encuentra el paciente
+     */
     @Override
     public Paciente actualizarPaciente(Long id, Paciente paciente) {
         Paciente existente = pacienteRepository.findById(id).orElse(null);
