@@ -29,14 +29,14 @@ public class PacienteServiceImpl implements PacienteService {
     @Override
     public PacienteResponseDTO getPacienteByDni(String dni) throws PacienteNoEncontradoException {
         Paciente paciente = pacienteRepository.findByDni(dni)
-                .orElseThrow(() -> new PacienteNoEncontradoException("Paciente no encontrado"));
+                .orElseThrow(() -> new PacienteNoEncontradoException("Paciente no encontrado", 404));
         return PacienteResponseMapper.toDTO(paciente);
     }
 
     @Override
     public PacienteResponseDTO createPaciente(PacienteRequestDTO pacienteRequestDTO) throws PacienteDuplicadoException {
         if (pacienteRepository.existsByDni(pacienteRequestDTO.getDni()))
-            throw new PacienteDuplicadoException("Paciente duplicado");
+            throw new PacienteDuplicadoException("Paciente duplicado", 409);
 
         Paciente paciente = PacienteRequestMapper.toEntity(pacienteRequestDTO);
         return PacienteResponseMapper.toDTO(pacienteRepository.save(paciente));
@@ -46,7 +46,7 @@ public class PacienteServiceImpl implements PacienteService {
     @Override
     public PacienteResponseDTO updatePaciente(String dni, PacienteUpdateDTO pacienteUpdateDTO) throws PacienteNoEncontradoException {
         Paciente paciente = pacienteRepository.findByDni(dni)
-                .orElseThrow(() -> new PacienteNoEncontradoException("Paciente no encontrado"));
+                .orElseThrow(() -> new PacienteNoEncontradoException("Paciente no encontrado", 404));
 
         // mala practica esto? viola O de solid?
         if (pacienteUpdateDTO.getNombre() != null) paciente.setNombre(pacienteUpdateDTO.getNombre());
@@ -61,7 +61,7 @@ public class PacienteServiceImpl implements PacienteService {
     @Override
     public void deletePaciente(String dni) throws PacienteNoEncontradoException {
         Paciente paciente = pacienteRepository.findByDni(dni)
-                .orElseThrow(() -> new PacienteNoEncontradoException("Paciente no encontrado"));
+                .orElseThrow(() -> new PacienteNoEncontradoException("Paciente no encontrado", 404));
         pacienteRepository.delete(paciente);
     }
 
