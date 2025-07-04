@@ -23,7 +23,10 @@ public class PacienteMapper {
             paciente.getDni(),
             paciente.getObraSocial(),
             paciente.getEmail(),
-            paciente.getTelefono()
+            paciente.getTelefono(),
+            paciente.getTipoPlanObraSocial(),
+            paciente.getFechaAlta(),
+            paciente.isEstado()
         );
     }
 
@@ -40,7 +43,10 @@ public class PacienteMapper {
             dto.getDni(),
             dto.getObraSocial(),
             dto.getEmail(),
-            dto.getTelefono()
+            dto.getTelefono(),
+            dto.getTipoPlanObraSocial(),
+            dto.getFechaAlta(),
+            dto.isEstado()
         );
     }
 } 
