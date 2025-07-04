@@ -1,5 +1,9 @@
 package microservice.pacientes.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import microservice.pacientes.dto.PacienteRequestDTO;
 import microservice.pacientes.dto.PacienteResponseDTO;
 import microservice.pacientes.dto.PacienteUpdateDTO;
@@ -20,7 +24,21 @@ public class PacienteController {
     }
 
     @GetMapping
-    public ResponseEntity<List<PacienteResponseDTO>> getPacientes(@RequestParam(required = false) String nombre) {
+    @Operation(
+            summary = "Obtener todos los pacientes",
+            description = "Devuelve los datos de todos los pacientes registrados"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Pacientes encontrados. Incluye lista vacía."),
+            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
+    public ResponseEntity<List<PacienteResponseDTO>> getPacientes(
+            @Parameter(
+                    description = "Nombre parcial o completo para filtrar los pacientes. Opcional.",
+                    required = false
+            )
+            @RequestParam(required = false) String nombre
+    ) {
         if(nombre != null && !nombre.isEmpty()){
             List<PacienteResponseDTO> pacientes = pacienteService.findByNombreContainingIgnoreCase(nombre);
             return ResponseEntity.ok(pacientes);
