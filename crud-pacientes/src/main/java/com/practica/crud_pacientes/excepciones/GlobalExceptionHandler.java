@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(PacienteDuplicadoException.class)
-    public ResponseEntity<?> handlerPacienteDuplicado(PacienteDuplicadoException exception, HttpServletRequest request){
+    public ResponseEntity<ErrorResponse> handlerPacienteDuplicado(PacienteDuplicadoException exception, HttpServletRequest request){
         ErrorResponse error = new ErrorResponse(
                 LocalDateTime.now(),
                 HttpStatus.NOT_FOUND.value(),
@@ -24,7 +24,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(PacienteNoEncontradoException.class)
-    public ResponseEntity<?> handlerPacienteNoEncontrado(PacienteNoEncontradoException exception, HttpServletRequest request){
+    public ResponseEntity<ErrorResponse> handlerPacienteNoEncontrado(PacienteNoEncontradoException exception, HttpServletRequest request){
         ErrorResponse error = new ErrorResponse(
                 LocalDateTime.now(),
                 HttpStatus.NOT_FOUND.value(),
