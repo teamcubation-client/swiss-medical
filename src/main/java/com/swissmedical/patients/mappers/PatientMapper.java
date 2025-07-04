@@ -1,5 +1,7 @@
 package com.swissmedical.patients.mappers;
 
+import java.time.LocalDate;
+
 import com.swissmedical.patients.dto.PatientDto;
 import com.swissmedical.patients.entity.Patient;
 
@@ -17,6 +19,9 @@ public class PatientMapper {
         patient.setPhoneNumber(patientDto.getPhoneNumber());
         patient.setDni(patientDto.getDni());
         patient.setSocialSecurity(patientDto.getSocialSecurity());
+        patient.setMemberNumber(patientDto.getMemberNumber());
+        patient.setBirthDate(LocalDate.parse(patientDto.getBirthDate()));
+        patient.setActive(patientDto.isActive());
 
         return patient;
     }

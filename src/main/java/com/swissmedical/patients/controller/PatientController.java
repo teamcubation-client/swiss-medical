@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.swissmedical.patients.dto.PatientDto;
 import com.swissmedical.patients.entity.Patient;
+import com.swissmedical.patients.exceptions.PatientNotFoundException;
 import com.swissmedical.patients.mappers.PatientMapper;
 import com.swissmedical.patients.service.PatientService;
 
@@ -25,7 +26,7 @@ import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/patients")
-public class PatientController {
+public class PatientController implements PatientApi {
 
     private final PatientService patientService;
 
@@ -33,14 +34,9 @@ public class PatientController {
         this.patientService = patientService;
     }
 
+    @Override
     @GetMapping()
-    @Operation(summary = "Obtener una lista con todos los pacientes o buscar por nombre")
-    @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "Lista de pacientes obtenida correctamente"),
-        @ApiResponse(responseCode = "404", description = "No se encontraron pacientes con el nombre especificado"),
-        @ApiResponse(responseCode = "500", description = "Error interno del servidor al obtener la lista de pacientes")
-    })
-    public ResponseEntity<List<Patient>> getMethodName(@RequestParam(defaultValue = "") String name) {
+    public ResponseEntity<List<Patient>> getMethodName(@RequestParam(defaultValue = "") String name) throws Exception {
         if (name.isEmpty()) {
             List<Patient> patients = patientService.getAllPatients();
             return ResponseEntity.ok(patients);
@@ -49,7 +45,7 @@ public class PatientController {
         List<Patient> patients = patientService.getPatientByFirstNameOrLastName(name, name);
 
         if (patients.isEmpty()) {
-            return ResponseEntity.notFound().build();
+            throw new PatientNotFoundException("No se encontraron pacientes con el nombre: " + name);
         }
 
         return ResponseEntity.ok(patients);
@@ -95,6 +91,7 @@ public class PatientController {
         @ApiResponse(responseCode = "500", description = "Error interno del servidor al actualizar el paciente")
     })
     public ResponseEntity<Patient> updatePatient(@RequestBody PatientDto patientDto, @PathVariable Long id) {
+        patientDto.setActive(false);
         Patient patient = PatientMapper.toEntity(patientDto);
 
         if (patient == null) {

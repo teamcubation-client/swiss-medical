@@ -30,6 +30,15 @@ public class PatientDto {
     @Size(min = 8, max = 10, message = "DNI must be between 8 and 15 characters")
     public String dni;
 
+    @NotNull(message = "Member number cannot be null")
+    @Size(min = 5, max = 15, message = "Member number must be between 5 and 15 characters")
+    public String memberNumber;
+
+    @NotNull(message = "Birth date cannot be null")
+    public String birthDate;
+
+    public boolean isActive;
+
     @NotNull(message = "Social Security cannot be null")
     public String socialSecurity;
 }
