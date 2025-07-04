@@ -14,13 +14,17 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 public class GlobalHandlerException {
 
     @ExceptionHandler(PatientNotFoundException.class)
-    public String handlePatientNotFoundException(PatientNotFoundException ex) {
-        return ex.getMessage();
+    public ResponseEntity<Map<String, String>> handlePatientNotFoundException(PatientNotFoundException ex) {
+        Map<String, String> errorResponse = new HashMap<>();
+        errorResponse.put("error", ex.getMessage());
+        return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(PatientDuplicateException.class)
-    public String handlePatientDuplicateException(PatientDuplicateException ex) {
-        return ex.getMessage();
+    public ResponseEntity<Map<String, String>> handlePatientDuplicateException(PatientDuplicateException ex) {
+        Map<String, String> errorResponse = new HashMap<>();
+        errorResponse.put("error", ex.getMessage());
+        return new ResponseEntity<>(errorResponse, HttpStatus.CONFLICT);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -30,6 +34,13 @@ public class GlobalHandlerException {
             errors.put(error.getField(), error.getDefaultMessage());
         }
         return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<Map<String, String>> handleGenericException(Exception ex) {
+        Map<String, String> errorResponse = new HashMap<>();
+        errorResponse.put("error", "An unexpected error occurred: " + ex.getMessage());
+        return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
 }
