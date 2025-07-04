@@ -28,13 +28,13 @@ public class PacienteControlador {
     }
 
     @GetMapping("/buscar-por-id/{idPaciente}")
-    public ResponseEntity<?> getPaciente(@PathVariable Integer idPaciente) {
+    public ResponseEntity<PacienteDto> getPaciente(@PathVariable Integer idPaciente) {
         PacienteDto pacienteEncontrado = pacienteServicio.getPacientePorId(idPaciente);
         return new ResponseEntity<>(pacienteEncontrado, HttpStatus.OK);
     }
 
     @GetMapping("/buscar-por-dni")
-    public ResponseEntity<?> getPacientePorDni(@RequestParam String dni){
+    public ResponseEntity<PacienteDto> getPacientePorDni(@RequestParam String dni){
         PacienteDto pacienteEncontrado = pacienteServicio.getPacientePorDni(dni);
         return new ResponseEntity<>(pacienteEncontrado, HttpStatus.OK);
     }
@@ -46,19 +46,19 @@ public class PacienteControlador {
     }
 
     @PostMapping("/nuevo-paciente")
-    public ResponseEntity<?> agregarPaciente(@RequestBody PacienteDto pacienteNuevo){
+    public ResponseEntity<PacienteDto> agregarPaciente(@RequestBody PacienteDto pacienteNuevo){
         PacienteDto nuevoPaciente = pacienteServicio.addPaciente(pacienteNuevo);
         return new ResponseEntity<>(nuevoPaciente, HttpStatus.CREATED);
     }
 
     @PutMapping("actualizar/{idPaciente}")
-    public ResponseEntity<?> actualizarPaciente(@PathVariable Integer idPaciente, @RequestBody PacienteDto paciente) {
+    public ResponseEntity<PacienteDto> actualizarPaciente(@PathVariable Integer idPaciente, @RequestBody PacienteDto paciente) {
         PacienteDto pacienteActualizado = pacienteServicio.updatePaciente(idPaciente, paciente);
-        return new ResponseEntity<>(pacienteActualizado, HttpStatus.OK);
+        return ResponseEntity.ok(pacienteActualizado);
     }
 
     @DeleteMapping("eliminar/{idPaciente}")
-    public ResponseEntity<?> eliminarPaciente(@PathVariable Integer idPaciente) {
+    public ResponseEntity<Void> eliminarPaciente(@PathVariable Integer idPaciente) {
         pacienteServicio.deletePaciente(idPaciente);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
