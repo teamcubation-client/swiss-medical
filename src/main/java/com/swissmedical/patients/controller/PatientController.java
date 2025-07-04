@@ -2,6 +2,8 @@ package com.swissmedical.patients.controller;
 
 import java.util.List;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,6 +21,9 @@ import com.swissmedical.patients.exceptions.PatientNotFoundException;
 import com.swissmedical.patients.mappers.PatientMapper;
 import com.swissmedical.patients.service.PatientService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 
 @RestController
@@ -32,6 +37,12 @@ public class PatientController {
     }
 
     @GetMapping()
+    @Operation(summary = "Obtener una lista con todos los pacientes o buscar por nombre")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Lista de pacientes obtenida correctamente"),
+        @ApiResponse(responseCode = "404", description = "No se encontraron pacientes con el nombre especificado"),
+        @ApiResponse(responseCode = "500", description = "Error interno del servidor al obtener la lista de pacientes")
+    })
     public ResponseEntity<List<Patient>> getMethodName(@RequestParam(defaultValue = "") String name) {
         if (name.isEmpty()) {
             List<Patient> patients = patientService.getAllPatients();
@@ -48,6 +59,12 @@ public class PatientController {
     }
 
     @GetMapping("/{dni}")
+    @Operation(summary = "Obtener un paciente por su DNI")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Paciente encontrado"),
+        @ApiResponse(responseCode = "404", description = "Paciente no encontrado con el DNI especificado"),
+        @ApiResponse(responseCode = "500", description = "Error interno del servidor al obtener el paciente")
+    })
     public ResponseEntity<Patient> getPatientByDni(@PathVariable String dni) {
         try {
             Patient patient = patientService.getPatientByDni(dni);
@@ -60,6 +77,12 @@ public class PatientController {
     }
 
     @PostMapping()
+    @Operation(summary = "Crear un nuevo paciente")
+    @ApiResponses({
+        @ApiResponse(responseCode = "201", description = "Paciente creado correctamente"),
+        @ApiResponse(responseCode = "400", description = "Solicitud inválida, datos del paciente incorrectos"),
+        @ApiResponse(responseCode = "500", description = "Error interno del servidor al crear el paciente")
+    })
     public ResponseEntity<?> createPatient(@Valid @RequestBody PatientDto patientDto) {
         Patient patient = PatientMapper.toEntity(patientDto);
 
@@ -77,6 +100,13 @@ public class PatientController {
     }
 
     @PutMapping("/{id}")
+    @Operation(summary = "Actualizar un paciente existente")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Paciente actualizado correctamente"),
+        @ApiResponse(responseCode = "400", description = "Solicitud inválida, datos del paciente incorrectos"),
+        @ApiResponse(responseCode = "404", description = "Paciente no encontrado con el ID especificado"),
+        @ApiResponse(responseCode = "500", description = "Error interno del servidor al actualizar el paciente")
+    })
     public ResponseEntity<Patient> updatePatient(@RequestBody PatientDto patientDto, @PathVariable Long id) {
         Patient patient = PatientMapper.toEntity(patientDto);
 
@@ -95,6 +125,12 @@ public class PatientController {
     }
 
     @DeleteMapping("/{id}")
+    @Operation(summary = "Eliminar un paciente por su ID")
+    @ApiResponses({
+        @ApiResponse(responseCode = "204", description = "Paciente eliminado correctamente"),
+        @ApiResponse(responseCode = "404", description = "Paciente no encontrado con el ID especificado"),
+        @ApiResponse(responseCode = "500", description = "Error interno del servidor al eliminar el paciente")
+    })
     public ResponseEntity<Void> deletePatient(@PathVariable Long id) {
         try {
             patientService.deletePatient(id);
