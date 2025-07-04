@@ -40,7 +40,9 @@ public class PatientService {
     }
 
     public List<Patient> getPatientByFirstNameOrLastName(String firstName, String lastName) {
-        return patientRepository.findByFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCase(firstName, lastName);
+        List<Patient> patients = patientRepository.findByFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCase(firstName, lastName);
+
+        return patients;
     }
 
     public Patient createPatient(Patient patient) {
