@@ -2,6 +2,7 @@ package com.teamcubation.api.pacientes.service;
 
 import com.teamcubation.api.pacientes.dto.PacienteRequest;
 import com.teamcubation.api.pacientes.dto.PacienteResponse;
+import com.teamcubation.api.pacientes.exception.PacienteDuplicadoException;
 import com.teamcubation.api.pacientes.exception.PacienteNoEncontradoException;
 import com.teamcubation.api.pacientes.model.Paciente;
 import com.teamcubation.api.pacientes.repository.IPacienteRepository;
@@ -23,6 +24,12 @@ public class PacienteService implements IPacienteService {
 
     @Override
     public PacienteResponse crearPaciente(PacienteRequest request) {
+        Optional<Paciente> existente = pacienteRepository.buscarPorDNI(request.getDni());
+
+        if (existente.isPresent()) {
+            throw new PacienteDuplicadoException("DNI", request.getDni());
+        }
+
         Paciente paciente = mapToEntity(request);
         Paciente pacienteGuardado = pacienteRepository.guardar(paciente);
         PacienteResponse response = mapToResponse(pacienteGuardado);

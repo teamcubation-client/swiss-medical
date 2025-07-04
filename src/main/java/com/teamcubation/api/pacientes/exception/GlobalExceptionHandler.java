@@ -18,4 +18,9 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handlePacienteNotFound(PacienteNoEncontradoException ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
     }
+
+    @ExceptionHandler(PacienteDuplicadoException.class)
+    public ResponseEntity<String> handlePacienteDuplicado(PacienteDuplicadoException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
+    }
 }

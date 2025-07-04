@@ -75,6 +75,27 @@ public class PacienteRepository implements IPacienteRepository {
     }
 
     @Override
+    public Optional<Paciente> buscarPorDNI(String dni) {
+        String sql = "SELECT * FROM pacientes WHERE dni = ?";
+        List<Paciente> resultados = jdbcTemplate.query(sql, new Object[]{dni}, new RowMapper<Paciente>() {
+            @Override
+            public Paciente mapRow(ResultSet rs, int rowNum) throws SQLException {
+                Paciente paciente = new Paciente();
+                paciente.setId(rs.getLong("id"));
+                paciente.setNombre(rs.getString("nombre"));
+                paciente.setApellido(rs.getString("apellido"));
+                paciente.setDni(rs.getString("dni"));
+                paciente.setObraSocial(rs.getString("obra_social"));
+                paciente.setEmail(rs.getString("email"));
+                paciente.setTelefono(rs.getString("telefono"));
+                return paciente;
+            }
+        });
+
+        return resultados.stream().findFirst();
+    }
+
+    @Override
     public List<Paciente> buscarTodos() {
         String sql = "SELECT * FROM pacientes";
         return jdbcTemplate.query(sql, new RowMapper<Paciente>() {
