@@ -30,8 +30,8 @@ public class PacienteService implements IPacienteService {
     }
 
     @Override
-    public List<PacienteResponse> obtenerPacientes() {
-        List<Paciente> pacientes = this.pacienteRepository.buscarTodos();
+    public List<PacienteResponse> obtenerPacientes(String dni, String nombre) {
+        List<Paciente> pacientes = this.pacienteRepository.buscarTodos(dni, nombre);
         List<PacienteResponse> response = new ArrayList<>();
         for (Paciente paciente : pacientes) {
             PacienteResponse pacienteResponse = mapToResponse(paciente);

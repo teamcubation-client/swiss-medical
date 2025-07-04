@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface IPacienteService {
     PacienteResponse crearPaciente(PacienteRequest request);
-    List<PacienteResponse> obtenerPacientes();
+    List<PacienteResponse> obtenerPacientes(String dni, String nombre);
     PacienteResponse obtenerPacientePorId(Long id);
     PacienteResponse actualizarPaciente(Long id, PacienteRequest request);
     void borrarPaciente(Long id);

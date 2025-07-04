@@ -12,6 +12,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -75,9 +76,21 @@ public class PacienteRepository implements IPacienteRepository {
     }
 
     @Override
-    public List<Paciente> buscarTodos() {
-        String sql = "SELECT * FROM pacientes";
-        return jdbcTemplate.query(sql, new RowMapper<Paciente>() {
+    public List<Paciente> buscarTodos(String dni, String nombre) {
+        StringBuilder sql = new StringBuilder("SELECT * FROM pacientes WHERE 1=1");
+        List<Object> params = new ArrayList<>();
+
+        if (dni != null && !dni.isEmpty()) {
+            sql.append(" AND dni = ?");
+            params.add(dni);
+        }
+
+        if (nombre != null && !nombre.isEmpty()) {
+            sql.append(" AND LOWER(nombre) LIKE ?");
+            params.add("%" + nombre.toLowerCase() + "%");
+        }
+
+        return jdbcTemplate.query(sql.toString(), params.toArray(), new RowMapper<Paciente>() {
             @Override
             public Paciente mapRow(ResultSet rs, int rowNum) throws SQLException {
                 Paciente paciente = new Paciente();

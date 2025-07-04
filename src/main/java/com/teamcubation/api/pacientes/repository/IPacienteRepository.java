@@ -8,7 +8,7 @@ import java.util.Optional;
 public interface IPacienteRepository {
     Paciente guardar(Paciente paciente);
     Optional<Paciente> buscarPorId(Long id);
-    List<Paciente> buscarTodos();
+    List<Paciente> buscarTodos(String dni, String nombre);
     boolean actualizar(Paciente paciente);
     boolean borrar(Long id);
 }
