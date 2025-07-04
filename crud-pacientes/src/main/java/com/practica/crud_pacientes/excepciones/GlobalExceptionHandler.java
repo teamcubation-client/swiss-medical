@@ -34,4 +34,18 @@ public class GlobalExceptionHandler {
         );
         return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
     }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorResponse> handlerExcepcionGenerica(Exception exception, HttpServletRequest request){
+        String mensaje = "Ocurrió un error inesperado";
+        ErrorResponse error = new ErrorResponse(
+                LocalDateTime.now(),
+                HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                mensaje,
+                HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
+                request.getContextPath()
+        );
+
+        return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 }
