@@ -70,6 +70,10 @@ public class PacienteServicioImpl implements IPacienteServicio {
         pacienteRepositorio.findById(idPaciente)
                 .orElseThrow(PacienteNoEncontradoException::new);
 
+        Paciente pacienteExistente = pacienteRepositorio.findByDni(pacienteDto.getDni());
+        if(pacienteExistente != null && !pacienteExistente.getIdPaciente().equals(idPaciente))
+            throw new PacienteDuplicadoException();
+
         Paciente pacienteActualizado = PacienteMapper.mapper.pacienteDtoToPaciente(pacienteDto);
         pacienteActualizado.setIdPaciente(idPaciente);
 
