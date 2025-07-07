@@ -7,7 +7,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import microservice.pacientes.dto.PacienteRequestDTO;
 import microservice.pacientes.dto.PacienteResponseDTO;
 import microservice.pacientes.dto.PacienteUpdateDTO;
+import microservice.pacientes.model.Paciente;
 import microservice.pacientes.service.PacienteService;
+import microservice.pacientes.util.PacienteResponseMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,36 +28,40 @@ public class PacienteControllerImpl implements PacienteController {
 
     @GetMapping
     public ResponseEntity<List<PacienteResponseDTO>> getAll(@RequestParam(required = false) String nombre) {
-        List<PacienteResponseDTO> pacientes;
+        List<Paciente> pacientes;
         if(nombre != null){
             pacientes = pacienteService.findByNombreContainingIgnoreCase(nombre);
         } else {
-            pacientes = pacienteService.getPacientes();
+            pacientes = pacienteService.getAll();
         }
-        return ResponseEntity.ok(pacientes);
+        List<PacienteResponseDTO> pacientesResponseDTO = PacienteResponseMapper.toDTO(pacientes);
+        return ResponseEntity.ok(pacientesResponseDTO);
     }
 
     @GetMapping("/{dni}")
     public ResponseEntity<PacienteResponseDTO> getByDni(@PathVariable String dni) {
-        PacienteResponseDTO paciente = pacienteService.getPacienteByDni(dni);
-        return ResponseEntity.ok(paciente);
+        Paciente paciente = pacienteService.getByDni(dni);
+        PacienteResponseDTO pacienteResponseDTO = PacienteResponseMapper.toDTO(paciente);
+        return ResponseEntity.ok(pacienteResponseDTO);
     }
 
     @PostMapping
     public ResponseEntity<PacienteResponseDTO> create(@RequestBody PacienteRequestDTO pacienteRequestDTO) {
-        PacienteResponseDTO paciente = pacienteService.createPaciente(pacienteRequestDTO);
-        return ResponseEntity.status(HttpStatus.CREATED).body(paciente);
+        Paciente paciente = pacienteService.create(pacienteRequestDTO);
+        PacienteResponseDTO pacienteResponseDTO = PacienteResponseMapper.toDTO(paciente);
+        return ResponseEntity.status(HttpStatus.CREATED).body(pacienteResponseDTO);
     }
 
     @PutMapping("/{dni}")
     public ResponseEntity<PacienteResponseDTO> update(@PathVariable String dni, @RequestBody PacienteUpdateDTO pacienteUpdateDTO) {
-        PacienteResponseDTO pacienteResponseDTO = pacienteService.updatePaciente(dni, pacienteUpdateDTO);
+        Paciente paciente = pacienteService.update(dni, pacienteUpdateDTO);
+        PacienteResponseDTO pacienteResponseDTO = PacienteResponseMapper.toDTO(paciente);
         return ResponseEntity.ok(pacienteResponseDTO);
     }
 
     @DeleteMapping("/{dni}")
     public ResponseEntity<Void> delete(@PathVariable String dni) {
-        pacienteService.deletePaciente(dni);
+        pacienteService.delete(dni);
         return ResponseEntity.noContent().build();
     }
 
