@@ -4,6 +4,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import swissmedical.dto.PacienteDTO;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -14,6 +16,8 @@ import swissmedical.model.Paciente;
 import swissmedical.service.PacienteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import swissmedical.mapper.PacienteMapper;
+
+import javax.validation.Valid;
 
 /**
  * Controlador REST para la gestion de pacientes
@@ -40,17 +44,16 @@ public class PacienteController {
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Pacientes listados exitosamente"),
-            @ApiResponse(responseCode = "204", description = "No hay pacientes dados de alta"),
             @ApiResponse(responseCode = "500", description = "Error del sistema")
     })
     @GetMapping
-    public List<PacienteDTO> listarPacientes() {
+    public ResponseEntity<List<PacienteDTO>> listarPacientes() {
         List<Paciente> pacientes = pacienteService.listarPacientes();
         List<PacienteDTO> dtos = new ArrayList<>();
         for (Paciente paciente : pacientes) {
             dtos.add(pacienteMapper.toDTO(paciente));
         }
-        return dtos;
+        return ResponseEntity.ok(dtos);
     }
     
     /**
@@ -65,14 +68,13 @@ public class PacienteController {
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Paciente creado exitosamente"),
-            @ApiResponse(responseCode = "400", description = "Datos inválidos"),
             @ApiResponse(responseCode = "500", description = "Error del sistema")
     })
     @PostMapping
-    public PacienteDTO crearPaciente(@RequestBody PacienteDTO pacienteDTO) {
+    public ResponseEntity<PacienteDTO> crearPaciente(@Valid @RequestBody PacienteDTO pacienteDTO) {
         Paciente paciente = pacienteMapper.toEntity(pacienteDTO);
         Paciente creado = pacienteService.crearPaciente(paciente);
-        return pacienteMapper.toDTO(creado);
+        return ResponseEntity.status(HttpStatus.CREATED).body(pacienteMapper.toDTO(creado));
     }
 
     /**
@@ -88,16 +90,15 @@ public class PacienteController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Paciente encontrado exitosamente"),
             @ApiResponse(responseCode = "404", description = "No existe el paciente con el ID"),
-            @ApiResponse(responseCode = "400", description = "Formato invalido de ID"),
             @ApiResponse(responseCode = "500", description = "Error del sistema")
     })
     @GetMapping("/{id}")
-    public PacienteDTO obtenerPaciente(@PathVariable Long id) {
+    public ResponseEntity<PacienteDTO> obtenerPaciente(@PathVariable Long id) {
         Paciente paciente = pacienteService.obtenerPacientePorId(id);
         if (paciente != null) {
-            return pacienteMapper.toDTO(paciente);
+            return ResponseEntity.ok(pacienteMapper.toDTO(paciente));
         } else {
-            return null;
+            return ResponseEntity.notFound().build();
         }
     }
     
@@ -111,14 +112,14 @@ public class PacienteController {
             tags = {"Paciente"}
     )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Paciente eliminado exitosamente"),
+            @ApiResponse(responseCode = "204", description = "Paciente eliminado exitosamente"),
             @ApiResponse(responseCode = "404", description = "No existe el paciente con el ID"),
-            @ApiResponse(responseCode = "400", description = "Formato invalido de ID"),
             @ApiResponse(responseCode = "500", description = "Error del sistema")
     })
     @DeleteMapping("/{id}")
-    public void eliminarPaciente(@PathVariable Long id) {
+    public ResponseEntity<Void> eliminarPaciente(@PathVariable Long id) {
         pacienteService.eliminarPaciente(id);
+        return ResponseEntity.noContent().build();
     }
 
     /**
@@ -134,16 +135,15 @@ public class PacienteController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Paciente encontrado exitosamente"),
             @ApiResponse(responseCode = "404", description = "No existe el paciente con el DNI"),
-            @ApiResponse(responseCode = "400", description = "Formato invalido de DNI"),
             @ApiResponse(responseCode = "500", description = "Error del sistema")
     })
     @GetMapping("/buscar/dni")
-    public PacienteDTO buscarPorDni(@RequestParam String dni) {
+    public ResponseEntity<PacienteDTO> buscarPorDni(@RequestParam String dni) {
         Paciente paciente = pacienteService.buscarPorDni(dni);
         if (paciente != null) {
-            return pacienteMapper.toDTO(paciente);
+            return ResponseEntity.ok(pacienteMapper.toDTO(paciente));
         } else {
-            return null;
+            return ResponseEntity.notFound().build();
         }
     }
 
@@ -160,18 +160,19 @@ public class PacienteController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Paciente encontrado exitosamente"),
             @ApiResponse(responseCode = "404", description = "No existe el paciente con el nombre"),
-            @ApiResponse(responseCode = "400", description = "Formato invalido de nombre"),
             @ApiResponse(responseCode = "500", description = "Error del sistema")
     })
     @GetMapping("/buscar/nombre")
-    public List<PacienteDTO> buscarPorNombre(@RequestParam String nombre) {
+    public ResponseEntity<List<PacienteDTO>> buscarPorNombre(@RequestParam String nombre) {
         List<Paciente> pacientes = pacienteService.buscarPorNombreParcial(nombre);
         List<PacienteDTO> pacienteDTOs = new ArrayList<>();
         for (Paciente paciente : pacientes) {
             pacienteDTOs.add(pacienteMapper.toDTO(paciente));
         }
-        return pacienteDTOs;
+        return ResponseEntity.ok(pacienteDTOs);
     }
+
+
 
     /**
      * Actualiza los datos de un paciente existente
@@ -187,18 +188,16 @@ public class PacienteController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Paciente actualizado exitosamente"),
             @ApiResponse(responseCode = "404", description = "No existe el paciente con el ID"),
-            @ApiResponse(responseCode = "400", description = "Cuerpo invalido o ID invalido"),
             @ApiResponse(responseCode = "500", description = "Error del sistema")
     })
     @PutMapping("/{id}")
-    public PacienteDTO actualizarPaciente(@PathVariable Long id, @RequestBody PacienteDTO pacienteDTO) {
+    public ResponseEntity<PacienteDTO> actualizarPaciente(@PathVariable Long id, @RequestBody PacienteDTO pacienteDTO) {
         Paciente paciente = pacienteMapper.toEntity(pacienteDTO);
         Paciente actualizado = pacienteService.actualizarPaciente(id, paciente);
-
         if (actualizado != null) {
-            return pacienteMapper.toDTO(actualizado);
+            return ResponseEntity.ok(pacienteMapper.toDTO(actualizado));
         } else {
-            return null;
+            return ResponseEntity.notFound().build();
         }
     }
 } 
