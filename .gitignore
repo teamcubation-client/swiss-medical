@@ -1,67 +1,33 @@
-# Ignore everything under gradle/ except the wrapper
-.gradle/*
-build/*
-.idea/*
-gradle/*
-!gradle/wrapper/
-!gradle/wrapper/gradle-wrapper.jar
-
-# Compiled class files
-*.class
-
-# Log files
-*.log
-
-# Temporary files
-*.tmp
-
-# Maven
+HELP.md
 target/
+.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
 
-# Gradle
-.gradle/
-build/
-!gradle/wrapper/gradle-wrapper.jar
-
-# IntelliJ IDEA
-.idea/
-*.iml
-*.iws
-out/
-
-# Eclipse
-.project
+### STS ###
+.apt_generated
 .classpath
-.settings/
-bin/
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
 
-# VS Code
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### VS Code ###
 .vscode/
-
-# OS generated files
-.DS_Store
-Thumbs.db
-
-# Logs
-logs/
-*.log
-hs_err_pid*
-
-# Spring Boot specific
-# Exclude local environment properties
-src/main/resources/application-local.properties
-.env
-
-# Database files
-*.h2.db
-*.mv.db
-
-# Node / Frontend tools (if you use npm/yarn in your project)
-node_modules/
-dist
-/.gradle
-/.gradle
-/.gradle/8.14.2
-/.gradle
-/build
-/.idea
