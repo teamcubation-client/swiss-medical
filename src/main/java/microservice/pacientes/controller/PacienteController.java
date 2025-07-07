@@ -7,23 +7,11 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import microservice.pacientes.dto.PacienteRequestDTO;
 import microservice.pacientes.dto.PacienteResponseDTO;
 import microservice.pacientes.dto.PacienteUpdateDTO;
-import microservice.pacientes.service.PacienteService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
-@RestController
-@RequestMapping("/pacientes")
-public class PacienteController {
+public interface PacienteController {
 
-    private final PacienteService pacienteService;
-
-    public PacienteController(PacienteService pacienteService) {
-        this.pacienteService = pacienteService;
-    }
-
-    @GetMapping
     @Operation(
             summary = "Obtener todos los pacientes",
             description = "Devuelve los datos de todos los pacientes registrados"
@@ -32,44 +20,62 @@ public class PacienteController {
             @ApiResponse(responseCode = "200", description = "Pacientes encontrados. Incluye lista vacía."),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
-    public ResponseEntity<List<PacienteResponseDTO>> getPacientes(
+    ResponseEntity<List<PacienteResponseDTO>> getPacientes(
             @Parameter(
                     description = "Nombre parcial o completo para filtrar los pacientes. Opcional.",
                     required = false
             )
-            @RequestParam(required = false) String nombre
-    ) {
-        if(nombre != null && !nombre.isEmpty()){
-            List<PacienteResponseDTO> pacientes = pacienteService.findByNombreContainingIgnoreCase(nombre);
-            return ResponseEntity.ok(pacientes);
-        } else {
-            List<PacienteResponseDTO> pacientes = pacienteService.getPacientes();
-            return ResponseEntity.ok(pacientes);
-        }
-    }
+            String nombre
+    );
 
-    @GetMapping("/{dni}")
-    public ResponseEntity<PacienteResponseDTO> getPacienteByDni(@PathVariable String dni) {
-        PacienteResponseDTO paciente = pacienteService.getPacienteByDni(dni);
-        return ResponseEntity.ok(paciente);
-    }
+    @Operation(
+            summary = "Obtener un paciente según su DNI",
+            description = "Devuelve los datos del paciente buscado por DNI"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Paciente encontrado"),
+            @ApiResponse(responseCode = "204", description = "Paciente no encontrado"),
+            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
+    ResponseEntity<PacienteResponseDTO> getPacienteByDni(
+            @Parameter(
+                    description = "DNI del paciente",
+                    required = true
+            )
+            String dni
+    );
 
-    @PostMapping
-    public ResponseEntity<PacienteResponseDTO> createPaciente(@RequestBody PacienteRequestDTO pacienteRequestDTO) {
-        PacienteResponseDTO paciente = pacienteService.createPaciente(pacienteRequestDTO);
-        return ResponseEntity.ok(paciente);
-    }
+    @Operation(
+            summary = "Crea un nuevo paciente",
+            description = "Devuelve los datos del paciente creado"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Paciente creado"),
+            @ApiResponse(responseCode = "409", description = "Paciente duplicado"),
+            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
+    ResponseEntity<PacienteResponseDTO> createPaciente(PacienteRequestDTO pacienteRequestDTO);
 
-    @PutMapping("/{dni}")
-    public ResponseEntity<PacienteResponseDTO> updatePaciente(@PathVariable String dni, @RequestBody PacienteUpdateDTO pacienteUpdateDTO) {
-        PacienteResponseDTO paciente = pacienteService.updatePaciente(dni, pacienteUpdateDTO);
-        return ResponseEntity.ok(paciente);
-    }
+    @Operation(
+            summary = "Actualiza parcial o totalmente un paciente",
+            description = "Devuelve los datos del paciente actualizado"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Paciente actualizado"),
+            @ApiResponse(responseCode = "204", description = "Paciente no encontrado"),
+            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
+    ResponseEntity<PacienteResponseDTO> updatePaciente(String dni, PacienteUpdateDTO pacienteUpdateDTO);
 
-    @DeleteMapping("/{dni}")
-    public ResponseEntity<Void> deletePaciente(@PathVariable String dni) {
-        pacienteService.deletePaciente(dni);
-        return ResponseEntity.noContent().build();
-    }
+    @Operation(
+            summary = "Elimina un paciente"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Paciente eliminado"),
+            @ApiResponse(responseCode = "204", description = "Paciente no encontrado"),
+            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
+    ResponseEntity<Void> deletePaciente(String dni);
+
 
 }
