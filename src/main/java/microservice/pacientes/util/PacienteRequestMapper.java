@@ -1,7 +1,6 @@
 package microservice.pacientes.util;
 
-import microservice.pacientes.dto.PacienteRequestDTO;
-import microservice.pacientes.dto.PacienteResponseDTO;
+import microservice.pacientes.controller.dto.PacienteRequestDTO;
 import microservice.pacientes.model.Paciente;
 
 import java.util.List;

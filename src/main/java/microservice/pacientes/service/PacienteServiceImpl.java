@@ -1,14 +1,12 @@
 package microservice.pacientes.service;
 
-import microservice.pacientes.dto.PacienteRequestDTO;
-import microservice.pacientes.dto.PacienteResponseDTO;
-import microservice.pacientes.dto.PacienteUpdateDTO;
+import microservice.pacientes.controller.dto.PacienteRequestDTO;
+import microservice.pacientes.controller.dto.PacienteUpdateDTO;
 import microservice.pacientes.exception.PacienteDuplicadoException;
 import microservice.pacientes.exception.PacienteNoEncontradoException;
 import microservice.pacientes.model.Paciente;
 import microservice.pacientes.repository.PacienteRepository;
 import microservice.pacientes.util.PacienteRequestMapper;
-import microservice.pacientes.util.PacienteResponseMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

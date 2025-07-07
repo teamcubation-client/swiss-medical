@@ -1,17 +1,19 @@
-package microservice.pacientes.dto;
+package microservice.pacientes.controller.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Getter
-@Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class PacienteResponseDTO {
+@Getter
+@Setter
+public class PacienteRequestDTO {
     private String dni;
     private String nombre;
     private String apellido;
     private String obraSocial;
+    private String email;
+    private String telefono;
 }

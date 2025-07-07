@@ -4,9 +4,9 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import microservice.pacientes.dto.PacienteRequestDTO;
-import microservice.pacientes.dto.PacienteResponseDTO;
-import microservice.pacientes.dto.PacienteUpdateDTO;
+import microservice.pacientes.controller.dto.PacienteRequestDTO;
+import microservice.pacientes.controller.dto.PacienteResponseDTO;
+import microservice.pacientes.controller.dto.PacienteUpdateDTO;
 import org.springframework.http.ResponseEntity;
 import java.util.List;
 
