@@ -2,6 +2,7 @@ package com.practica.crud_pacientes.controlador;
 
 import com.practica.crud_pacientes.dto.PacienteDto;
 import com.practica.crud_pacientes.servicio.IPacienteServicio;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -30,19 +31,19 @@ public class PacienteControlador {
     }
 
     @GetMapping("/buscar-por-dni")
-    public ResponseEntity<PacienteDto> getPacientePorDni(@RequestParam String dni){
+    public ResponseEntity<PacienteDto> getPacientePorDni(@RequestParam @Valid String dni){
         PacienteDto pacienteEncontrado = pacienteServicio.getPacientePorDni(dni);
         return ResponseEntity.ok(pacienteEncontrado);
     }
 
     @GetMapping("/buscar-por-nombre")
-    public ResponseEntity<List<PacienteDto>> getPacientePorNombre(@RequestParam String nombre){
+    public ResponseEntity<List<PacienteDto>> getPacientePorNombre(@RequestParam @Valid String nombre){
         List<PacienteDto> pacientesEncontrados = pacienteServicio.getPacientePorNombre(nombre);
         return ResponseEntity.ok(pacientesEncontrados);
     }
 
     @PostMapping("/nuevo-paciente")
-    public ResponseEntity<PacienteDto> agregarPaciente(@RequestBody PacienteDto pacienteNuevo){
+    public ResponseEntity<PacienteDto> agregarPaciente(@RequestBody @Valid PacienteDto pacienteNuevo){
         PacienteDto nuevoPaciente = pacienteServicio.addPaciente(pacienteNuevo);
         return ResponseEntity.status(HttpStatus.CREATED).body(nuevoPaciente);
     }
