@@ -59,3 +59,9 @@ src/main/resources/application-local.properties
 # Node / Frontend tools (if you use npm/yarn in your project)
 node_modules/
 dist
+/.gradle
+/.gradle
+/.gradle/8.14.2
+/.gradle
+/build
+/.idea
