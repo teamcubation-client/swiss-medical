@@ -30,4 +30,14 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handlePacienteDuplicado(PacienteDuplicadoException ex) {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
+
+    /**
+     * Maneja cualquier otra excepción no contemplada
+     * @param ex excepción genérica
+     * @return respuesta HTTP 500 con el mensaje de error
+     */
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<String> handleGlobalException(Exception ex) {
+        return new ResponseEntity<>("Ha ocurrido un error inesperado: " + ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 } 
