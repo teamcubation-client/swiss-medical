@@ -5,14 +5,13 @@ import lombok.*;
 
 import java.time.LocalDate;
 
-@Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
 public class Paciente {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer idPaciente;
+    private int id;
     private String nombre;
     private String apellido;
 
@@ -49,8 +48,8 @@ public class Paciente {
         this.fechaNacimiento = fechaNacimiento;
     }
 
-    public Integer getIdPaciente() {
-        return idPaciente;
+    public int getId() {
+        return id;
     }
 
     public String getNombre() {
@@ -77,8 +76,8 @@ public class Paciente {
         return telefono;
     }
 
-    public void setIdPaciente(Integer idPaciente) {
-        this.idPaciente = idPaciente;
+    public void setId(int idPaciente) {
+        this.id = idPaciente;
     }
 
     public void setNombre(String nombre) {
