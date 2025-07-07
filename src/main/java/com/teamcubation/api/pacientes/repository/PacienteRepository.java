@@ -48,7 +48,7 @@ public class PacienteRepository implements IPacienteRepository {
     }
 
     @Override
-    public Optional<Paciente> buscarPorId(Long id) {
+    public Optional<Paciente> buscarPorID(Long id) {
         String sql = "SELECT * FROM pacientes WHERE id = ?";
         try {
             Paciente paciente = jdbcTemplate.queryForObject(
@@ -107,7 +107,7 @@ public class PacienteRepository implements IPacienteRepository {
     }
 
     @Override
-    public boolean actualizar(Paciente paciente) {
+    public boolean actualizarPorID(Long id, Paciente paciente) {
         String sql = "UPDATE pacientes SET nombre = ?, apellido = ?, dni = ?, obra_social = ?, email = ?, telefono = ? WHERE id = ?";
 
         int filasAfectadas = jdbcTemplate.update(
@@ -125,9 +125,8 @@ public class PacienteRepository implements IPacienteRepository {
     }
 
     @Override
-    public boolean borrar(Long id) {
+    public void borrarPorID(Long id) {
         String sql = "DELETE FROM pacientes WHERE id = ?";
         int filasAfectadas = jdbcTemplate.update(sql, id);
-        return filasAfectadas > 0;
     }
 }
