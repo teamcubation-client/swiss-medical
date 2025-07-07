@@ -1,7 +1,5 @@
 package com.practica.crud_pacientes.servicio;
 
-import com.practica.crud_pacientes.dto.PacienteDto;
-import com.practica.crud_pacientes.dto.PacienteMapper;
 import com.practica.crud_pacientes.excepciones.PacienteDuplicadoException;
 import com.practica.crud_pacientes.excepciones.PacienteNoEncontradoException;
 import com.practica.crud_pacientes.modelo.Paciente;
@@ -20,71 +18,57 @@ public class PacienteServicioImpl implements IPacienteServicio {
     }
 
     @Override
-    public List<PacienteDto> getPacientes() {
-        List<Paciente> pacientes = pacienteRepositorio.findAll();
-
-        return pacientes.stream().map(
-                PacienteMapper.mapper::pacienteToPacienteDto).toList();
+    public List<Paciente> getPacientes() {
+        return pacienteRepositorio.findAll();
     }
 
     @Override
-    public PacienteDto getPacientePorId(Integer idPaciente) throws PacienteNoEncontradoException {
-        Paciente paciente = pacienteRepositorio.findById(idPaciente).orElseThrow(PacienteNoEncontradoException::new);
-
-        return PacienteMapper.mapper.pacienteToPacienteDto(paciente);
+    public Paciente getPacientePorId(int id) throws PacienteNoEncontradoException {
+        return pacienteRepositorio.findById(id).orElseThrow(PacienteNoEncontradoException::new);
     }
 
     @Override
-    public PacienteDto getPacientePorDni(String dni) {
+    public Paciente getPacientePorDni(String dni) {
         Paciente paciente = pacienteRepositorio.findByDni(dni);
 
         if (paciente == null) {
             throw new PacienteNoEncontradoException();
         }
-        return PacienteMapper.mapper.pacienteToPacienteDto(paciente);
+        return paciente;
     }
 
     @Override
-    public List<PacienteDto> getPacientePorNombre(String nombre) {
-        List<Paciente> pacientes = pacienteRepositorio.findByNombreContainingIgnoreCase(nombre);
-        return pacientes.stream()
-                .map(PacienteMapper.mapper::pacienteToPacienteDto)
-                .toList();
+    public List<Paciente> getPacientePorNombre(String nombre) {
+        return pacienteRepositorio.findByNombreContainingIgnoreCase(nombre);
     }
 
     @Override
-    public PacienteDto addPaciente(PacienteDto pacienteDto) {
-        if(pacienteRepositorio.findByDni(pacienteDto.getDni()) != null){
+    public Paciente addPaciente(Paciente paciente) {
+        if (pacienteRepositorio.findByDni(paciente.getDni()) != null) {
             throw new PacienteDuplicadoException();
         }
-
-        Paciente paciente = PacienteMapper.mapper.pacienteDtoToPaciente(pacienteDto);
-        Paciente pacienteGuardado = pacienteRepositorio.save(paciente);
-        return PacienteMapper.mapper.pacienteToPacienteDto(pacienteGuardado);
+        return pacienteRepositorio.save(paciente);
     }
 
     @Override
-    public PacienteDto updatePaciente(Integer idPaciente, PacienteDto pacienteDto) throws PacienteNoEncontradoException {
+    public Paciente updatePaciente(int id, Paciente paciente) throws PacienteNoEncontradoException {
 
-        pacienteRepositorio.findById(idPaciente)
+        pacienteRepositorio.findById(id)
                 .orElseThrow(PacienteNoEncontradoException::new);
 
-        Paciente pacienteExistente = pacienteRepositorio.findByDni(pacienteDto.getDni());
-        if(pacienteExistente != null && !pacienteExistente.getIdPaciente().equals(idPaciente))
+        Paciente pacienteExistente = pacienteRepositorio.findByDni(paciente.getDni());
+        if (pacienteExistente != null)
             throw new PacienteDuplicadoException();
 
-        Paciente pacienteActualizado = PacienteMapper.mapper.pacienteDtoToPaciente(pacienteDto);
-        pacienteActualizado.setIdPaciente(idPaciente);
-
-        Paciente pacienteGuardado = pacienteRepositorio.save(pacienteActualizado);
-        return PacienteMapper.mapper.pacienteToPacienteDto(pacienteGuardado);
+        paciente.setId(id);
+        return pacienteRepositorio.save(paciente);
     }
 
     @Override
-    public void deletePaciente(Integer idPaciente) throws PacienteNoEncontradoException {
-        if(!pacienteRepositorio.existsById(idPaciente))
+    public void deletePaciente(int id) throws PacienteNoEncontradoException {
+        if (!pacienteRepositorio.existsById(id))
             throw new PacienteNoEncontradoException();
 
-        pacienteRepositorio.deleteById(idPaciente);
+        pacienteRepositorio.deleteById(id);
     }
 }
