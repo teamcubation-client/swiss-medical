@@ -49,4 +49,8 @@ public interface PacienteService {
      * @return paciente actualizado
      */
     Paciente actualizarPaciente(Long id, Paciente paciente);
-} 
+
+    Paciente desactivarPaciente(Long id);
+
+    Paciente activarPaciente(Long id);
+}

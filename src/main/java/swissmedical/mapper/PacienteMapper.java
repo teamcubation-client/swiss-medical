@@ -16,18 +16,19 @@ public class PacienteMapper {
      * @return PacienteDTO con los datos del paciente
      */
     public PacienteDTO toDTO(Paciente paciente) {
-        return new PacienteDTO(
-            paciente.getId(),
-            paciente.getNombre(),
-            paciente.getApellido(),
-            paciente.getDni(),
-            paciente.getObraSocial(),
-            paciente.getEmail(),
-            paciente.getTelefono(),
-            paciente.getTipoPlanObraSocial(),
-            paciente.getFechaAlta(),
-            paciente.isEstado()
-        );
+        if (paciente == null) return null;
+        PacienteDTO dto = new PacienteDTO();
+        dto.setId(paciente.getId());
+        dto.setNombre(paciente.getNombre());
+        dto.setApellido(paciente.getApellido());
+        dto.setDni(paciente.getDni());
+        dto.setObraSocial(paciente.getObraSocial());
+        dto.setEmail(paciente.getEmail());
+        dto.setTelefono(paciente.getTelefono());
+        dto.setTipoPlanObraSocial(paciente.getTipoPlanObraSocial());
+        dto.setFechaAlta(paciente.getFechaAlta());
+        dto.setEstado(paciente.isEstado());
+        return dto;
     }
 
     /**
@@ -36,17 +37,18 @@ public class PacienteMapper {
      * @return entidad Paciente con los datos del DTO
      */
     public Paciente toEntity(PacienteDTO dto) {
-        return new Paciente(
-            dto.getId(),
-            dto.getNombre(),
-            dto.getApellido(),
-            dto.getDni(),
-            dto.getObraSocial(),
-            dto.getEmail(),
-            dto.getTelefono(),
-            dto.getTipoPlanObraSocial(),
-            dto.getFechaAlta(),
-            dto.isEstado()
-        );
+        if (dto == null) return null;
+        Paciente paciente = new Paciente();
+        paciente.setId(dto.getId());
+        paciente.setNombre(dto.getNombre());
+        paciente.setApellido(dto.getApellido());
+        paciente.setDni(dto.getDni());
+        paciente.setObraSocial(dto.getObraSocial());
+        paciente.setEmail(dto.getEmail());
+        paciente.setTelefono(dto.getTelefono());
+        paciente.setTipoPlanObraSocial(dto.getTipoPlanObraSocial());
+        paciente.setFechaAlta(dto.getFechaAlta());
+        paciente.setEstado(dto.isEstado());
+        return paciente;
     }
 } 

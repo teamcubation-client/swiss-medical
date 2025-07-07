@@ -133,4 +133,21 @@ public class PacienteServiceImpl implements PacienteService {
         existente.setEstado(paciente.isEstado());
         return pacienteRepository.save(existente);
     }
+
+    @Override
+    public Paciente desactivarPaciente(Long id) {
+        Paciente paciente = pacienteRepository.findById(id)
+                .orElseThrow(() -> new PacienteNotFoundException(id));
+        paciente.setEstado(false);
+        return pacienteRepository.save(paciente);
+    }
+
+    @Override
+    public Paciente activarPaciente(Long id) {
+        Paciente paciente = pacienteRepository.findById(id)
+                .orElseThrow(() -> new PacienteNotFoundException(id));
+        paciente.setEstado(true);
+        return pacienteRepository.save(paciente);
+    }
+
 } 
