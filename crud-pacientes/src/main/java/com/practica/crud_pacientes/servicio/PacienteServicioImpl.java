@@ -9,7 +9,6 @@ import com.practica.crud_pacientes.repositorio.PacienteRepositorio;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class PacienteServicioImpl implements IPacienteServicio {
@@ -25,7 +24,7 @@ public class PacienteServicioImpl implements IPacienteServicio {
         List<Paciente> pacientes = pacienteRepositorio.findAll();
 
         return pacientes.stream().map(
-                PacienteMapper.mapper::pacienteToPacienteDto).collect(Collectors.toList());
+                PacienteMapper.mapper::pacienteToPacienteDto).toList();
     }
 
     @Override
@@ -50,7 +49,7 @@ public class PacienteServicioImpl implements IPacienteServicio {
         List<Paciente> pacientes = pacienteRepositorio.findByNombreContainingIgnoreCase(nombre);
         return pacientes.stream()
                 .map(PacienteMapper.mapper::pacienteToPacienteDto)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override
@@ -69,6 +68,10 @@ public class PacienteServicioImpl implements IPacienteServicio {
 
         pacienteRepositorio.findById(idPaciente)
                 .orElseThrow(PacienteNoEncontradoException::new);
+
+        Paciente pacienteExistente = pacienteRepositorio.findByDni(pacienteDto.getDni());
+        if(pacienteExistente != null && !pacienteExistente.getIdPaciente().equals(idPaciente))
+            throw new PacienteDuplicadoException();
 
         Paciente pacienteActualizado = PacienteMapper.mapper.pacienteDtoToPaciente(pacienteDto);
         pacienteActualizado.setIdPaciente(idPaciente);
