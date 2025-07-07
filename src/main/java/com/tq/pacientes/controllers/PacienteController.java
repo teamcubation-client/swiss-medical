@@ -1,5 +1,6 @@
 package com.tq.pacientes.controllers;
 
+import com.tq.pacientes.documentation.IPacienteController;
 import com.tq.pacientes.dtos.ActualizarPacienteDTO;
 import com.tq.pacientes.dtos.PacienteDTO;
 import com.tq.pacientes.models.Paciente;
@@ -12,7 +13,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/pacientes")
-public class PacienteController {
+public class PacienteController implements IPacienteController {
 
     private final PacienteService pacienteService;
 
