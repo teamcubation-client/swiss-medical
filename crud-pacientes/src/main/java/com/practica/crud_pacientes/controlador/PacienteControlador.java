@@ -19,12 +19,8 @@ public class PacienteControlador {
 
     @GetMapping("/pacientes")
     public ResponseEntity<List<PacienteDto>> getPacientes() {
-        try{
-            List<PacienteDto> pacienteObtenido = pacienteServicio.getPacientes();
-            return ResponseEntity.ok(pacienteObtenido);
-        }catch(RuntimeException e){
-            return ResponseEntity.noContent().build();
-        }
+        List<PacienteDto> pacienteObtenido = pacienteServicio.getPacientes();
+        return ResponseEntity.ok(pacienteObtenido);
     }
 
     @GetMapping("/buscar-por-id/{idPaciente}")
@@ -48,7 +44,7 @@ public class PacienteControlador {
     @PostMapping("/nuevo-paciente")
     public ResponseEntity<PacienteDto> agregarPaciente(@RequestBody PacienteDto pacienteNuevo){
         PacienteDto nuevoPaciente = pacienteServicio.addPaciente(pacienteNuevo);
-        return ResponseEntity.ok(nuevoPaciente);
+        return ResponseEntity.status(HttpStatus.CREATED).body(nuevoPaciente);
     }
 
     @PutMapping("actualizar/{idPaciente}")
