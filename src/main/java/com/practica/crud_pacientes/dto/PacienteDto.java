@@ -1,5 +1,6 @@
 package com.practica.crud_pacientes.dto;
 
+import jakarta.validation.constraints.*;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
@@ -8,14 +9,40 @@ import java.time.LocalDate;
 @NoArgsConstructor
 public class PacienteDto {
 
+    @NotEmpty(message = "Debe ingresar un nombre.")
+    @Size(min = 3, max = 25)
     private String nombre;
+
+    @NotEmpty(message = "Debe ingresar un apellido.")
+    @Size(min = 3, max = 25)
     private String apellido;
+
+    @NotEmpty(message = "Debe ingresar un DNI.")
+    @Size(min = 8, max = 8, message = "Ingrese un DNI valido")
+    @Pattern(regexp = "\\d+", message = "El DNI debe contener solo números.")
     private String dni;
+
+    @NotEmpty(message = "Debe ingresar una obra social.")
+    @Size(min = 2, max = 20)
     private String obraSocial;
+
+    @NotEmpty(message = "Debe ingresar un email.")
+    @Email(message = "Ingrese un formato de mail valido")
     private String email;
+
+    @NotEmpty(message = "Debe ingresar un telefono.")
+    @Pattern(regexp = "\\d{6,15}", message = "El telefono debe contener solo números.")
     private String telefono;
+
+    @NotEmpty(message = "Debe ingresar un domicilio.")
     private String domicilio;
+
+    @NotNull(message = "Debe ingresar la fecha de nacimiento.")
+    @Past(message = "La fecha de nacimiento debe ser una fecha pasada")
     private LocalDate fechaNacimiento;
+
+    @NotEmpty(message = "Debe ingresar el estado civil.")
+    @Size(min = 3)
     private String estadoCivil;
 
     public String getEstadoCivil() {
