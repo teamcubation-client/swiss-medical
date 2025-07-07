@@ -13,8 +13,8 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(PacienteException.class)
     public ResponseEntity<ApiError> handlePacienteException(PacienteException ex) {
-        ApiError error = new ApiError(ex.getMessage(), ex.getStatus());
-        return new ResponseEntity<>(error, HttpStatusCode.valueOf(ex.getStatus()));
+        ApiError error = new ApiError(ex.getMessage(), ex.getStatus().value());
+        return new ResponseEntity<>(error, ex.getStatus());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -25,5 +25,12 @@ public class GlobalExceptionHandler {
         ApiError error = new ApiError(mensaje, HttpStatus.BAD_REQUEST.value());
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ApiError> handleException(Exception ex) {
+        ApiError error = new ApiError(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value());
+        return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
 }
 

@@ -1,17 +1,16 @@
 package microservice.pacientes.service;
 
-import microservice.pacientes.dto.PacienteRequestDTO;
-import microservice.pacientes.dto.PacienteResponseDTO;
-import microservice.pacientes.dto.PacienteUpdateDTO;
+import microservice.pacientes.controller.dto.PacienteRequestDTO;
+import microservice.pacientes.controller.dto.PacienteUpdateDTO;
 import microservice.pacientes.exception.PacienteDuplicadoException;
 import microservice.pacientes.exception.PacienteNoEncontradoException;
 import microservice.pacientes.model.Paciente;
 import microservice.pacientes.repository.PacienteRepository;
 import microservice.pacientes.util.PacienteRequestMapper;
-import microservice.pacientes.util.PacienteResponseMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class PacienteServiceImpl implements PacienteService {
@@ -22,51 +21,52 @@ public class PacienteServiceImpl implements PacienteService {
     }
 
     @Override
-    public List<PacienteResponseDTO> getPacientes() {
-        return PacienteResponseMapper.toDTO(pacienteRepository.findAll());
+    public List<Paciente> getAll() {
+        return pacienteRepository.findAll();
     }
 
     @Override
-    public PacienteResponseDTO getPacienteByDni(String dni) throws PacienteNoEncontradoException {
+    public Paciente getByDni(String dni) throws PacienteNoEncontradoException {
         Paciente paciente = pacienteRepository.findByDni(dni)
-                .orElseThrow(() -> new PacienteNoEncontradoException("Paciente no encontrado", 404));
-        return PacienteResponseMapper.toDTO(paciente);
+                .orElseThrow(PacienteNoEncontradoException::new);
+        return paciente;
     }
 
     @Override
-    public PacienteResponseDTO createPaciente(PacienteRequestDTO pacienteRequestDTO) throws PacienteDuplicadoException {
+    public Paciente create(PacienteRequestDTO pacienteRequestDTO) throws PacienteDuplicadoException {
         if (pacienteRepository.existsByDni(pacienteRequestDTO.getDni()))
-            throw new PacienteDuplicadoException("Paciente duplicado", 409);
+            throw new PacienteDuplicadoException();
 
         Paciente paciente = PacienteRequestMapper.toEntity(pacienteRequestDTO);
-        return PacienteResponseMapper.toDTO(pacienteRepository.save(paciente));
+        return pacienteRepository.save(paciente);
     }
 
 
     @Override
-    public PacienteResponseDTO updatePaciente(String dni, PacienteUpdateDTO pacienteUpdateDTO) throws PacienteNoEncontradoException {
-        Paciente paciente = pacienteRepository.findByDni(dni)
-                .orElseThrow(() -> new PacienteNoEncontradoException("Paciente no encontrado", 404));
+    public Paciente update(String dni, PacienteUpdateDTO pacienteUpdateDTO) throws PacienteNoEncontradoException {
+        Optional<Paciente> optionalPaciente = pacienteRepository.findByDni(dni);
+        if (optionalPaciente.isEmpty())
+            throw new PacienteNoEncontradoException();
+        Paciente paciente = optionalPaciente.get();
 
-        // mala practica esto? viola O de solid?
         if (pacienteUpdateDTO.getNombre() != null) paciente.setNombre(pacienteUpdateDTO.getNombre());
         if (pacienteUpdateDTO.getApellido() != null) paciente.setApellido(pacienteUpdateDTO.getApellido());
         if (pacienteUpdateDTO.getObraSocial() != null) paciente.setObraSocial(pacienteUpdateDTO.getObraSocial());
         if (pacienteUpdateDTO.getEmail() != null) paciente.setEmail(pacienteUpdateDTO.getEmail());
         if (pacienteUpdateDTO.getTelefono() != null) paciente.setTelefono(pacienteUpdateDTO.getTelefono());
 
-        return PacienteResponseMapper.toDTO(pacienteRepository.save(paciente));
+        return pacienteRepository.save(paciente);
     }
 
     @Override
-    public void deletePaciente(String dni) throws PacienteNoEncontradoException {
+    public void delete(String dni) throws PacienteNoEncontradoException {
         Paciente paciente = pacienteRepository.findByDni(dni)
-                .orElseThrow(() -> new PacienteNoEncontradoException("Paciente no encontrado", 404));
+                .orElseThrow(PacienteNoEncontradoException::new);
         pacienteRepository.delete(paciente);
     }
 
     @Override
-    public List<PacienteResponseDTO> findByNombreContainingIgnoreCase(String nombre) {
-        return PacienteResponseMapper.toDTO(pacienteRepository.findByNombreContainingIgnoreCase(nombre));
+    public List<Paciente> findByNombreContainingIgnoreCase(String nombre) {
+        return pacienteRepository.findByNombreContainingIgnoreCase(nombre);
     }
 }

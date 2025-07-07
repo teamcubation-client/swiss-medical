@@ -1,4 +1,4 @@
-package microservice.pacientes.dto;
+package microservice.pacientes.controller.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,8 +9,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
-public class PacienteRequestDTO {
-    private String dni;
+public class PacienteUpdateDTO {
     private String nombre;
     private String apellido;
     private String obraSocial;
