@@ -53,6 +53,7 @@ public class PacienteController implements IPacienteController {
      * @param pacienteDTO datos del paciente a crear
      * @return PacienteDTO creado
      */
+
     @PostMapping
     public ResponseEntity<PacienteDTO> crearPaciente(@Valid @RequestBody PacienteDTO pacienteDTO) {
         Paciente paciente = pacienteMapper.toEntity(pacienteDTO);
@@ -65,6 +66,7 @@ public class PacienteController implements IPacienteController {
      * @param id identificador del paciente
      * @return PacienteDTO encontrado o null si no existe
      */
+
     @GetMapping("/{id}")
     public ResponseEntity<PacienteDTO> obtenerPaciente(@PathVariable Long id) {
         Paciente paciente = pacienteService.obtenerPacientePorId(id);
@@ -79,6 +81,7 @@ public class PacienteController implements IPacienteController {
      * Elimina un paciente por su identificador unico
      * @param id identificador del paciente a eliminar
      */
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminarPaciente(@PathVariable Long id) {
         pacienteService.eliminarPaciente(id);
@@ -90,6 +93,7 @@ public class PacienteController implements IPacienteController {
      * @param dni Documento Nacional de Identidad
      * @return PacienteDTO encontrado o null si no existe
      */
+
     @GetMapping("/buscar/dni")
     public ResponseEntity<PacienteDTO> buscarPorDni(@RequestParam String dni) {
         Paciente paciente = pacienteService.buscarPorDni(dni);
@@ -105,6 +109,7 @@ public class PacienteController implements IPacienteController {
      * @param nombre parte o nombre completo a buscar
      * @return lista de PacienteDTO que coinciden con el parametro
      */
+
     @GetMapping("/buscar/nombre")
     public ResponseEntity<List<PacienteDTO>> buscarPorNombre(@RequestParam String nombre) {
         List<Paciente> pacientes = pacienteService.buscarPorNombreParcial(nombre);
@@ -115,12 +120,15 @@ public class PacienteController implements IPacienteController {
         return ResponseEntity.ok(pacienteDTOs);
     }
 
+
+
     /**
      * Actualiza los datos de un paciente existente
      * @param id identificador del paciente a actualizar
      * @param pacienteDTO datos nuevos del paciente
      * @return PacienteDTO actualizado o null si no existe
      */
+
     @PutMapping("/{id}")
     public ResponseEntity<PacienteDTO> actualizarPaciente(@PathVariable Long id, @RequestBody PacienteDTO pacienteDTO) {
         Paciente paciente = pacienteMapper.toEntity(pacienteDTO);
@@ -129,6 +137,7 @@ public class PacienteController implements IPacienteController {
             return ResponseEntity.ok(pacienteMapper.toDTO(actualizado));
         } else {
             return ResponseEntity.notFound().build();
+
         }
     }
 
