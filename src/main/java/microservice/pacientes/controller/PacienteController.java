@@ -20,7 +20,7 @@ public interface PacienteController {
             @ApiResponse(responseCode = "200", description = "Pacientes encontrados. Incluye lista vacía."),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
-    ResponseEntity<List<PacienteResponseDTO>> getPacientes(
+    ResponseEntity<List<PacienteResponseDTO>> getAll(
             @Parameter(
                     description = "Nombre parcial o completo para filtrar los pacientes. Opcional.",
                     required = false
@@ -37,7 +37,7 @@ public interface PacienteController {
             @ApiResponse(responseCode = "204", description = "Paciente no encontrado"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
-    ResponseEntity<PacienteResponseDTO> getPacienteByDni(
+    ResponseEntity<PacienteResponseDTO> getByDni(
             @Parameter(
                     description = "DNI del paciente",
                     required = true
@@ -54,7 +54,7 @@ public interface PacienteController {
             @ApiResponse(responseCode = "409", description = "Paciente duplicado"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
-    ResponseEntity<PacienteResponseDTO> createPaciente(PacienteRequestDTO pacienteRequestDTO);
+    ResponseEntity<PacienteResponseDTO> create(PacienteRequestDTO pacienteRequestDTO);
 
     @Operation(
             summary = "Actualiza parcial o totalmente un paciente",
@@ -65,7 +65,7 @@ public interface PacienteController {
             @ApiResponse(responseCode = "204", description = "Paciente no encontrado"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
-    ResponseEntity<PacienteResponseDTO> updatePaciente(String dni, PacienteUpdateDTO pacienteUpdateDTO);
+    ResponseEntity<PacienteResponseDTO> update(String dni, PacienteUpdateDTO pacienteUpdateDTO);
 
     @Operation(
             summary = "Elimina un paciente"
@@ -75,7 +75,7 @@ public interface PacienteController {
             @ApiResponse(responseCode = "204", description = "Paciente no encontrado"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
-    ResponseEntity<Void> deletePaciente(String dni);
+    ResponseEntity<Void> delete(String dni);
 
 
 }

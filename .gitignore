@@ -1,3 +1,8 @@
+# Ignore everything under gradle/ except the wrapper
+gradle/*
+!gradle/wrapper/
+!gradle/wrapper/gradle-wrapper.jar
+
 # Compiled class files
 *.class
 
