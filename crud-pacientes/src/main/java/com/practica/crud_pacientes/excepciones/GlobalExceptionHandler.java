@@ -18,9 +18,9 @@ public class GlobalExceptionHandler {
                 HttpStatus.NOT_FOUND.value(),
                 exception.getMessage(),
                 HttpStatus.NOT_FOUND.getReasonPhrase(),
-                request.getContextPath()
+                request.getRequestURI()
         );
-        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(error, HttpStatus.CONFLICT);
     }
 
     @ExceptionHandler(PacienteNoEncontradoException.class)
@@ -30,20 +30,20 @@ public class GlobalExceptionHandler {
                 HttpStatus.NOT_FOUND.value(),
                 exception.getMessage(),
                 HttpStatus.NOT_FOUND.getReasonPhrase(),
-                request.getContextPath()
+                request.getRequestURI()
         );
         return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> handlerExcepcionGenerica(Exception exception, HttpServletRequest request){
+    public ResponseEntity<ErrorResponse> handlerExcepcionGenerica(HttpServletRequest request){
         String mensaje = "Ocurrió un error inesperado";
         ErrorResponse error = new ErrorResponse(
                 LocalDateTime.now(),
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
                 mensaje,
                 HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
-                request.getContextPath()
+                request.getRequestURI()
         );
 
         return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
