@@ -30,7 +30,7 @@ public interface PacienteAPI {
                     @ApiResponse(responseCode = "404", description = "Paciente inexistente")
             }
     )
-    ResponseEntity<PacienteDto> getPaciente(@PathVariable Integer idPaciente);
+    ResponseEntity<PacienteDto> getPaciente(@PathVariable int id);
 
     @Operation(
             summary = "Buscar paciente por DNI",
@@ -70,7 +70,7 @@ public interface PacienteAPI {
                     @ApiResponse(responseCode = "400", description = "Los datos que se intentan actualizar son incorrectos")
             }
     )
-    ResponseEntity<PacienteDto> actualizarPaciente(@PathVariable Integer idPaciente, @RequestBody PacienteDto paciente);
+    ResponseEntity<PacienteDto> actualizarPaciente(@PathVariable int id, @RequestBody PacienteDto paciente);
 
     @Operation(
             summary = "Elimina un paciente",
@@ -80,5 +80,5 @@ public interface PacienteAPI {
                     @ApiResponse(responseCode = "404", description = "El paciente que se intenta eliminar no existe")
             }
     )
-    ResponseEntity<Void> eliminarPaciente(@PathVariable Integer idPaciente);
+    ResponseEntity<Void> eliminarPaciente(@PathVariable int id);
 }
