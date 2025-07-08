@@ -29,11 +29,11 @@ public class PacienteServiceImpl implements PacienteService {
      */
     @Override
     public Paciente crearPaciente(Paciente paciente) {
-        Paciente pacienteExistente = pacienteRepository.findByDni(paciente.getDni()).orElse(null);
+        pacienteRepository.findByDni(paciente.getDni())
+                .ifPresent(p -> {
+                    throw new PacienteDuplicadoException(paciente.getDni());
+                });
 
-        if (pacienteExistente != null) {
-            throw new PacienteDuplicadoException(paciente.getDni());
-        }
         return pacienteRepository.save(paciente);
     }
 
@@ -45,13 +45,8 @@ public class PacienteServiceImpl implements PacienteService {
      */
     @Override
     public Paciente obtenerPacientePorId(Long id) {
-        Paciente paciente = pacienteRepository.findById(id).orElse(null);
-
-        if (paciente == null) {
-            throw new PacienteNotFoundException(id);
-        }
-
-        return paciente;
+        return pacienteRepository.findById(id)
+                .orElseThrow(() -> new PacienteNotFoundException(id));
     }
 
     /**
@@ -70,13 +65,10 @@ public class PacienteServiceImpl implements PacienteService {
      */
     @Override
     public void eliminarPaciente(Long id) {
-        boolean existe = pacienteRepository.existsById(id);
+        Paciente paciente = pacienteRepository.findById(id)
+                .orElseThrow(() -> new PacienteNotFoundException(id));
 
-        if (!existe) {
-            throw new PacienteNotFoundException(id);
-        }
-
-        pacienteRepository.deleteById(id);
+        pacienteRepository.delete(paciente);
     }
 
     /**
@@ -111,11 +103,9 @@ public class PacienteServiceImpl implements PacienteService {
      */
     @Override
     public Paciente actualizarPaciente(Long id, Paciente paciente) {
-        Paciente existente = pacienteRepository.findById(id).orElse(null);
+        Paciente existente = pacienteRepository.findById(id)
+                .orElseThrow(() -> new PacienteNotFoundException(id));
 
-        if (existente == null) {
-            throw new PacienteNotFoundException(id);
-        }
         if (paciente.getNombre() != null) {
             existente.setNombre(paciente.getNombre());
         }
@@ -143,4 +133,21 @@ public class PacienteServiceImpl implements PacienteService {
         existente.setEstado(paciente.isEstado());
         return pacienteRepository.save(existente);
     }
+
+    @Override
+    public Paciente desactivarPaciente(Long id) {
+        Paciente paciente = pacienteRepository.findById(id)
+                .orElseThrow(() -> new PacienteNotFoundException(id));
+        paciente.setEstado(false);
+        return pacienteRepository.save(paciente);
+    }
+
+    @Override
+    public Paciente activarPaciente(Long id) {
+        Paciente paciente = pacienteRepository.findById(id)
+                .orElseThrow(() -> new PacienteNotFoundException(id));
+        paciente.setEstado(true);
+        return pacienteRepository.save(paciente);
+    }
+
 } 
