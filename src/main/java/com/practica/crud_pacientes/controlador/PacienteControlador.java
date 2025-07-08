@@ -4,7 +4,6 @@ import com.practica.crud_pacientes.dto.PacienteDto;
 import com.practica.crud_pacientes.dto.PacienteMapper;
 import com.practica.crud_pacientes.modelo.Paciente;
 import com.practica.crud_pacientes.servicio.IPacienteServicio;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,7 +12,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@Tag(name = "Paciente")
 public class PacienteControlador implements PacienteAPI{
 
     private final IPacienteServicio pacienteServicio;
