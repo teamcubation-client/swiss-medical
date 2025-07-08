@@ -13,7 +13,7 @@ public class Paciente {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     /** Identificador unico del paciente */
-    private Long id;
+    private long id;
     /** Nombre del paciente */
     private String nombre;
     /** Apellido del paciente */

@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import swissmedical.model.Paciente;
@@ -40,11 +42,9 @@ public class PacienteController implements IPacienteController {
      */
     @GetMapping
     public ResponseEntity<List<PacienteDTO>> listarPacientes() {
-        List<Paciente> pacientes = pacienteService.listarPacientes();
-        List<PacienteDTO> dtos = new ArrayList<>();
-        for (Paciente paciente : pacientes) {
-            dtos.add(pacienteMapper.toDTO(paciente));
-        }
+        List<PacienteDTO> dtos = pacienteService.listarPacientes().stream()
+                .map(pacienteMapper::toDTO)
+                .collect(Collectors.toList());
         return ResponseEntity.ok(dtos);
     }
     
@@ -70,11 +70,9 @@ public class PacienteController implements IPacienteController {
     @GetMapping("/{id}")
     public ResponseEntity<PacienteDTO> obtenerPaciente(@PathVariable Long id) {
         Paciente paciente = pacienteService.obtenerPacientePorId(id);
-        if (paciente != null) {
-            return ResponseEntity.ok(pacienteMapper.toDTO(paciente));
-        } else {
+        if (paciente == null)
             return ResponseEntity.notFound().build();
-        }
+        return ResponseEntity.ok(pacienteMapper.toDTO(paciente));
     }
     
     /**
@@ -97,11 +95,9 @@ public class PacienteController implements IPacienteController {
     @GetMapping("/buscar/dni")
     public ResponseEntity<PacienteDTO> buscarPorDni(@RequestParam String dni) {
         Paciente paciente = pacienteService.buscarPorDni(dni);
-        if (paciente != null) {
-            return ResponseEntity.ok(pacienteMapper.toDTO(paciente));
-        } else {
+        if (paciente == null)
             return ResponseEntity.notFound().build();
-        }
+        return ResponseEntity.ok(pacienteMapper.toDTO(paciente));
     }
 
     /**
@@ -112,11 +108,10 @@ public class PacienteController implements IPacienteController {
 
     @GetMapping("/buscar/nombre")
     public ResponseEntity<List<PacienteDTO>> buscarPorNombre(@RequestParam String nombre) {
-        List<Paciente> pacientes = pacienteService.buscarPorNombreParcial(nombre);
-        List<PacienteDTO> pacienteDTOs = new ArrayList<>();
-        for (Paciente paciente : pacientes) {
-            pacienteDTOs.add(pacienteMapper.toDTO(paciente));
-        }
+        List<PacienteDTO> pacienteDTOs = pacienteService.buscarPorNombreParcial(nombre)
+                .stream()
+                .map(pacienteMapper::toDTO)
+                .collect(Collectors.toList());
         return ResponseEntity.ok(pacienteDTOs);
     }
 
@@ -133,12 +128,9 @@ public class PacienteController implements IPacienteController {
     public ResponseEntity<PacienteDTO> actualizarPaciente(@PathVariable Long id, @RequestBody PacienteDTO pacienteDTO) {
         Paciente paciente = pacienteMapper.toEntity(pacienteDTO);
         Paciente actualizado = pacienteService.actualizarPaciente(id, paciente);
-        if (actualizado != null) {
-            return ResponseEntity.ok(pacienteMapper.toDTO(actualizado));
-        } else {
+        if (actualizado == null)
             return ResponseEntity.notFound().build();
-
-        }
+        return ResponseEntity.ok(pacienteMapper.toDTO(actualizado));
     }
 
     @PatchMapping("/{id}/activar")
@@ -158,26 +150,20 @@ public class PacienteController implements IPacienteController {
     @GetMapping("/activos")
     @Override
     public ResponseEntity<List<PacienteDTO>> listarPacientesActivos() {
-        List<Paciente> pacientes = pacienteService.listarPacientes();
-        List<PacienteDTO> activos = new ArrayList<>();
-        for (Paciente paciente : pacientes) {
-            if (paciente.isEstado()) {
-                activos.add(pacienteMapper.toDTO(paciente));
-            }
-        }
+        List<PacienteDTO> activos = pacienteService.listarPacientes().stream()
+                .filter(Paciente::isEstado)
+                .map(pacienteMapper::toDTO)
+                .collect(Collectors.toList());
         return ResponseEntity.ok(activos);
     }
 
     @GetMapping("/inactivos")
     @Override
     public ResponseEntity<List<PacienteDTO>> listarPacientesInactivos() {
-        List<Paciente> pacientes = pacienteService.listarPacientes();
-        List<PacienteDTO> inactivos = new ArrayList<>();
-        for (Paciente paciente : pacientes) {
-            if (!paciente.isEstado()) {
-                inactivos.add(pacienteMapper.toDTO(paciente));
-            }
-        }
+        List<PacienteDTO> inactivos = pacienteService.listarPacientes().stream()
+                .filter(p -> !p.isEstado())
+                .map(pacienteMapper::toDTO)
+                .collect(Collectors.toList());
         return ResponseEntity.ok(inactivos);
     }
 }
