@@ -5,12 +5,12 @@ services:
     image: mysql:8.0
     container_name: mysqlpacientes
     environment:
-      MYSQL_ROOT_PASSWORD: admin
-      MYSQL_DATABASE: paciente
-      MYSQL_USER: rootpacientes
-      MYSQL_PASSWORD: admin
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
     ports:
-      - "3306:3306"
+      - "${DB_PORT_IN}:${DB_PORT_OUT}"
     volumes:
       - mysql_data:/var/lib/mysql
     restart: unless-stopped
@@ -19,14 +19,14 @@ services:
     build: .
     container_name: pacientes-app
     ports:
-      - "8080:8080"
+      - "${API_PORT_IN}:${API_PORT_OUT}"
     depends_on:
       - mysql
     environment:
-      SERVER_PORT: 8080
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/paciente?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
-      SPRING_DATASOURCE_USERNAME: rootpacientes
-      SPRING_DATASOURCE_PASSWORD: admin
+      SERVER_PORT: ${API_PORT_IN}
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:${DB_PORT_OUT}/${DB_DATABASE}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: ${DB_USER}
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
     restart: unless-stopped
 
 volumes:
