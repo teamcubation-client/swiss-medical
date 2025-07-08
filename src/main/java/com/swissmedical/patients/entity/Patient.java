@@ -1,5 +1,7 @@
 package com.swissmedical.patients.entity;
 
+import java.time.LocalDate;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -35,6 +37,15 @@ public class Patient {
 
     @Column(name = "dni", nullable = false, unique = true)
     private String dni;
+
+    @Column(name = "member_number", nullable = false, unique = true)
+    private String memberNumber;
+
+    @Column(name = "birth_date", nullable = false)
+    private LocalDate birthDate;
+
+    @Column(name = "is_active", nullable = false)
+    private boolean isActive;
 
     @Column(name = "social_security", nullable = false, unique = true)
     private String socialSecurity;

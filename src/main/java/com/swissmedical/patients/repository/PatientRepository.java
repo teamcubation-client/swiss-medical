@@ -13,13 +13,9 @@ public interface PatientRepository extends JpaRepository<Patient, Long> {
 
     Optional<Patient> findByDni(String dni);
 
-    Optional<Patient> findByEmail(String email);
-
     List<Patient> findByFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCase(String firstName, String lastName);
 
     boolean existsByDni(String dni);
 
     boolean existsByEmail(String email);
-
-    boolean existsByPhoneNumber(String phoneNumber);
 }

@@ -14,7 +14,7 @@ Content-Type: application/json
 {
   "firstName": "John",
   "lastName": "Doe",
-  "dni": "40128095",
+  "dni": "40128092",
   "email": "john@gmail.com",
   "phoneNumber": "1234567890",
   "socialSecurity": "Swiss Medical"

@@ -1,6 +1,6 @@
 # Microservicio de Pacientes – Versión Java 11
 
-# 🎯 Objetivo general
+## 🎯 Objetivo general
 
 Implementar un microservicio RESTful en Java 11 usando Spring Boot que gestione pacientes. El proyecto debe aplicar buenas prácticas de Programación Orientada a Objetos (POO), arquitectura en capas, manejo de excepciones personalizadas, y separación entre modelo y vista mediante DTOs.
 
@@ -57,12 +57,31 @@ Dividir el proyecto en al menos tres capas:
 - Configurar H2 o cualquier otra base de datos relacional.
 - Agregar anotaciones como @Entity, @Id, etc. en la clase Paciente.
 
-# 📌 Consideraciones
+> [!NOTE]
+> 📌 Consideraciones
 
 - El microservicio debe estar desarrollado en Java 11.
 - Debe utilizar Spring Boot (versión mínima compatible con Java 11).
 - Se valora el uso de @RestController, @Service, @Repository, DTOs y validaciones simples.
 - El código debe ser claro, legible y estar organizado por paquetes.
+
+## Fase 4: Documentación y Mensajería
+
+### ✅ Parte A: Documentación de la API con Swagger (SpringDoc OpenAPI)
+
+- 📚 Objetivo: Documentar de manera automática los endpoints del microservicio usando Swagger, permitiendo probarlos desde una interfaz web (/swagger-ui.html o /swagger-ui/index.html).
+- Instalar la dependencia springdoc-openapi-ui.
+- Probar que aparezca la documentación.
+- (Opcional) Agregar anotaciones @Operation, @Parameter o @ApiResponse para enriquecer la docu.
+- 🧠 Beneficio: les ayuda a visualizar los endpoints y compartir su API con otros fácilmente.
+
+### ✅ Parte B: Centralización de Excepciones con @ControllerAdvice
+
+- 📚 Objetivo: Implementar una clase global que maneje las excepciones personalizadas del microservicio, devolviendo mensajes claros y estados HTTP adecuados.
+- Crear una clase GlobalExceptionHandler.
+- Usar @ExceptionHandler para capturar PacienteNoEncontradoException y PacienteDuplicadoException.
+- Retornar objetos ResponseEntity con código de error y mensaje.
+- 🧠 Beneficio: muestra una práctica real de cómo se manejan errores de forma profesional en aplicaciones REST.
 
 # 📝 Check List
 
@@ -70,4 +89,35 @@ Dividir el proyecto en al menos tres capas:
 - [ x ] Manejo de excepciones personalizadas
 - [ x ] Dividir el proyecto en capas (Modelo, Controlador, Servicio, Repositorio)
 - [ x ] Uso de DTOs y Mappers
-- [ ] Crear requests de prueba
+- [ x ] Crear requests de prueba
+- [ x ] Documentar el API con Swagger
+
+## Estructura del Proyecto
+
+```
+patients/
+├── src/
+│   ├── main/
+│   │   ├── java/
+│   │   │   ├── com/swissmedical
+│   │   │   │   ├── patients/
+│   │   │   │   │   ├── controller/
+│   │   │   │   │   ├── dto/
+│   │   │   │   │   ├── exception/
+│   │   │   │   │   ├── entity/
+│   │   │   │   │   ├── mappers/
+│   │   │   │   │   ├── repository/
+│   │   │   │   │   ├── service/
+│   │   │   │   │   └── PatientsApplication.java
+│   │   ├── resources/
+│   │   │   ├── application.properties
+│   │   │   └── static
+│   │   │   └── templates
+│   └── test/
+│       └── java/
+│           └── com/swissmedical/patients/
+│               └── PatientsApplicationTests.java
+└── pom.xml
+docker-compose.yml
+README.md
+```
