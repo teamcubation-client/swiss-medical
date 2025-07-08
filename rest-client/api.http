@@ -1,0 +1,16 @@
+### GET pacientes
+GET http://localhost:8080/pacientes
+Accept: application/json
+
+### POST pacientes
+POST http://localhost:8080/pacientes
+Content-Type: application/json
+
+{
+    "dni": "111111",
+    "nombre": "NOMBRE",
+    "apellido": "APELLIDO",
+    "obraSocial": "OBRA SOCIAL",
+    "email": "EMAIL",
+    "telefono": "TELEFONO"
+}
