@@ -8,9 +8,7 @@ import microservice.pacientes.model.Paciente;
 import microservice.pacientes.repository.PacienteRepository;
 import microservice.pacientes.util.PacienteRequestMapper;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class PacienteServiceImpl implements PacienteService {
