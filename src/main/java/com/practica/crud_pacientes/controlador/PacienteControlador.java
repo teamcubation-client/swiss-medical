@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-public class PacienteControlador {
+public class PacienteControlador implements PacienteAPI{
 
     private final IPacienteServicio pacienteServicio;
 
@@ -57,10 +57,10 @@ public class PacienteControlador {
                 .body(PacienteMapper.mapper.pacienteToPacienteDto(pacienteGuardado));
     }
 
-    @PutMapping("actualizar/{idPaciente}")
-    public ResponseEntity<PacienteDto> actualizarPaciente(@PathVariable int idPaciente, @RequestBody PacienteDto pacienteDto) {
+    @PutMapping("actualizar/{id}")
+    public ResponseEntity<PacienteDto> actualizarPaciente(@PathVariable int id, @RequestBody PacienteDto pacienteDto) {
         Paciente paciente = PacienteMapper.mapper.pacienteDtoToPaciente(pacienteDto);
-        Paciente pacienteActualizado = pacienteServicio.updatePaciente(idPaciente, paciente);
+        Paciente pacienteActualizado = pacienteServicio.updatePaciente(id, paciente);
         return ResponseEntity.ok(PacienteMapper.mapper.pacienteToPacienteDto(pacienteActualizado));
     }
 
