@@ -2,6 +2,8 @@ package com.swissmedical.patients.controller;
 
 import java.util.List;
 
+import com.swissmedical.patients.dto.PatientUpdateDto;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.swissmedical.patients.dto.PatientDto;
+import com.swissmedical.patients.dto.PatientCreateDto;
 import com.swissmedical.patients.entity.Patient;
 import com.swissmedical.patients.mappers.PatientMapper;
 import com.swissmedical.patients.service.PatientService;
@@ -32,13 +34,14 @@ public class PatientController implements PatientApi {
 
     @Override
     @GetMapping()
-    public ResponseEntity<List<Patient>> getPatients(@RequestParam(defaultValue = "") String name) {
-        if (name.isEmpty()) {
+    public ResponseEntity<List<Patient>> getAll(@RequestParam(defaultValue = "") String firstName,
+                                                @RequestParam(defaultValue = "") String lastName) {
+        if (firstName.isEmpty() || lastName.isEmpty()) {
             List<Patient> patients = patientService.getAllPatients();
             return ResponseEntity.ok(patients);
         }
 
-        List<Patient> patients = patientService.getPatientByFirstNameOrLastName(name, name);
+        List<Patient> patients = patientService.getPatientByFirstNameOrLastName(firstName, lastName);
 
         if (patients.isEmpty()) {
             return ResponseEntity.noContent().build();
@@ -49,34 +52,24 @@ public class PatientController implements PatientApi {
 
     @Override
     @GetMapping("/{dni}")
-    public ResponseEntity<Patient> getPatientByDni(@PathVariable String dni) {
-        Patient patient = patientService.getPatientByDni(dni);
-        return ResponseEntity.ok(patient);
+    public ResponseEntity<Patient> getByDni(@PathVariable String dni) {
+        return ResponseEntity.ok(patientService.getPatientByDni(dni));
 
     }
 
     @Override
     @PostMapping()
-    public ResponseEntity<?> createPatient(@Valid @RequestBody PatientDto patientDto) {
-        Patient patient = PatientMapper.toEntity(patientDto);
-
-        if (patient == null) {
-            return ResponseEntity.badRequest().build();
-        }
+    public ResponseEntity<Patient> create(@Valid @RequestBody PatientCreateDto patientCreateDto) {
+        Patient patient = PatientMapper.toEntity(patientCreateDto);
 
         Patient createdPatient = patientService.createPatient(patient);
-        return ResponseEntity.status(201).body(createdPatient);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdPatient);
     }
 
     @Override
     @PutMapping("/{id}")
-    public ResponseEntity<Patient> updatePatient(@RequestBody PatientDto patientDto, @PathVariable Long id) {
-        patientDto.setActive(false);
-        Patient patient = PatientMapper.toEntity(patientDto);
-
-        if (patient == null) {
-            return ResponseEntity.badRequest().build();
-        }
+    public ResponseEntity<Patient> update(@Valid @RequestBody PatientUpdateDto patientUpdateDto, @PathVariable Long id) {
+        Patient patient = PatientMapper.toEntity(patientUpdateDto);
 
         Patient updatedPatient = patientService.updatePatient(id, patient);
         return ResponseEntity.ok(updatedPatient);
@@ -85,9 +78,9 @@ public class PatientController implements PatientApi {
 
     @Override
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletePatient(@PathVariable Long id) {
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
         patientService.deletePatient(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok().build();
 
     }
 

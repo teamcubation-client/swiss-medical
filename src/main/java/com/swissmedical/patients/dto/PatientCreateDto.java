@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class PatientDto {
+public class PatientCreateDto {
 
     @NotNull(message = "First name cannot be null")
     public String firstName;

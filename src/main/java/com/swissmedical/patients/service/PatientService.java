@@ -22,21 +22,9 @@ public class PatientService {
         return patientRepository.findAll();
     }
 
-    public Patient getPatientById(Long id) {
-        return patientRepository.findById(id).orElseThrow(
-                () -> new PatientNotFoundException("Patient with ID " + id + " does not exist.")
-        );
-    }
-
     public Patient getPatientByDni(String dni) {
         return patientRepository.findByDni(dni)
                 .orElseThrow(() -> new PatientNotFoundException("Patient with DNI " + dni + " does not exist."));
-    }
-
-    public Patient getPatientByEmail(String email) {
-        return patientRepository.findByEmail(email).orElseThrow(
-                () -> new PatientNotFoundException("Patient with email " + email + " does not exist.")
-        );
     }
 
     public List<Patient> getPatientByFirstNameOrLastName(String firstName, String lastName) {
@@ -59,11 +47,11 @@ public class PatientService {
 
     public Patient updatePatient(Long id, Patient patientDetails) {
         if (!patientRepository.existsById(id)) {
-            throw new IllegalArgumentException("Patient with ID " + id + " does not exist.");
+            throw new PatientNotFoundException("Patient with ID " + id + " does not exist.");
         }
 
         Patient existingPatient = patientRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Patient with ID " + id + " does not exist."));
+                .orElseThrow(() -> new PatientNotFoundException("Patient with ID " + id + " does not exist."));
 
         existingPatient.setFirstName(patientDetails.getFirstName());
         existingPatient.setLastName(patientDetails.getLastName());
@@ -77,7 +65,7 @@ public class PatientService {
 
     public void deletePatient(Long id) {
         if (!patientRepository.existsById(id)) {
-            throw new IllegalArgumentException("Patient with ID " + id + " does not exist.");
+            throw new PatientNotFoundException("Patient with ID " + id + " does not exist.");
         }
         patientRepository.deleteById(id);
     }
