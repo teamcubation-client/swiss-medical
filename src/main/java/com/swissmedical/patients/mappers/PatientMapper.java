@@ -9,10 +9,6 @@ import com.swissmedical.patients.entity.Patient;
 public class PatientMapper {
 
     static public Patient toEntity(PatientCreateDto patientCreateDto) {
-        if (patientCreateDto == null) {
-            return null;
-        }
-
         Patient patient = new Patient();
         patient.setFirstName(patientCreateDto.getFirstName());
         patient.setLastName(patientCreateDto.getLastName());
@@ -28,10 +24,6 @@ public class PatientMapper {
     }
 
     static public Patient toEntity(PatientUpdateDto patientUpdateDto) {
-        if (patientUpdateDto == null) {
-            return null;
-        }
-
         Patient patient = new Patient();
         patient.setFirstName(patientUpdateDto.getFirstName());
         patient.setLastName(patientUpdateDto.getLastName());
