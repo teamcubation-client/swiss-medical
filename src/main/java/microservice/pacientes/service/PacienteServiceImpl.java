@@ -44,11 +44,9 @@ public class PacienteServiceImpl implements PacienteService {
 
     @Override
     public Paciente update(String dni, PacienteUpdateDTO pacienteUpdateDTO) throws PacienteNoEncontradoException {
-        Optional<Paciente> optionalPaciente = pacienteRepository.findByDni(dni);
-        if (optionalPaciente.isEmpty())
-            throw new PacienteNoEncontradoException();
-        Paciente paciente = optionalPaciente.get();
-
+        Paciente paciente = pacienteRepository.findByDni(dni)
+                .orElseThrow(PacienteNoEncontradoException::new);
+                
         if (pacienteUpdateDTO.getNombre() != null) paciente.setNombre(pacienteUpdateDTO.getNombre());
         if (pacienteUpdateDTO.getApellido() != null) paciente.setApellido(pacienteUpdateDTO.getApellido());
         if (pacienteUpdateDTO.getObraSocial() != null) paciente.setObraSocial(pacienteUpdateDTO.getObraSocial());
