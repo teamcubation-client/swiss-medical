@@ -1,4 +1,4 @@
-package com.practica.crud_pacientes.modelo;
+package com.practica.crud_pacientes.model;
 
 import jakarta.persistence.*;
 import lombok.*;
