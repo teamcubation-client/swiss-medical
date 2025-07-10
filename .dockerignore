@@ -13,3 +13,7 @@ git
 # Otros archivos temporales
 *.log
 .DS_Store 
+.env
+Dockerfile
+docker-compose.yml
+README.md 
