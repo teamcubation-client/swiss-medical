@@ -13,27 +13,31 @@ import java.util.List;
 public interface IPacienteAPI {
 
     @Operation(summary = "Crear un nuevo paciente")
-    ResponseEntity<PacienteResponse> crearPaciente(PacienteRequest request);
+    ResponseEntity<PacienteResponse> crear(PacienteRequest request);
 
     @Operation(summary = "Obtener todos los pacientes")
-    ResponseEntity<List<PacienteResponse>> obtenerPacientes();
+    ResponseEntity<List<PacienteResponse>> obtenerTodos(
+            @Parameter(description = "DNI completo del paciente", example = "12345678")
+            String dni,
+            @Parameter(description = "Nombre completo o parcial del paciente", example = "Roberto")
+            String nombre);
 
     @Operation(summary = "Buscar paciente por ID")
-    ResponseEntity<PacienteResponse> obtenerPaciente(
+    ResponseEntity<PacienteResponse> obtenerPorID(
             @Parameter(description = "ID único del paciente", example = "1")
-            Long id
+            long id
     );
 
     @Operation(summary = "Actualizar un paciente existente")
-    ResponseEntity<PacienteResponse> actualizarPaciente(
+    ResponseEntity<PacienteResponse> actualizarPorID(
             @Parameter(description = "ID único del paciente", example = "1")
-            Long id,
+            long id,
             PacienteRequest request
     );
 
     @Operation(summary = "Eliminar un paciente por ID")
-    ResponseEntity<Object> borrarPaciente(
+    ResponseEntity<Object> borrarPorID(
             @Parameter(description = "ID único del paciente", example = "1")
-            Long id
+            long id
     );
 }
