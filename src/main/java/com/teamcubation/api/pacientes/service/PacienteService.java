@@ -1,16 +1,19 @@
 package com.teamcubation.api.pacientes.service;
 
+import com.teamcubation.api.pacientes.exception.PacienteDuplicadoException;
 import com.teamcubation.api.pacientes.exception.PacienteNoEncontradoException;
 import com.teamcubation.api.pacientes.model.Paciente;
 import com.teamcubation.api.pacientes.repository.PacienteRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class PacienteService implements IPacienteService {
 
     private final PacienteRepository pacienteRepository;
+    private static final String CAMPO_DNI = "DNI";
 
     public PacienteService(PacienteRepository pacienteRepository) {
         this.pacienteRepository = pacienteRepository;
@@ -18,6 +21,11 @@ public class PacienteService implements IPacienteService {
 
     @Override
     public Paciente crear(Paciente paciente) {
+        Optional<Paciente> existente = pacienteRepository.buscarPorDNI(paciente.getDni());
+
+        if (existente.isPresent()) {
+            throw new PacienteDuplicadoException(CAMPO_DNI, paciente.getDni());
+        }
         return pacienteRepository.guardar(paciente);
     }
 
@@ -28,9 +36,8 @@ public class PacienteService implements IPacienteService {
 
     @Override
     public Paciente obtenerPorID(long id) {
-        Paciente paciente = this.pacienteRepository.buscarPorID(id)
+        return this.pacienteRepository.buscarPorID(id)
                 .orElseThrow(() -> new PacienteNoEncontradoException(id));
-        return paciente;
     }
 
     @Override
@@ -38,14 +45,16 @@ public class PacienteService implements IPacienteService {
         Paciente existente = pacienteRepository.buscarPorID(id)
                 .orElseThrow(() -> new PacienteNoEncontradoException(id));
 
-        copiarCamposNoNulos(paciente, existente);
-        boolean actualizado = pacienteRepository.actualizarPorID(id, paciente);
-
-        if (!actualizado) {
-            throw new PacienteNoEncontradoException(id);
+        if (paciente.getDni() != null) {
+            Optional<Paciente> pacienteDNIDuplicado = pacienteRepository.buscarPorDNI(paciente.getDni());
+            boolean dniUsadoPorOtro = pacienteDNIDuplicado.isPresent() && !pacienteDNIDuplicado.get().getId().equals(id);
+            if (dniUsadoPorOtro) {
+                throw new PacienteDuplicadoException(CAMPO_DNI, paciente.getDni());
+            }
         }
 
-        return paciente;
+        copiarCamposNoNulos(paciente, existente);
+        return pacienteRepository.actualizarPorID(id, paciente);
     }
 
     @Override
@@ -74,5 +83,4 @@ public class PacienteService implements IPacienteService {
         if (datosActualizados.getEmail() != null) pacienteExistente.setEmail(datosActualizados.getEmail());
         if (datosActualizados.getTelefono() != null) pacienteExistente.setTelefono(datosActualizados.getTelefono());
     }
-
 }
