@@ -10,6 +10,6 @@ public interface IPacienteRepository {
     Optional<Paciente> buscarPorId(Long id);
     Optional<Paciente> buscarPorDNI(String dni);
     List<Paciente> buscarTodos();
-    boolean actualizar(Paciente paciente);
+    Paciente actualizar(Paciente paciente);
     boolean borrar(Long id);
 }

@@ -17,6 +17,7 @@ import java.util.Optional;
 public class PacienteService implements IPacienteService {
 
     private final PacienteRepository pacienteRepository;
+    private static final String PACIENTE_DUPLICADO_ERROR = "DNI";
 
     public PacienteService(PacienteRepository pacienteRepository) {
         this.pacienteRepository = pacienteRepository;
@@ -27,13 +28,12 @@ public class PacienteService implements IPacienteService {
         Optional<Paciente> existente = pacienteRepository.buscarPorDNI(request.getDni());
 
         if (existente.isPresent()) {
-            throw new PacienteDuplicadoException("DNI", request.getDni());
+            throw new PacienteDuplicadoException(PACIENTE_DUPLICADO_ERROR, request.getDni());
         }
 
         Paciente paciente = mapToEntity(request);
         Paciente pacienteGuardado = pacienteRepository.guardar(paciente);
-        PacienteResponse response = mapToResponse(pacienteGuardado);
-        return response;
+        return mapToResponse(pacienteGuardado);
     }
 
     @Override
@@ -61,13 +61,9 @@ public class PacienteService implements IPacienteService {
 
         copiarCamposNoNulos(request, paciente);
 
-        boolean actualizado = pacienteRepository.actualizar(paciente);
+        Paciente pacienteActualizado = pacienteRepository.actualizar(paciente);
 
-        if (!actualizado) {
-            throw new PacienteNoEncontradoException(id);
-        }
-
-        return mapToResponse(paciente);
+        return mapToResponse(pacienteActualizado);
     }
 
     @Override

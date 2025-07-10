@@ -115,7 +115,7 @@ public class PacienteRepository implements IPacienteRepository {
     }
 
     @Override
-    public boolean actualizar(Paciente paciente) {
+    public Paciente actualizar(Paciente paciente) {
         String sql = "UPDATE pacientes SET nombre = ?, apellido = ?, dni = ?, obra_social = ?, email = ?, telefono = ? WHERE id = ?";
 
         int filasAfectadas = jdbcTemplate.update(
@@ -129,7 +129,10 @@ public class PacienteRepository implements IPacienteRepository {
                 paciente.getId()
         );
 
-        return filasAfectadas > 0;
+        if (filasAfectadas == 0) {
+            throw new RuntimeException("No se pudo actualizar el paciente con id " + paciente.getId());
+        }
+        return paciente;
     }
 
     @Override
