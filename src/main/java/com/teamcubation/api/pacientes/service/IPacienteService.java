@@ -1,14 +1,13 @@
 package com.teamcubation.api.pacientes.service;
 
-import com.teamcubation.api.pacientes.dto.PacienteRequest;
-import com.teamcubation.api.pacientes.dto.PacienteResponse;
+import com.teamcubation.api.pacientes.model.Paciente;
 
 import java.util.List;
 
 public interface IPacienteService {
-    PacienteResponse crearPaciente(PacienteRequest request);
-    List<PacienteResponse> obtenerPacientes();
-    PacienteResponse obtenerPacientePorId(Long id);
-    PacienteResponse actualizarPaciente(Long id, PacienteRequest request);
-    void borrarPaciente(Long id);
+    Paciente crear(Paciente request);
+    List<Paciente> obtenerTodos(String dni, String nombre);
+    Paciente obtenerPorID(long id);
+    Paciente actualizarPorID(long id, Paciente paciente);
+    void borrarPorID(long id);
 }
