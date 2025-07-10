@@ -1,4 +1,4 @@
-package com.practica.crud_pacientes.controlador;
+package com.practica.crud_pacientes.controller;
 
 import com.practica.crud_pacientes.dto.PacienteDto;
 import io.swagger.v3.oas.annotations.Operation;
@@ -42,7 +42,7 @@ public interface PacienteAPI {
                     @ApiResponse(responseCode = "404", description = "Paciente inexistente")
             }
     )
-    ResponseEntity<PacienteDto> getPacientePorDni(@RequestParam String dni);
+    ResponseEntity<PacienteDto> getPacienteByDni(@RequestParam String dni);
 
     @Operation(
             summary = "Buscar pacientes por nombre",
@@ -51,7 +51,7 @@ public interface PacienteAPI {
                     @ApiResponse(responseCode = "200", description = "Operacion exitosa")
             }
     )
-    ResponseEntity<List<PacienteDto>> getPacientePorNombre(@RequestParam String nombre);
+    ResponseEntity<List<PacienteDto>> getPacienteByName(@RequestParam String nombre);
 
     @Operation(
             summary = "Registrar un nuevo paciente",
@@ -61,7 +61,7 @@ public interface PacienteAPI {
                     @ApiResponse(responseCode = "409", description = "Ya existe un paciente con ese DNI")
             }
     )
-    ResponseEntity<PacienteDto> agregarPaciente(@RequestBody PacienteDto pacienteNuevo);
+    ResponseEntity<PacienteDto> addPaciente(@RequestBody PacienteDto pacienteNuevo);
 
     @Operation(
             summary = "Actualizar un paciente existente",
@@ -72,7 +72,7 @@ public interface PacienteAPI {
                     @ApiResponse(responseCode = "400", description = "Los datos que se intentan actualizar son incorrectos")
             }
     )
-    ResponseEntity<PacienteDto> actualizarPaciente(@PathVariable int id, @RequestBody PacienteDto paciente);
+    ResponseEntity<PacienteDto> updatePaciente(@PathVariable int id, @RequestBody PacienteDto paciente);
 
     @Operation(
             summary = "Elimina un paciente",
@@ -82,5 +82,5 @@ public interface PacienteAPI {
                     @ApiResponse(responseCode = "404", description = "El paciente que se intenta eliminar no existe")
             }
     )
-    ResponseEntity<Void> eliminarPaciente(@PathVariable int id);
+    ResponseEntity<Void> deletePaciente(@PathVariable int id);
 }

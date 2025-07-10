@@ -1,6 +1,6 @@
 package com.practica.crud_pacientes.dto;
 
-import com.practica.crud_pacientes.modelo.Paciente;
+import com.practica.crud_pacientes.model.Paciente;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
