@@ -1,0 +1,15 @@
+# Ignora la carpeta de compilación
+/target
+
+# Ignora archivos y carpetas de configuración de IDE
+/.idea
+*.iml
+
+# Ignora archivos de control de versiones
+git
+.git
+.gitignore
+
+# Otros archivos temporales
+*.log
+.DS_Store 

@@ -22,6 +22,7 @@
         <java.version>11</java.version>
         <springdoc.version>1.7.0</springdoc.version>
         <lombok.version>1.18.32</lombok.version>
+        <postresql.version>42.7.3</postresql.version>
     </properties>
 
     <dependencies>
@@ -55,6 +56,16 @@
             <artifactId>lombok</artifactId>
             <version>${lombok.version}</version>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>${postgresql.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.cdimascio</groupId>
+            <artifactId>java-dotenv</artifactId>
+            <version>5.2.2</version>
         </dependency>
     </dependencies>
 
