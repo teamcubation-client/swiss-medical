@@ -6,22 +6,24 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class PacienteMapper {
-    public
-    PacienteDTO toDto(Paciente paciente) {
+    public PacienteDTO toDto(Paciente paciente) {
         return new PacienteDTO(
                 paciente.getNombre(),
                 paciente.getApellido(),
                 paciente.getDni(),
-                paciente.getObraSocial()
-        );
+                paciente.getObraSocial(), ,
+                ,
+                paciente.getTelefono(), paciente.getEmail());
     }
 
     public Paciente toEntity(PacienteDTO dto) {
         Paciente paciente = new Paciente();
-        paciente.setNombre(dto.nombre());
-        paciente.setApellido(dto.apellido());
+        paciente.setNombre(dto.firstName());
+        paciente.setApellido(dto.lastName());
         paciente.setDni(dto.dni());
-        paciente.setObraSocial(dto.obraSocial());
+        paciente.setObraSocial(dto.healthInsurance());
+        paciente.setTelefono(dto.phone());
+        paciente.setEmail(dto.email());
         return paciente;
     }
 }

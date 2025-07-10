@@ -1,10 +1,10 @@
 package com.tq.pacientes.dtos;
 
-public record ActualizarPacienteDTO(
-        String dni,
+public record PacienteDTO(
         String nombre,
         String apellido,
+        String dni,
         String obraSocial,
-        String email,
-        String telefono) {
+        String telefono,
+        String email) {
 }
