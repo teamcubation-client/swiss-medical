@@ -46,10 +46,6 @@ public class PatientService {
     }
 
     public Patient updatePatient(Long id, Patient patientDetails) {
-        if (!patientRepository.existsById(id)) {
-            throw new PatientNotFoundException("Patient with ID " + id + " does not exist.");
-        }
-
         Patient existingPatient = patientRepository.findById(id)
                 .orElseThrow(() -> new PatientNotFoundException("Patient with ID " + id + " does not exist."));
 
