@@ -1,5 +1,6 @@
 package com.teamcubation.api.pacientes.repository;
 
+import com.teamcubation.api.pacientes.exception.PacienteNoActualizadoException;
 import com.teamcubation.api.pacientes.model.Paciente;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -12,6 +13,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -47,7 +49,7 @@ public class PacienteRepository implements IPacienteRepository {
     }
 
     @Override
-    public Optional<Paciente> buscarPorId(Long id) {
+    public Optional<Paciente> buscarPorID(Long id) {
         String sql = "SELECT * FROM pacientes WHERE id = ?";
         try {
             Paciente paciente = jdbcTemplate.queryForObject(
@@ -96,9 +98,21 @@ public class PacienteRepository implements IPacienteRepository {
     }
 
     @Override
-    public List<Paciente> buscarTodos() {
-        String sql = "SELECT * FROM pacientes";
-        return jdbcTemplate.query(sql, new RowMapper<Paciente>() {
+    public List<Paciente> buscarTodos(String dni, String nombre) {
+        StringBuilder sql = new StringBuilder("SELECT * FROM pacientes WHERE 1=1");
+        List<Object> params = new ArrayList<>();
+
+        if (dni != null && !dni.isEmpty()) {
+            sql.append(" AND dni = ?");
+            params.add(dni);
+        }
+
+        if (nombre != null && !nombre.isEmpty()) {
+            sql.append(" AND LOWER(nombre) LIKE ?");
+            params.add("%" + nombre.toLowerCase() + "%");
+        }
+
+        return jdbcTemplate.query(sql.toString(), params.toArray(), new RowMapper<Paciente>() {
             @Override
             public Paciente mapRow(ResultSet rs, int rowNum) throws SQLException {
                 Paciente paciente = new Paciente();
@@ -115,7 +129,8 @@ public class PacienteRepository implements IPacienteRepository {
     }
 
     @Override
-    public Paciente actualizar(Paciente paciente) {
+    public Paciente actualizarPorID(Long id, Paciente paciente) {
+        paciente.setId(id);
         String sql = "UPDATE pacientes SET nombre = ?, apellido = ?, dni = ?, obra_social = ?, email = ?, telefono = ? WHERE id = ?";
 
         int filasAfectadas = jdbcTemplate.update(
@@ -130,15 +145,15 @@ public class PacienteRepository implements IPacienteRepository {
         );
 
         if (filasAfectadas == 0) {
-            throw new RuntimeException("No se pudo actualizar el paciente con id " + paciente.getId());
+            throw new PacienteNoActualizadoException(id);
         }
+
         return paciente;
     }
 
     @Override
-    public boolean borrar(Long id) {
+    public void borrarPorID(Long id) {
         String sql = "DELETE FROM pacientes WHERE id = ?";
-        int filasAfectadas = jdbcTemplate.update(sql, id);
-        return filasAfectadas > 0;
+        jdbcTemplate.update(sql, id);
     }
 }
