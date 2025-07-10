@@ -1,0 +1,26 @@
+### GET pacientes
+GET http://localhost:8080/pacientes
+Accept: application/json
+
+### POST pacientes
+POST http://localhost:8080/pacientes
+Content-Type: application/json
+
+{
+    "dni": "111111",
+    "nombre": "Nicolas",
+    "apellido": "Berti",
+    "obraSocial": "OSDE",
+    "email": "nicolas.berti@teamcubation.com",
+    "telefono": "2920642002"
+}
+
+### PUT pacientes
+PUT http://localhost:8080/pacientes/111111
+Content-Type: application/json
+
+{
+    "nombre": "Martin",
+    "apellido": "Girolamo",
+    "email": "nicolas.berti69@gmail.com"
+}

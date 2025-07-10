@@ -1,18 +1,15 @@
-FROM eclipse-temurin:17-jdk AS builder
+FROM gradle:8.5-jdk17 AS build
 
 WORKDIR /app
-
 COPY . .
 
-RUN chmod +x mvnw
+RUN gradle clean build -x test --no-daemon --no-build-cache
 
-RUN ./mvnw clean package -DskipTests
-
-FROM eclipse-temurin:23-jre
+FROM eclipse-temurin:17-jdk-alpine
 
 WORKDIR /app
 
-COPY --from=builder /app/target/*.jar app.jar
+COPY --from=build /app/build/libs/*.jar app.jar
 
 EXPOSE 8080
 
