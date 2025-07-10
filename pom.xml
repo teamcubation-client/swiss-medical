@@ -23,6 +23,7 @@
         <springdoc.version>1.7.0</springdoc.version>
         <lombok.version>1.18.32</lombok.version>
         <postresql.version>42.7.3</postresql.version>
+        <dotenv.version>5.2.2</dotenv.version>
     </properties>
 
     <dependencies>
@@ -60,7 +61,7 @@
         <dependency>
             <groupId>io.github.cdimascio</groupId>
             <artifactId>java-dotenv</artifactId>
-            <version>5.2.2</version>
+            <version>${dotenv.version}</version>
         </dependency>
     </dependencies>
 
