@@ -11,11 +11,11 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/v1/pacientes")
-public class IPacienteController implements IPacienteAPI {
+public class PacienteController implements IPacienteAPI {
 
     private final PacienteService pacienteService;
 
-    public IPacienteController(PacienteService pacienteService) {
+    public PacienteController(PacienteService pacienteService) {
         this.pacienteService = pacienteService;
     }
 
