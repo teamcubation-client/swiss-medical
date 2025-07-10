@@ -36,7 +36,7 @@ public interface IPacienteAPI {
     );
 
     @Operation(summary = "Eliminar un paciente por ID")
-    ResponseEntity<Object> borrarPorID(
+    ResponseEntity<Void> borrarPorID(
             @Parameter(description = "ID único del paciente", example = "1")
             long id
     );
