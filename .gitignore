@@ -34,3 +34,7 @@ build/
 
 ### Docker Volumes ###
 mysql_data
+db_data
+
+### Environment Variables ###
+.env
