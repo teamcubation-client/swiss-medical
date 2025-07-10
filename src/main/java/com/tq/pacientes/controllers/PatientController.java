@@ -14,12 +14,12 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/patients")
-public class PacienteController implements IPacienteController {
+public class PatientController implements IPacienteController {
 
     private final PatientService patientService;
     private final PatientMapper patientMapper;
 
-    public PacienteController(PatientService patientService, PatientMapper patientMapper) {
+    public PatientController(PatientService patientService, PatientMapper patientMapper) {
         this.patientService = patientService;
         this.patientMapper = patientMapper;
     }
@@ -34,17 +34,17 @@ public class PacienteController implements IPacienteController {
 
     @GetMapping
     public ResponseEntity<List<PatientDTO>> search(
-            @RequestParam(required = false) String idNumber,
-            @RequestParam(required = false) String name
+            @RequestParam(required = false) String dni,
+            @RequestParam(required = false) String firstName
     ) {
         List<Patient> results;
 
-        if (idNumber != null) {
-            return patientService.findByDni(idNumber)
+        if (dni != null) {
+            return patientService.findByDni(dni)
                     .map(p -> ResponseEntity.ok(List.of(patientMapper.toDto(p))))
                     .orElse(ResponseEntity.noContent().build());
-        } else if (name != null) {
-            results = patientService.searchByFirstName(name);
+        } else if (firstName != null) {
+            results = patientService.searchByFirstName(firstName);
         } else {
             results = patientService.listAllPatients();
         }
@@ -71,10 +71,12 @@ public class PacienteController implements IPacienteController {
             @RequestBody PatientDTO dto
     ) {
         Patient patientUpdates = new Patient();
-        if (dto.idNumber() != null) patientUpdates.setDni(dto.idNumber());
+        if (dto.dni() != null) patientUpdates.setDni(dto.dni());
         if (dto.firstName() != null) patientUpdates.setFirstName(dto.firstName());
         if (dto.lastName() != null) patientUpdates.setLastName(dto.lastName());
         if (dto.healthInsurance() != null) patientUpdates.setHealthInsurance(dto.healthInsurance());
+        if (dto.healthPlan() != null) patientUpdates.setHealthPlan(dto.healthPlan());
+        if (dto.address() != null) patientUpdates.setAddress(dto.address());
         if (dto.email() != null) patientUpdates.setEmail(dto.email());
         if (dto.phoneNumber() != null) patientUpdates.setPhoneNumber(dto.phoneNumber());
 

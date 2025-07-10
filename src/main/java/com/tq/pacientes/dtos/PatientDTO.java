@@ -1,10 +1,12 @@
 package com.tq.pacientes.dtos;
 
-public record PacienteDTO(
-        String nombre,
-        String apellido,
+public record PatientDTO(
+        String firstName,
+        String lastName,
         String dni,
-        String obraSocial,
-        String telefono,
+        String healthInsurance,
+        String healthPlan,
+        String address,
+        String phoneNumber,
         String email) {
 }

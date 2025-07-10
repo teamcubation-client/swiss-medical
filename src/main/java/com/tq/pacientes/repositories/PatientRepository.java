@@ -1,6 +1,6 @@
 package com.tq.pacientes.repositories;
 
-import com.tq.pacientes.models.Paciente;
+import com.tq.pacientes.models.Patient;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -8,8 +8,9 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface PacienteRepository extends JpaRepository<Paciente, Long> {
+public interface PatientRepository extends JpaRepository<Patient, Long> {
 
-    Optional<Paciente> findByDni(String dni);
-    List<Paciente> findByNombreContainingIgnoreCase(String nombre);
+    Optional<Patient> findByDni(String dni);
+
+    List<Patient> findByFirstNameContainingIgnoreCase(String firstName);
 }

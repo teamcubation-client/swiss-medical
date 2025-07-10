@@ -71,6 +71,12 @@ public class PatientServiceImpl implements PatientService {
                     if (patientDetails.getHealthInsurance() != null) {
                         patient.setHealthInsurance(patientDetails.getHealthInsurance());
                     }
+                    if (patientDetails.getHealthPlan() != null) {
+                        patient.setHealthPlan(patientDetails.getHealthPlan());
+                    }
+                    if (patientDetails.getAddress() != null) {
+                        patient.setAddress(patientDetails.getAddress());
+                    }
                     if (patientDetails.getEmail() != null) {
                         patient.setEmail(patientDetails.getEmail());
                     }

@@ -11,10 +11,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
         version = "V1.0",
         description = "API para gestionar pacientes")
 )
-public class PacientesApplication {
+public class PatientsApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(PacientesApplication.class, args);
+        SpringApplication.run(PatientsApplication.class, args);
     }
 
 }
