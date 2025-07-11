@@ -172,8 +172,8 @@ public class PacienteController implements IPacienteController {
      * @param dni Documento Nacional de Identidad
      * @return PacienteDTO encontrado
      */
-    @GetMapping("/sp/buscar/dni")
-    public ResponseEntity<PacienteDTO> buscarPorDniConSP(@RequestParam String dni) {
+    @GetMapping("/sp/buscar/dni/{dni}")
+    public ResponseEntity<PacienteDTO> buscarPorDniConSP(@PathVariable String dni) {
         PacienteDTO paciente = pacienteService.buscarPorDniConSP(dni);
         return ResponseEntity.ok(paciente);
     }
@@ -183,8 +183,8 @@ public class PacienteController implements IPacienteController {
      * @param nombre parte o nombre completo a buscar
      * @return lista de PacienteDTO que coinciden con el parametro
      */
-    @GetMapping("/sp/buscar/nombre")
-    public ResponseEntity<List<PacienteDTO>> buscarPorNombreConSP(@RequestParam String nombre) {
+    @GetMapping("/sp/buscar/nombre/{nombre}")
+    public ResponseEntity<List<PacienteDTO>> buscarPorNombreConSP(@PathVariable String nombre) {
         List<PacienteDTO> pacientes = pacienteService.buscarPorNombreConSP(nombre);
         return ResponseEntity.ok(pacientes);
     }

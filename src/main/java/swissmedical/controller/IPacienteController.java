@@ -122,8 +122,8 @@ public interface IPacienteController {
         @ApiResponse(responseCode = CODE_NOT_FOUND, description = DESC_NOT_FOUND_DNI),
         @ApiResponse(responseCode = CODE_INTERNAL_SERVER_ERROR, description = DESC_INTERNAL_ERROR)
     })
-    @GetMapping("/sp/buscar/dni")
-    ResponseEntity<PacienteDTO> buscarPorDniConSP(@RequestParam String dni);
+    @GetMapping("/sp/buscar/dni/{dni}")
+    ResponseEntity<PacienteDTO> buscarPorDniConSP(@PathVariable String dni);
 
     @Operation(summary = "Buscar pacientes por Nombre (SP)", description = "Busca pacientes por nombre usando stored procedure", tags = {"Stored Procedure"})
     @ApiResponses(value = {
@@ -131,8 +131,8 @@ public interface IPacienteController {
         @ApiResponse(responseCode = CODE_NOT_FOUND, description = DESC_NOT_FOUND_NAME),
         @ApiResponse(responseCode = CODE_INTERNAL_SERVER_ERROR, description = DESC_INTERNAL_ERROR)
     })
-    @GetMapping("/sp/buscar/nombre")
-    ResponseEntity<List<PacienteDTO>> buscarPorNombreConSP(@RequestParam String nombre);
+    @GetMapping("/sp/buscar/nombre/{nombre}")
+    ResponseEntity<List<PacienteDTO>> buscarPorNombreConSP(@PathVariable String nombre);
 
     @Operation(summary = "Buscar pacientes por Obra Social (SP)", description = "Busca pacientes por obra social con paginacion usando stored procedure", tags = {"Stored Procedure"})
     @ApiResponses(value = {

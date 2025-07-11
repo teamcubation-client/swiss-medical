@@ -25,6 +25,8 @@ INSERT INTO paciente (nombre, apellido, dni, obra_social, email, telefono, tipo_
 ('Diego', 'Herrera', '01234567', 'Medicus', 'diego.herrera@example.com', '101-0101', 'Integral', '2021-12-01', true);
 
 
+
+-- Procedimiento 1: buscar paciente por DNI
 DELIMITER //
 
 CREATE PROCEDURE buscar_paciente_por_dni (IN p_dni VARCHAR(20))
@@ -34,14 +36,14 @@ BEGIN
     WHERE dni = p_dni;
 END //
 
-
+-- Procedimiento 2: buscar pacientes por nombre parcial
 CREATE PROCEDURE buscar_pacientes_por_nombre (IN p_nombre VARCHAR(50))
 BEGIN
     SELECT  id, nombre, apellido, dni, obra_social, email, telefono, tipo_plan_obra_social, fecha_alta, estado
     FROM paciente
     WHERE LOWER(nombre) LIKE CONCAT('%', LOWER(p_nombre), '%');
 END //
-
+-- Procedimiento 3: buscar pacientes por obra social con paginacion
 CREATE PROCEDURE buscar_pacientes_por_obra_social_paginado(
     IN p_obra_social VARCHAR(50),
     IN p_limit INT,

@@ -22,7 +22,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: pacientes-app-bd
+    container_name: pacientes-app
     depends_on:
       db:
         condition: service_healthy
