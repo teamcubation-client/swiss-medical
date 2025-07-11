@@ -14,7 +14,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/v1/pacientes")
-public class PacienteController {
+public class PacienteController implements IPacienteAPI {
 
     private final PacienteService pacienteService;
 
@@ -22,6 +22,7 @@ public class PacienteController {
         this.pacienteService = pacienteService;
     }
 
+    @Override
     @PostMapping
     public ResponseEntity<PacienteResponse> crear(@RequestBody PacienteRequest request) {
         Paciente paciente = PacienteMapper.toEntity(request);
@@ -29,6 +30,7 @@ public class PacienteController {
         return ResponseEntity.status(HttpStatus.CREATED).body(PacienteMapper.toResponse(creado));
     }
 
+    @Override
     @GetMapping
     public ResponseEntity<List<PacienteResponse>> obtenerTodos(@RequestParam(required = false) String dni,
                                                                @RequestParam(required = false) String nombre) {
@@ -40,12 +42,14 @@ public class PacienteController {
         return ResponseEntity.ok().body(response);
     }
 
+    @Override
     @GetMapping("/{id}")
     public ResponseEntity<PacienteResponse> obtenerPorID(@PathVariable long id) {
         Paciente paciente = this.pacienteService.obtenerPorID(id);
         return ResponseEntity.ok().body(PacienteMapper.toResponse(paciente));
     }
 
+    @Override
     @PutMapping("/{id}")
     public ResponseEntity<PacienteResponse> actualizarPorID(@PathVariable long id,
                                                             @RequestBody PacienteRequest request) {
@@ -54,6 +58,7 @@ public class PacienteController {
         return ResponseEntity.ok().body(PacienteMapper.toResponse(response));
     }
 
+    @Override
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> borrarPorID(@PathVariable long id) {
         this.pacienteService.borrarPorID(id);

@@ -1,9 +1,20 @@
 package com.teamcubation.api.pacientes.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
+@Schema(description = "Respuesta con datos de un paciente")
 public class PacienteResponse {
+
+    @Schema(description = "Identificador único del paciente", example = "123")
     private Long id;
+
+    @Schema(description = "Nombre del paciente", example = "María")
     private String nombre;
+
+    @Schema(description = "Apellido del paciente", example = "Gómez")
     private String apellido;
+
+    @Schema(description = "Documento Nacional de Identidad", example = "12345678")
     private String dni;
 
     public Long getId() {
