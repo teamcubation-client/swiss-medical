@@ -2,7 +2,7 @@ version: '3.8'
 services:
   mysql:
     image: mysql:8.0
-    container_name: mysqlpacientes
+    container_name: pacientes_stored_procedures
     environment:
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
       MYSQL_DATABASE: ${DB_DATABASE}
@@ -11,6 +11,7 @@ services:
     ports:
       - "${DB_PORT_IN}:${DB_PORT_OUT}"
     volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
       - mysql_data:/var/lib/mysql
     restart: unless-stopped
     healthcheck:

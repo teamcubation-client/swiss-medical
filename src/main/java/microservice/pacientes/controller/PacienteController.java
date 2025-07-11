@@ -77,5 +77,53 @@ public interface PacienteController {
     })
     ResponseEntity<Void> delete(String dni);
 
+    @Operation(
+            summary = "Obtener un paciente según su DNI usando SP",
+            description = "Devuelve los datos del paciente buscado por DNI"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Paciente encontrado"),
+            @ApiResponse(responseCode = "204", description = "Paciente no encontrado"),
+            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
+    ResponseEntity<PacienteResponseDTO> getByDniSP(String dni);
+
+    @Operation(
+            summary = "Obtener un paciente según su nombre usando SP",
+            description = "Devuelve los datos del paciente buscado por DNI"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Paciente encontrado"),
+            @ApiResponse(responseCode = "204", description = "Paciente no encontrado"),
+            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
+    ResponseEntity<PacienteResponseDTO> getByNombreSP(String nombre);
+
+    @Operation(
+            summary = "Obtener todos los pacientes según cierta obra social usando SP y paginación",
+            description = "Devuelve los datos de todos los pacientes con cierta obra social"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Pacientes encontrados. Incluye lista vacía."),
+            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
+    ResponseEntity<List<PacienteResponseDTO>> getByObraSocialSP(
+            @Parameter(
+                    description = "Obra social",
+                    required = true
+            )
+            String obraSocial,
+            @Parameter(
+                    description = "Limite de la paginación",
+                    required = true
+            )
+            int limit,
+            @Parameter(
+                    description = "Offset de la paginación",
+                    required = true
+            )
+            int offset);
+
+
 
 }

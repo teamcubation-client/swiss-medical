@@ -24,3 +24,21 @@ Content-Type: application/json
     "apellido": "Girolamo",
     "email": "nicolas.berti69@gmail.com"
 }
+
+### GET paciente by DNI with SP
+GET http://localhost:8080/pacientes/dni/90123456
+
+### GET paciente by DNI
+GET http://localhost:8080/pacientes/90123456
+
+### GET paciente by DNI with SP
+GET http://localhost:8080/pacientes/dni/1
+
+### GET paciente by DNI
+GET http://localhost:8080/pacientes/1
+
+### GET paciente by nombre with SP
+GET http://localhost:8080/pacientes/nombre/Laura
+
+### GET paciente by obra social with SP
+GET http://localhost:8080/pacientes/obra_social?obra_social=OSDE&page=1&size=2

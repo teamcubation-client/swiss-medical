@@ -15,4 +15,9 @@ public interface PacienteService {
     Paciente update(String dni, PacienteUpdateDTO pacienteUpdateDTO) throws PacienteNoEncontradoException;
     void delete(String dni) throws PacienteNoEncontradoException;
     List<Paciente> findByNombreContainingIgnoreCase(String nombre);
+
+    Paciente findByDniSP(String dni) throws PacienteNoEncontradoException;
+    Paciente findByNombreSP(String nombre) throws PacienteNoEncontradoException;
+    List<Paciente> findByObraSocialSP(String obraSocial, int limit, int offset) throws PacienteNoEncontradoException;
+
 }

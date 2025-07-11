@@ -8,6 +8,8 @@ import microservice.pacientes.model.Paciente;
 import microservice.pacientes.repository.PacienteRepository;
 import microservice.pacientes.util.PacienteRequestMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
 
 @Service
@@ -47,7 +49,7 @@ public class PacienteServiceImpl implements PacienteService {
                 
         if (pacienteUpdateDTO.getNombre() != null) paciente.setNombre(pacienteUpdateDTO.getNombre());
         if (pacienteUpdateDTO.getApellido() != null) paciente.setApellido(pacienteUpdateDTO.getApellido());
-        if (pacienteUpdateDTO.getObraSocial() != null) paciente.setObraSocial(pacienteUpdateDTO.getObraSocial());
+        if (pacienteUpdateDTO.getObraSocial() != null) paciente.setObra_social(pacienteUpdateDTO.getObraSocial());
         if (pacienteUpdateDTO.getEmail() != null) paciente.setEmail(pacienteUpdateDTO.getEmail());
         if (pacienteUpdateDTO.getTelefono() != null) paciente.setTelefono(pacienteUpdateDTO.getTelefono());
 
@@ -65,4 +67,27 @@ public class PacienteServiceImpl implements PacienteService {
     public List<Paciente> findByNombreContainingIgnoreCase(String nombre) {
         return pacienteRepository.findByNombreContainingIgnoreCase(nombre);
     }
+
+    @Override
+    public Paciente findByDniSP(String dni) throws PacienteNoEncontradoException {
+       Paciente paciente = pacienteRepository.findByDniSP(dni)
+                .orElseThrow(PacienteNoEncontradoException::new);
+        return paciente;
+    }
+
+    @Override
+    @Transactional// No me deja ejecutar esto MySQL (readOnly = true)
+    public Paciente findByNombreSP(String nombre) throws PacienteNoEncontradoException {
+       Paciente paciente = pacienteRepository.findByNombreSP(nombre)
+                .orElseThrow(PacienteNoEncontradoException::new);
+        return paciente;
+    }
+
+    @Override
+    @Transactional// No me deja ejecutar esto MySQL (readOnly = true)
+    public List<Paciente> findByObraSocialSP(String obraSocial, int limit, int offset) throws PacienteNoEncontradoException {
+       List<Paciente> pacientes = pacienteRepository.findByObraSocialSP(obraSocial, limit, offset);
+        return pacientes;
+    }
+
 }
