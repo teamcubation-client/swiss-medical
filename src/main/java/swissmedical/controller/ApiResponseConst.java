@@ -17,6 +17,7 @@ public class ApiResponseConst {
     public static final String DESC_NOT_FOUND_ID = "No existe el paciente con el ID";
     public static final String DESC_NOT_FOUND_DNI = "No existe el paciente con el DNI";
     public static final String DESC_NOT_FOUND_NAME = "No existe el paciente con el nombre";
+    public static final String DESC_NOT_FOUND_OBRASOCIAL = "No existe el paciente con la obra social";
     public static final String DESC_INTERNAL_ERROR = "Error del sistema";
     public static final String DESC_LIST_ACTIVATED = "Lista de pacientes activos";
     public static final String DESC_LIST_DEACTIVATED = "Lista de pacientes inactivos";

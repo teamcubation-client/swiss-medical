@@ -7,6 +7,9 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import swissmedical.exception.PacienteDuplicadoException;
 import swissmedical.exception.PacienteNotFoundException;
+import swissmedical.dto.PacienteDTO;
+import swissmedical.mapper.PacienteMapper;
+import java.util.stream.Collectors;
 
 /**
  * Implementacion del servicio de pacientes
@@ -16,9 +19,11 @@ import swissmedical.exception.PacienteNotFoundException;
 public class PacienteServiceImpl implements PacienteService {
 
     private final PacienteRepository pacienteRepository;
+    private final PacienteMapper pacienteMapper;
 
-    public PacienteServiceImpl(PacienteRepository pacienteRepository) {
+    public PacienteServiceImpl(PacienteRepository pacienteRepository, PacienteMapper pacienteMapper) {
         this.pacienteRepository = pacienteRepository;
+        this.pacienteMapper = pacienteMapper;
     }
 
     /**
@@ -46,7 +51,7 @@ public class PacienteServiceImpl implements PacienteService {
     @Override
     public Paciente obtenerPacientePorId(Long id) {
         return pacienteRepository.findById(id)
-                .orElseThrow(() -> new PacienteNotFoundException(id));
+                .orElseThrow(() -> PacienteNotFoundException.porId(id));
     }
 
     /**
@@ -66,7 +71,7 @@ public class PacienteServiceImpl implements PacienteService {
     @Override
     public void eliminarPaciente(Long id) {
         Paciente paciente = pacienteRepository.findById(id)
-                .orElseThrow(() -> new PacienteNotFoundException(id));
+                .orElseThrow(() -> PacienteNotFoundException.porId(id));
 
         pacienteRepository.delete(paciente);
     }
@@ -89,7 +94,6 @@ public class PacienteServiceImpl implements PacienteService {
      */
     @Override
     public List<Paciente> buscarPorNombreParcial(String nombre) {
-
         List<Paciente> pacientes = pacienteRepository.findByNombreContainingIgnoreCase(nombre);
         return pacientes;
     }
@@ -104,7 +108,7 @@ public class PacienteServiceImpl implements PacienteService {
     @Override
     public Paciente actualizarPaciente(Long id, Paciente paciente) {
         Paciente existente = pacienteRepository.findById(id)
-                .orElseThrow(() -> new PacienteNotFoundException(id));
+                .orElseThrow(() -> PacienteNotFoundException.porId(id));
 
         if (paciente.getNombre() != null) {
             existente.setNombre(paciente.getNombre());
@@ -137,7 +141,7 @@ public class PacienteServiceImpl implements PacienteService {
     @Override
     public Paciente desactivarPaciente(Long id) {
         Paciente paciente = pacienteRepository.findById(id)
-                .orElseThrow(() -> new PacienteNotFoundException(id));
+                .orElseThrow(() -> PacienteNotFoundException.porId(id));
         paciente.setEstado(false);
         return pacienteRepository.save(paciente);
     }
@@ -145,9 +149,34 @@ public class PacienteServiceImpl implements PacienteService {
     @Override
     public Paciente activarPaciente(Long id) {
         Paciente paciente = pacienteRepository.findById(id)
-                .orElseThrow(() -> new PacienteNotFoundException(id));
+                .orElseThrow(() -> PacienteNotFoundException.porId(id));
         paciente.setEstado(true);
         return pacienteRepository.save(paciente);
+    }
+
+    @Override
+    public PacienteDTO buscarPorDniConSP(String dni) {
+        return pacienteRepository.buscarPorDniConSP(dni)
+            .map(pacienteMapper::toDTO)
+            .orElseThrow(() -> PacienteNotFoundException.porDni(dni));
+    }
+
+    @Override
+    public List<PacienteDTO> buscarPorNombreConSP(String nombre) {
+        List<Paciente> pacientes = pacienteRepository.buscarPorNombreConSP(nombre);
+        if (pacientes == null || pacientes.isEmpty()) {
+            throw PacienteNotFoundException.porNombre(nombre);
+        }
+        return pacientes.stream().map(pacienteMapper::toDTO).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<PacienteDTO> buscarPorObraSocialPaginado(String obraSocial, int limit, int offset) {
+        List<Paciente> pacientes = pacienteRepository.buscarPorObraSocialPaginado(obraSocial, limit, offset);
+        if (pacientes == null || pacientes.isEmpty()) {
+            throw PacienteNotFoundException.porObraSocial(obraSocial);
+        }
+        return pacientes.stream().map(pacienteMapper::toDTO).collect(Collectors.toList());
     }
 
 } 
