@@ -21,4 +21,10 @@ public interface IPacienteService {
 
     void deletePaciente(int id) throws PacienteNoEncontradoException;
 
+    Paciente getByDniFromSP(String dni);
+
+    List<Paciente> getPacientesbyNombreFromSP(String nombre);
+
+    List<Paciente> getPacietesbyObraSocialFromSP(String obraSocial, int limite, int off);
+
 }

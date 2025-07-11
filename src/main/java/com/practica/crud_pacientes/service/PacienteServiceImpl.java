@@ -5,6 +5,7 @@ import com.practica.crud_pacientes.exceptions.PacienteNoEncontradoException;
 import com.practica.crud_pacientes.model.Paciente;
 import com.practica.crud_pacientes.repository.PacienteRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -70,5 +71,27 @@ public class PacienteServiceImpl implements IPacienteService {
             throw new PacienteNoEncontradoException();
 
         pacienteRepository.deleteById(id);
+    }
+
+    @Transactional
+    @Override
+    public Paciente getByDniFromSP(String dni) {
+        Paciente paciente = pacienteRepository.getByDniFromSP(dni);
+        if(paciente == null)
+            throw new PacienteNoEncontradoException();
+
+        return paciente;
+    }
+
+    @Transactional
+    @Override
+    public List<Paciente> getPacientesbyNombreFromSP(String nombre) {
+        return pacienteRepository.getPacientesByNombreFromSP(nombre.toLowerCase());
+    }
+
+    @Transactional
+    @Override
+    public List<Paciente> getPacietesbyObraSocialFromSP(String obraSocial, int limite, int off) {
+        return pacienteRepository.getPacietesbyObraSocialFromSP(obraSocial, limite, off);
     }
 }
