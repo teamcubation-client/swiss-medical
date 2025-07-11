@@ -89,6 +89,118 @@ Dividir el proyecto en al menos tres capas:
 
 - Contenerizar el microservicio usando Docker. Sustituir la base de datos H2 en memoria por una base de datos MySQL montada también como contenedor. Usar Docker Compose para orquestar ambos contenedores (app + db) y un archivo .env para manejar variables de entorno.
 
+
+## Fase 6: Implementación e Integración de Stored Procedures
+### 🎯 Objetivo
+- Extender el microservicio para incluir lógica almacenada directamente en la base de datos. En esta etapa, deberán:
+- Crear y poblar la base de datos MySQL con registros de pacientes.
+- Implementar procedimientos almacenados (stored procedures) para consultas específicas.
+- Invocar esos procedimientos desde el repositorio en Java.
+- Exponerlos a través de la API REST de forma limpia y documentada.
+
+### ✅ Módulo 6-A: Crear script init.sql
+
+1. Crear un archivo llamado init.sql con el siguiente contenido:
+   - Carga de datos de ejemplo: al menos 10 registros realistas en la tabla paciente.
+
+   - Definición de stored procedures:
+     - `buscar_paciente_por_dni(IN p_dni VARCHAR(20))`: devuelve un único paciente por DNI.
+     - `buscar_pacientes_por_nombre(IN p_nombre VARCHAR(50))`: devuelve pacientes cuyo nombre contenga el valor parcial recibido (insensible a mayúsculas).
+     - `buscar_pacientes_por_obra_social_paginado(IN p_obra_social VARCHAR(50), IN p_limit INT, IN p_offset INT)`: devuelve pacientes de una obra social con paginación estilo limit/offset.
+
+```sql
+init.sql
+-- Datos de ejemplo para la tabla paciente
+INSERT INTO paciente (dni, nombre, apellido, obra_social, email, telefono) VALUES
+('12345678', 'Carlos', 'Pérez', 'OSDE', 'carlos.perez@example.com', '111-1111'),
+('23456789', 'Ana', 'Gómez', 'Swiss Medical', 'ana.gomez@example.com', '222-2222'),
+('34567890', 'Luis', 'Martínez', 'OSDE', 'luis.martinez@example.com', '333-3333'),
+('45678901', 'María', 'López', 'Galeno', 'maria.lopez@example.com', '444-4444'),
+('56789012', 'Jorge', 'Sánchez', 'OSDE', 'jorge.sanchez@example.com', '555-5555'),
+('67890123', 'Lucía', 'Fernández', 'Swiss Medical', 'lucia.fernandez@example.com', '666-6666'),
+('78901234', 'Pedro', 'Ramírez', 'Medicus', 'pedro.ramirez@example.com', '777-7777'),
+('89012345', 'Laura', 'Suárez', 'Galeno', 'laura.suarez@example.com', '888-8888'),
+('90123456', 'Sofía', 'Gutiérrez', 'OSDE', 'sofia.gutierrez@example.com', '999-9999'),
+('01234567', 'Diego', 'Herrera', 'Medicus', 'diego.herrera@example.com', '101-0101');
+
+-- Procedimiento 1: buscar paciente por DNI
+DELIMITER //
+
+CREATE PROCEDURE buscar_paciente_por_dni(IN p_dni VARCHAR(20))
+BEGIN
+SELECT dni, nombre, apellido, obra_social, email, telefono
+FROM paciente
+WHERE dni = p_dni;
+END;
+//
+
+-- Procedimiento 2: buscar pacientes por nombre parcial (case-insensitive)
+CREATE PROCEDURE buscar_pacientes_por_nombre(IN p_nombre VARCHAR(50))
+BEGIN
+SELECT dni, nombre, apellido, obra_social, email, telefono
+FROM paciente
+WHERE LOWER(nombre) LIKE CONCAT('%', LOWER(p_nombre), '%');
+END;
+//
+
+-- Procedimiento 3: buscar pacientes por obra social con paginación
+CREATE PROCEDURE buscar_pacientes_por_obra_social_paginado(
+IN p_obra_social VARCHAR(50),
+IN p_limit INT,
+IN p_offset INT
+)
+BEGIN
+SELECT dni, nombre, apellido, obra_social, email, telefono
+FROM paciente
+WHERE obra_social = p_obra_social
+LIMIT p_limit OFFSET p_offset;
+END;
+//
+
+DELIMITER ;
+```
+
+2. Configurar docker-compose.yml para que el contenedor MySQL ejecute automáticamente init.sql al inicializarse
+
+```yaml
+volumes:
+- ./01_init.sql:/docker-entrypoint-initdb.d/01_init.sql
+```
+
+3. Definir el archivo .env con las variables necesarias para la base de datos.
+
+### ✅ Módulo 6-B: Invocar los Stored Procedures desde Java
+1. En la interfaz PacienteRepository, agregar métodos que ejecuten los stored procedures utilizando @Query(value = "...", nativeQuery = true) o @Procedure.
+
+```java
+@Query(value = "CALL buscar_paciente_por_dni(:dni)", nativeQuery = true)
+Optional<Paciente> buscarPorDniConSP(@Param("dni") String dni);
+```
+
+2. Desde la capa de servicios, invocar los métodos del repositorio y mapear los resultados a PacienteDTO.
+3. Manejar posibles errores (por ejemplo, si no se encuentra un paciente) usando excepciones personalizadas como PacienteNoEncontradoException.
+
+### ✅ Módulo 6-C: Exponer Endpoints REST
+
+- Agregar endpoints en el controlador que permitan consultar los stored procedures desde la API REST. Ejemplo de endpoints:
+
+| Endpoint                   | Método | Descripción                                    |
+|----------------------------|--------|------------------------------------------------|
+| /pacientes/dni/{dni}       | GET    | Busca un paciente por DNI (via SP)             |
+| /pacientes/nombre/{nombre} | GET    | Busca pacientes por nombre parcial (via SP)    |
+| /pacientes/obra-social     | GET    | Busca pacientes por obra social con paginación |
+
+
+- El endpoint /obra-social debe recibir los parámetros:
+  - `obraSocial`, `page`, `size` como `@RequestParam`
+
+### 📌 Requisitos técnicos
+
+- Usar MySQL en Docker, reemplazando la base en memoria.
+- Spring Boot con Spring Data JPA.
+- El script SQL debe ejecutarse automáticamente en la creación del contenedor.
+- Resolver las búsquedas solicitadas usando exclusivamente los stored procedures implementados.
+
 ---
 # 📝 Check List
 
