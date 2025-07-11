@@ -8,6 +8,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
+@Table(name = "paciente")
 public class Paciente {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -17,11 +18,17 @@ public class Paciente {
 
     @Column(nullable = false, unique = true)
     private String dni;
+
+    @Column(name = "obra_social")
     private String obraSocial;
     private String email;
     private String telefono;
     private String domicilio;
+
+    @Column(name = "fecha_nacimiento")
     private LocalDate fechaNacimiento;
+
+    @Column(name = "estado_civil")
     private String estadoCivil;
 
     public String getEstadoCivil() {
