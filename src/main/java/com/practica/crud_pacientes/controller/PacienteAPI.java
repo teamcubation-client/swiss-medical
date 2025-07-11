@@ -83,4 +83,34 @@ public interface PacienteAPI {
             }
     )
     ResponseEntity<Void> deletePaciente(@PathVariable int id);
+
+    @Operation(
+            summary = "Busca pacientes por su DNI",
+            description = "Busca pacientes por su DNI invocando un stored procedure",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Operacion exitosa"),
+                    @ApiResponse(responseCode = "404", description = "Paciente no encontrado")
+            }
+    )
+    ResponseEntity<PacienteDto> getPacientePorDniFromSP(@PathVariable String dni);
+
+    @Operation(
+            summary = "Busca pacientes por su nombre",
+            description = "Busca pacientes por su nombre invocando un stored procedure",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Pacientes encontrados")
+            }
+    )
+    ResponseEntity<List<PacienteDto>> getPacientesByNombreFromSP(@PathVariable String nombre);
+
+    @Operation(
+            summary = "Busca pacientes por su obra social",
+            description = "Busca pacientes por su obra social con paginado invocando un stored procedure",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Pacientes encontrados")
+            }
+    )
+    ResponseEntity<List<PacienteDto>> getPacientesByObraSocialFromSP(@PathVariable String obraSocial,
+                                                                     @PathVariable int limite,
+                                                                     @PathVariable int off);
 }

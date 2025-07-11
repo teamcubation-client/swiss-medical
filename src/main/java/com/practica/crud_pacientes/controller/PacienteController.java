@@ -69,4 +69,27 @@ public class PacienteController implements PacienteAPI{
         pacienteService.deletePaciente(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("pacientes/dni/{dni}")
+    public ResponseEntity<PacienteDto> getPacientePorDniFromSP(@PathVariable @Valid String dni) {
+        Paciente obtainedPaciente = pacienteService.getByDniFromSP(dni);
+        return ResponseEntity.ok(PacienteMapper.mapper.pacienteToPacienteDto(obtainedPaciente));
+    }
+
+    @GetMapping("pacientes/nombre/{nombre}")
+    public ResponseEntity<List<PacienteDto>> getPacientesByNombreFromSP(@PathVariable @Valid String nombre) {
+        List<Paciente> obtainedPacientes = pacienteService.getPacientesbyNombreFromSP(nombre);
+        return ResponseEntity.ok(obtainedPacientes.stream()
+                .map(PacienteMapper.mapper::pacienteToPacienteDto)
+                .toList());
+    }
+
+    @GetMapping("pacientes/obra-social/{obraSocial}/{limite}/{off}")
+    public ResponseEntity<List<PacienteDto>> getPacientesByObraSocialFromSP(@PathVariable @Valid String obraSocial, @PathVariable int limite, @PathVariable int off) {
+        List<Paciente> obtainedPacientes = pacienteService.getPacietesbyObraSocialFromSP(obraSocial, limite, off);
+        return ResponseEntity.ok(obtainedPacientes.stream()
+                .map(PacienteMapper.mapper::pacienteToPacienteDto)
+                .toList());
+    }
+
 }
