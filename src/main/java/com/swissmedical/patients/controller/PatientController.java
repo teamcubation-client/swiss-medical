@@ -34,19 +34,13 @@ public class PatientController implements PatientApi {
 
     @Override
     @GetMapping()
-    public ResponseEntity<List<Patient>> getAll(@RequestParam(defaultValue = "") String firstName,
-                                                @RequestParam(defaultValue = "") String lastName) {
-        if (firstName.isEmpty() || lastName.isEmpty()) {
+    public ResponseEntity<List<Patient>> getAll(@RequestParam(defaultValue = "") String name) {
+        if (name.isEmpty()) {
             List<Patient> patients = patientService.getAllPatients();
             return ResponseEntity.ok(patients);
         }
 
-        if (!firstName.isEmpty() && lastName.isEmpty()) {
-            List<Patient> patients = patientService.getPatientsByFirstName(firstName);
-            return ResponseEntity.ok(patients);
-        }
-
-        List<Patient> patients = patientService.getPatientByFirstNameOrLastName(firstName, lastName);
+        List<Patient> patients = patientService.getPatientByFirstName(name);
 
         if (patients.isEmpty()) {
             return ResponseEntity.noContent().build();

@@ -24,7 +24,7 @@ public interface PatientRepository extends JpaRepository<Patient, Long> {
     Optional<Patient> findByDniSP(String dni);
 
     @Query(value = "CALL buscar_pacientes_por_nombre(:firstName)", nativeQuery = true)
-    List<Patient> findByFirstNameSP(String firstName);
+    List<Patient> findByFirstNameOrLastNameSP(String firstName);
 
     @Query(value = "CALL buscar_pacientes_por_obra_social_paginado(:socialSecurity, :limit, :offset)", nativeQuery =
             true)

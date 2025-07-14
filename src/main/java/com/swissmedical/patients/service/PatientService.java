@@ -27,22 +27,18 @@ public class PatientService {
                 .orElseThrow(() -> new PatientNotFoundException("Patient with DNI " + dni + " does not exist."));
     }
 
-    public List<Patient> getPatientsByFirstName(String firstName) {
-        List<Patient> patients = patientRepository.findByFirstNameSP(firstName);
-
-        if (patients.isEmpty()) {
-            throw new PatientNotFoundException("No patients found with first name " + firstName + ".");
-        }
-
-        return patients;
-    }
-
     public List<Patient> getPatientsBySocialSecurity(String socialSecurity, int limit, int offset) {
         List<Patient> patients = patientRepository.findBySocialSecuritySP(socialSecurity, limit, offset);
 
         if (patients.isEmpty()) {
             throw new PatientNotFoundException("No patients found with social security " + socialSecurity + ".");
         }
+
+        return patients;
+    }
+
+    public List<Patient> getPatientByFirstName(String firstName) {
+        List<Patient> patients = patientRepository.findByFirstNameOrLastNameSP(firstName);
 
         return patients;
     }

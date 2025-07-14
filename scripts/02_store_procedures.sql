@@ -1,7 +1,6 @@
 SET NAMES utf8mb4;
 SET CHARACTER SET utf8mb4;
 
-
 -- Procedimiento 1: buscar paciente por DNI
 DELIMITER $$
 
@@ -18,6 +17,7 @@ BEGIN
     SELECT id, dni, first_name, last_name, social_security, email, phone_number, member_number, birth_date, is_active
     FROM patients
     WHERE LOWER(first_name) LIKE CONCAT('%', LOWER(p_first_name), '%');
+
 END$$
 
 -- Procedimiento 3: buscar pacientes por obra social con paginación
