@@ -114,15 +114,15 @@ public interface PacienteController {
             )
             String obraSocial,
             @Parameter(
-                    description = "Limite de la paginación",
+                    description = "Página",
                     required = true
             )
-            int limit,
+            int page,
             @Parameter(
-                    description = "Offset de la paginación",
+                    description = "Tamaño de la página",
                     required = true
             )
-            int offset);
+            int size);
 
 
 
