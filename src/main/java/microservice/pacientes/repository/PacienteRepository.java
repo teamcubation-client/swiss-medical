@@ -6,7 +6,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.jpa.repository.query.Procedure;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-
 import java.util.List;
 import java.util.Optional;
 
@@ -20,10 +19,10 @@ public interface PacienteRepository extends JpaRepository<Paciente, Long> {
     @Query(value = "CALL buscar_paciente_por_dni(:dni)", nativeQuery = true)
     Optional<Paciente> findByDniSP(@Param("dni") String dni);
 
-    @Procedure(name = "findByNombreSP")
+    @Procedure(procedureName = "buscar_pacientes_por_nombre")
     Optional<Paciente> findByNombreSP(@Param("p_nombre") String nombre);
 
-    @Procedure(name = "findByObraSocialSP")
+    @Procedure(procedureName = "buscar_pacientes_por_obra_social_paginado")
     List<Paciente> findByObraSocialSP(@Param("p_obra_social") String obraSocial, @Param("p_limit") int limit, @Param("p_offset") int offset);
 
 
