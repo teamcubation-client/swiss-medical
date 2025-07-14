@@ -35,25 +35,6 @@ public interface PacienteAPI {
     ResponseEntity<PacienteDto> getPaciente(@PathVariable int id);
 
     @Operation(
-            summary = "Buscar paciente por DNI",
-            description = "Devuelve el paciente correspondiente al DNI proporcionado. Si no existe o el formato es incorrecto, se lanza una excepción.",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "Paciente encontrado"),
-                    @ApiResponse(responseCode = "404", description = "Paciente inexistente")
-            }
-    )
-    ResponseEntity<PacienteDto> getPacienteByDni(@RequestParam String dni);
-
-    @Operation(
-            summary = "Buscar pacientes por nombre",
-            description = "DDevuelve una lista de pacientes cuyos nombres coincidan parcialmente con el valor ingresado, sin distinguir entre mayúsculas, minúsculas ni tildes.",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "Operacion exitosa")
-            }
-    )
-    ResponseEntity<List<PacienteDto>> getPacienteByName(@RequestParam String nombre);
-
-    @Operation(
             summary = "Registrar un nuevo paciente",
             description = "Crea un nuevo paciente en el sistema. El DNI debe ser único. En caso de duplicado, se lanza una excepción.",
             responses = {
@@ -92,7 +73,7 @@ public interface PacienteAPI {
                     @ApiResponse(responseCode = "404", description = "Paciente no encontrado")
             }
     )
-    ResponseEntity<PacienteDto> getPacientePorDniFromSP(@PathVariable String dni);
+    ResponseEntity<PacienteDto> getPacienteByDni(@PathVariable String dni);
 
     @Operation(
             summary = "Busca pacientes por su nombre",
@@ -101,7 +82,7 @@ public interface PacienteAPI {
                     @ApiResponse(responseCode = "200", description = "Pacientes encontrados")
             }
     )
-    ResponseEntity<List<PacienteDto>> getPacientesByNombreFromSP(@PathVariable String nombre);
+    ResponseEntity<List<PacienteDto>> getPacientesByName(@PathVariable String nombre);
 
     @Operation(
             summary = "Busca pacientes por su obra social",
@@ -110,7 +91,7 @@ public interface PacienteAPI {
                     @ApiResponse(responseCode = "200", description = "Pacientes encontrados")
             }
     )
-    ResponseEntity<List<PacienteDto>> getPacientesByObraSocialFromSP(@PathVariable String obraSocial,
-                                                                     @PathVariable int limite,
-                                                                     @PathVariable int off);
+    ResponseEntity<List<PacienteDto>> getPacientesByObraSocial(@PathVariable String obraSocial,
+                                                                     @RequestParam int limite,
+                                                                     @RequestParam int off);
 }
