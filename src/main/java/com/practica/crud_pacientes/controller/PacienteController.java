@@ -35,20 +35,6 @@ public class PacienteController implements PacienteAPI{
         return ResponseEntity.ok(PacienteMapper.mapper.pacienteToPacienteDto(obtainedPaciente));
     }
 
-    @GetMapping("/buscar-por-dni")
-    public ResponseEntity<PacienteDto> getPacienteByDni(@RequestParam @Valid String dni) {
-        Paciente obtainedPaciente = pacienteService.getPacienteByDni(dni);
-        return ResponseEntity.ok(PacienteMapper.mapper.pacienteToPacienteDto(obtainedPaciente));
-    }
-
-    @GetMapping("/buscar-por-nombre")
-    public ResponseEntity<List<PacienteDto>> getPacienteByName(@RequestParam @Valid String nombre) {
-        List<Paciente> obtainedPacientes = pacienteService.getPacienteByName(nombre);
-        return ResponseEntity.ok(obtainedPacientes.stream()
-                .map(PacienteMapper.mapper::pacienteToPacienteDto)
-                .toList());
-    }
-
     @PostMapping("/nuevo-paciente")
     public ResponseEntity<PacienteDto> addPaciente(@RequestBody @Valid PacienteDto pacienteNuevo) {
         Paciente paciente = PacienteMapper.mapper.pacienteDtoToPaciente(pacienteNuevo);
@@ -57,16 +43,41 @@ public class PacienteController implements PacienteAPI{
                 .body(PacienteMapper.mapper.pacienteToPacienteDto(savedPaciente));
     }
 
-    @PutMapping("actualizar/{id}")
+    @PutMapping("/actualizar/{id}")
     public ResponseEntity<PacienteDto> updatePaciente(@PathVariable int id, @RequestBody PacienteDto pacienteDto) {
         Paciente paciente = PacienteMapper.mapper.pacienteDtoToPaciente(pacienteDto);
         Paciente updatedPaciente = pacienteService.updatePaciente(id, paciente);
         return ResponseEntity.ok(PacienteMapper.mapper.pacienteToPacienteDto(updatedPaciente));
     }
 
-    @DeleteMapping("eliminar/{id}")
+    @DeleteMapping("/eliminar/{id}")
     public ResponseEntity<Void> deletePaciente(@PathVariable int id) {
         pacienteService.deletePaciente(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/dni/{dni}")
+    public ResponseEntity<PacienteDto> getPacienteByDni(@PathVariable @Valid String dni) {
+        Paciente obtainedPaciente = pacienteService.getByDni(dni);
+        return ResponseEntity.ok(PacienteMapper.mapper.pacienteToPacienteDto(obtainedPaciente));
+    }
+
+    @GetMapping("/nombre/{nombre}")
+    public ResponseEntity<List<PacienteDto>> getPacientesByName(@PathVariable @Valid String nombre) {
+        List<Paciente> obtainedPacientes = pacienteService.getPacientesbyName(nombre);
+        return ResponseEntity.ok(obtainedPacientes.stream()
+                .map(PacienteMapper.mapper::pacienteToPacienteDto)
+                .toList());
+    }
+
+    @GetMapping("/obra-social/{obraSocial}")
+    public ResponseEntity<List<PacienteDto>> getPacientesByObraSocial(@PathVariable @Valid String obraSocial,
+                                                                      @RequestParam(defaultValue = "1") int limite,
+                                                                      @RequestParam(defaultValue = "0") int off) {
+        List<Paciente> obtainedPacientes = pacienteService.getPacietesbyObraSocial(obraSocial, limite, off);
+        return ResponseEntity.ok(obtainedPacientes.stream()
+                .map(PacienteMapper.mapper::pacienteToPacienteDto)
+                .toList());
+    }
+
 }

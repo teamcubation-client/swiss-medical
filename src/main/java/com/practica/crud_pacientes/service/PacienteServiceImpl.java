@@ -5,6 +5,7 @@ import com.practica.crud_pacientes.exceptions.PacienteNoEncontradoException;
 import com.practica.crud_pacientes.model.Paciente;
 import com.practica.crud_pacientes.repository.PacienteRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -28,23 +29,8 @@ public class PacienteServiceImpl implements IPacienteService {
     }
 
     @Override
-    public Paciente getPacienteByDni(String dni) {
-        Paciente paciente = pacienteRepository.findByDni(dni);
-
-        if (paciente == null) {
-            throw new PacienteNoEncontradoException();
-        }
-        return paciente;
-    }
-
-    @Override
-    public List<Paciente> getPacienteByName(String nombre) {
-        return pacienteRepository.findByNombreContainingIgnoreCase(nombre);
-    }
-
-    @Override
     public Paciente addPaciente(Paciente paciente) {
-        if (pacienteRepository.findByDni(paciente.getDni()) != null) {
+        if (pacienteRepository.getByDniFromSP(paciente.getDni()) != null) {
             throw new PacienteDuplicadoException();
         }
         return pacienteRepository.save(paciente);
@@ -56,7 +42,7 @@ public class PacienteServiceImpl implements IPacienteService {
         pacienteRepository.findById(id)
                 .orElseThrow(PacienteNoEncontradoException::new);
 
-        Paciente existingPaciente = pacienteRepository.findByDni(paciente.getDni());
+        Paciente existingPaciente = pacienteRepository.getByDniFromSP(paciente.getDni());
         if (existingPaciente != null)
             throw new PacienteDuplicadoException();
 
@@ -70,5 +56,27 @@ public class PacienteServiceImpl implements IPacienteService {
             throw new PacienteNoEncontradoException();
 
         pacienteRepository.deleteById(id);
+    }
+
+    @Transactional
+    @Override
+    public Paciente getByDni(String dni) {
+        Paciente paciente = pacienteRepository.getByDniFromSP(dni);
+        if(paciente == null)
+            throw new PacienteNoEncontradoException();
+
+        return paciente;
+    }
+
+    @Transactional
+    @Override
+    public List<Paciente> getPacientesbyName(String nombre) {
+        return pacienteRepository.getPacientesByNombreFromSP(nombre.toLowerCase());
+    }
+
+    @Transactional
+    @Override
+    public List<Paciente> getPacietesbyObraSocial(String obraSocial, int limite, int off) {
+        return pacienteRepository.getPacietesbyObraSocialFromSP(obraSocial, limite, off);
     }
 }
