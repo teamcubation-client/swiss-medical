@@ -155,28 +155,27 @@ public class PacienteServiceImpl implements PacienteService {
     }
 
     @Override
-    public PacienteDTO buscarPorDniConSP(String dni) {
+    public Paciente buscarPorDniConSP(String dni) {
         return pacienteRepository.buscarPorDniConSP(dni)
-            .map(pacienteMapper::toDTO)
             .orElseThrow(() -> PacienteNotFoundException.porDni(dni));
     }
 
     @Override
-    public List<PacienteDTO> buscarPorNombreConSP(String nombre) {
-        List<Paciente> pacientes = pacienteRepository.buscarPorNombreConSP(nombre);
-        if (pacientes == null || pacientes.isEmpty()) {
+    public List<Paciente> buscarPorNombreConSP(String nombre) {
+        List<Paciente> paciente = pacienteRepository.buscarPorNombreConSP(nombre);
+        if (paciente == null || paciente.isEmpty()) {
             throw PacienteNotFoundException.porNombre(nombre);
         }
-        return pacientes.stream().map(pacienteMapper::toDTO).collect(Collectors.toList());
+        return paciente;
     }
 
     @Override
-    public List<PacienteDTO> buscarPorObraSocialPaginado(String obraSocial, int limit, int offset) {
-        List<Paciente> pacientes = pacienteRepository.buscarPorObraSocialPaginado(obraSocial, limit, offset);
-        if (pacientes == null || pacientes.isEmpty()) {
+    public List<Paciente> buscarPorObraSocialPaginado(String obraSocial, int limit, int offset) {
+        List<Paciente> paciente = pacienteRepository.buscarPorObraSocialPaginado(obraSocial, limit, offset);
+        if (paciente == null || paciente.isEmpty()) {
             throw PacienteNotFoundException.porObraSocial(obraSocial);
         }
-        return pacientes.stream().map(pacienteMapper::toDTO).collect(Collectors.toList());
+        return paciente;
     }
 
 } 

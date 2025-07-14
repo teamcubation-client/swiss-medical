@@ -5,47 +5,20 @@ En este proyecto se desarrollo una API REST para la gestion de pacientes en una 
 # Tabla de contenidos
 - [Descripcion](#descripcion)
 - [Tecnologias utilizadas](#tecnologias-utilizadas)
-- [API REST](#api-rest)
 - [Estructura del proyecto](#estructura-del-proyecto)
 
 ## Descripcion
 
 Este proyecto permite la gestion de pacientes, incluyendo operaciones para crear, listar, buscar, actualizar y eliminar pacientes. Incluye manejo de excepciones y documentacion de codigo con JavaDoc.
-
+Tambien se hace el uso de Stored Procedures y el uso de un script para la carga de pacientes. Por ultimo, se uso Docker para armar una imagen del proyecyto.
 ## Tecnologias utilizadas
 
     - Java 11
     - Spring Boot
     - JPA
-    - Base de datos H2
+    - Base de datos MySQL
     - Maven
-
-## API REST
-
-Los endpoints del proyecto son:
-    
-    - POST /api/pacientes
-    Crea un nuevo paciente.
-    
-    - GET /api/pacientes
-    Lista todos los pacientes.
-
-    - GET /api/pacientes/{id}
-    Obtiene un paciente por su ID.
-
-    - GET /api/pacientes/buscar/dni?dni=12345678
-    Busca un paciente por DNI.
-
-    - GET /api/pacientes/buscar/nombre?nombre=Juan
-    Busca pacientes por nombre.
-
-    - DELETE /api/pacientes/{id}
-    Elimina un paciente por su ID.
-
-    - PUT /api/pacientes/{id}
-    Actualiza los datos de un paciente.
-    
-
+    - Docker
 
 ## Estructura del proyecto
 

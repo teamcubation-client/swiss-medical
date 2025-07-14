@@ -70,14 +70,14 @@ public interface PacienteService {
      * @param dni Documento Nacional de Identidad
      * @return PacienteDTO encontrado
      */
-    PacienteDTO buscarPorDniConSP(String dni);
+    Paciente buscarPorDniConSP(String dni);
 
     /**
      * Busca pacientes cuyo nombre contenga la cadena especificada usando stored procedure
      * @param nombre parte o nombre completo a buscar
      * @return lista de PacienteDTO que coinciden con el parametro
      */
-    List<PacienteDTO> buscarPorNombreConSP(String nombre);
+    List<Paciente> buscarPorNombreConSP(String nombre);
 
     /**
      * Busca pacientes por obra social con paginacion usando stored procedure
@@ -86,5 +86,5 @@ public interface PacienteService {
      * @param offset desplazamiento de resultados
      * @return lista de PacienteDTO
      */
-    List<PacienteDTO> buscarPorObraSocialPaginado(String obraSocial, int limit, int offset);
+    List<Paciente> buscarPorObraSocialPaginado(String obraSocial, int limit, int offset);
 }

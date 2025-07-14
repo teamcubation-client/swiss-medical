@@ -1,0 +1,377 @@
+{
+	"info": {
+		"_postman_id": "6de0527f-5746-4162-9983-60eee02e20ed",
+		"name": "swiss medical",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "28268342",
+		"_collection_link": "https://planetary-moon-835310.postman.co/workspace/Proyecto~79a8b679-a73d-485f-b7fd-e3ce69f2fbb6/collection/28268342-6de0527f-5746-4162-9983-60eee02e20ed?action=share&source=collection_link&creator=28268342"
+	},
+	"item": [
+		{
+			"name": "crear paciente",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"nombre\": \"marcos\",\r\n  \"apellido\": \"hwang\",\r\n  \"dni\": \"11\",\r\n  \"obraSocial\": \"swiss medical\",\r\n  \"email\": \"marcos.hwang@email.com\",\r\n  \"telefono\": \"123123\",\r\n  \"tipoPlanObraSocial\": \"asdasd\",\r\n  \"fechaAlta\": \"2024-06-01\",\r\n  \"estado\": false\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/pacientes",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"pacientes"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "listar pacientes",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/pacientes",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"pacientes"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "buscar por nombre",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/pacientes/buscar/nombre?nombre=ar",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"pacientes",
+						"buscar",
+						"nombre"
+					],
+					"query": [
+						{
+							"key": "nombre",
+							"value": "ar"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "buscar por id",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/pacientes/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"pacientes",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "buscar por dni",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/pacientes/buscar/dni?dni=12345678",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"pacientes",
+						"buscar",
+						"dni"
+					],
+					"query": [
+						{
+							"key": "dni",
+							"value": "12345678"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "eliminar por id",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/pacientes/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"pacientes",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "modificar paciente",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"nombre\": \"marcos\",\r\n  \"apellido\": \"hwang\",\r\n  \"dni\": \"12345678\",\r\n  \"obraSocial\": \"swiss medical\",\r\n  \"email\": \"marcos.hwang@email.com\",\r\n  \"telefono\": \"1122334455\",\r\n  \"tipoPlanObraSocial\": \"smg-210\",\r\n  \"fechaAlta\": \"2024-07-03\",\r\n  \"estado\": false\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/pacientes/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"pacientes",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "activar paciente",
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/pacientes/1/activar",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"pacientes",
+						"1",
+						"activar"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "desactivar paciente",
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/pacientes/1/desactivar",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"pacientes",
+						"1",
+						"desactivar"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "listar activos",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/pacientes/activos",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"pacientes",
+						"activos"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "listar inactivos",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/pacientes/inactivos",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"pacientes",
+						"inactivos"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "sp buscar por dni",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/pacientes/sp/buscar/dni/12345678",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"pacientes",
+						"sp",
+						"buscar",
+						"dni",
+						"12345678"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "sp buscar por nombre",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/pacientes/sp/buscar/nombre/ar",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"pacientes",
+						"sp",
+						"buscar",
+						"nombre",
+						"ar"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "sp buscar por obra social",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "",
+						"value": "",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/pacientes/sp/buscar/obra-social?obraSocial=swiss medical&limit=10&offset=0",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"pacientes",
+						"sp",
+						"buscar",
+						"obra-social"
+					],
+					"query": [
+						{
+							"key": "obraSocial",
+							"value": "swiss medical"
+						},
+						{
+							"key": "limit",
+							"value": "10"
+						},
+						{
+							"key": "offset",
+							"value": "0"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

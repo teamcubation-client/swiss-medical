@@ -174,8 +174,9 @@ public class PacienteController implements IPacienteController {
      */
     @GetMapping("/sp/buscar/dni/{dni}")
     public ResponseEntity<PacienteDTO> buscarPorDniConSP(@PathVariable String dni) {
-        PacienteDTO paciente = pacienteService.buscarPorDniConSP(dni);
-        return ResponseEntity.ok(paciente);
+        Paciente paciente = pacienteService.buscarPorDniConSP(dni);
+        PacienteDTO dto = pacienteMapper.toDTO(paciente);
+        return ResponseEntity.ok(dto);
     }
 
     /**
@@ -185,8 +186,11 @@ public class PacienteController implements IPacienteController {
      */
     @GetMapping("/sp/buscar/nombre/{nombre}")
     public ResponseEntity<List<PacienteDTO>> buscarPorNombreConSP(@PathVariable String nombre) {
-        List<PacienteDTO> pacientes = pacienteService.buscarPorNombreConSP(nombre);
-        return ResponseEntity.ok(pacientes);
+        List<Paciente> paciente = pacienteService.buscarPorNombreConSP(nombre);
+        List<PacienteDTO> dto = paciente.stream()
+                .map(pacienteMapper::toDTO)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(dto);
     }
 
     /**
@@ -201,7 +205,10 @@ public class PacienteController implements IPacienteController {
             @RequestParam String obraSocial,
             @RequestParam(defaultValue = "10") int limit,
             @RequestParam(defaultValue = "0") int offset) {
-        List<PacienteDTO> pacientes = pacienteService.buscarPorObraSocialPaginado(obraSocial, limit, offset);
-        return ResponseEntity.ok(pacientes);
+        List<Paciente> paciente = pacienteService.buscarPorObraSocialPaginado(obraSocial, limit, offset);
+        List<PacienteDTO> dto = paciente.stream()
+                .map(pacienteMapper::toDTO)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(dto);
     }
 }
