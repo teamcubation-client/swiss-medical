@@ -17,7 +17,7 @@ public interface PacienteRepository extends JpaRepository<Paciente, Integer> {
     @Procedure(procedureName = "buscar_pacientes_por_nombre")
     List<Paciente> getPacientesByNombreFromSP(@Param("p_nombre") String nombre);
 
-    @Procedure(procedureName = "buscar_pacientes_por_obra_social_paginad")
+    @Procedure(procedureName = "buscar_pacientes_por_obra_social_paginado")
     List<Paciente> getPacietesbyObraSocialFromSP(
             @Param("p_obra_social") String obraSocial,
             @Param("p_limit") int limite,
