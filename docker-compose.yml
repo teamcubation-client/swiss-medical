@@ -31,7 +31,7 @@ services:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_PARAMS: ${MYSQL_PARAMS}
     ports:
-      - "8000:8000"
+      - "${SERVER_PORT}:8000"
     depends_on:
       mysql:
         condition: service_healthy
