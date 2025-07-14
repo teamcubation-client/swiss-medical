@@ -166,4 +166,49 @@ public class PacienteController implements IPacienteController {
                 .collect(Collectors.toList());
         return ResponseEntity.ok(inactivos);
     }
+
+    /**
+     * Busca un paciente por su DNI usando stored procedure
+     * @param dni Documento Nacional de Identidad
+     * @return PacienteDTO encontrado
+     */
+    @GetMapping("/sp/buscar/dni/{dni}")
+    public ResponseEntity<PacienteDTO> buscarPorDniConSP(@PathVariable String dni) {
+        Paciente paciente = pacienteService.buscarPorDniConSP(dni);
+        PacienteDTO dto = pacienteMapper.toDTO(paciente);
+        return ResponseEntity.ok(dto);
+    }
+
+    /**
+     * Busca pacientes cuyo nombre contenga la cadena especificada usando stored procedure
+     * @param nombre parte o nombre completo a buscar
+     * @return lista de PacienteDTO que coinciden con el parametro
+     */
+    @GetMapping("/sp/buscar/nombre/{nombre}")
+    public ResponseEntity<List<PacienteDTO>> buscarPorNombreConSP(@PathVariable String nombre) {
+        List<Paciente> paciente = pacienteService.buscarPorNombreConSP(nombre);
+        List<PacienteDTO> dto = paciente.stream()
+                .map(pacienteMapper::toDTO)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(dto);
+    }
+
+    /**
+     * Busca pacientes por obra social con paginacion usando stored procedure
+     * @param obraSocial nombre de la obra social
+     * @param limit cantidad maxima de resultados
+     * @param offset desplazamiento de resultados
+     * @return lista de PacienteDTO
+     */
+    @GetMapping("/sp/buscar/obra-social")
+    public ResponseEntity<List<PacienteDTO>> buscarPorObraSocialPaginado(
+            @RequestParam String obraSocial,
+            @RequestParam(defaultValue = "10") int limit,
+            @RequestParam(defaultValue = "0") int offset) {
+        List<Paciente> paciente = pacienteService.buscarPorObraSocialPaginado(obraSocial, limit, offset);
+        List<PacienteDTO> dto = paciente.stream()
+                .map(pacienteMapper::toDTO)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(dto);
+    }
 }
