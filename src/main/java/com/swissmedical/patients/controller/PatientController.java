@@ -41,6 +41,11 @@ public class PatientController implements PatientApi {
             return ResponseEntity.ok(patients);
         }
 
+        if (!firstName.isEmpty() && lastName.isEmpty()) {
+            List<Patient> patients = patientService.getPatientsByFirstName(firstName);
+            return ResponseEntity.ok(patients);
+        }
+
         List<Patient> patients = patientService.getPatientByFirstNameOrLastName(firstName, lastName);
 
         if (patients.isEmpty()) {
@@ -51,10 +56,28 @@ public class PatientController implements PatientApi {
     }
 
     @Override
-    @GetMapping("/{dni}")
+    @GetMapping("/dni/{dni}")
     public ResponseEntity<Patient> getByDni(@PathVariable String dni) {
         return ResponseEntity.ok(patientService.getPatientByDni(dni));
+    }
 
+    @Override
+    @GetMapping("/social-security/{socialSecurity}")
+    public ResponseEntity<List<Patient>> getBySocialSecurity(@PathVariable String socialSecurity,
+                                                             @RequestParam(defaultValue = "10") int limit,
+                                                             @RequestParam(defaultValue = "0") int offset
+    ) {
+        if (limit <= 0 || offset < 0) {
+            throw new IllegalArgumentException("Limit must be greater than 0 and offset must be non-negative.");
+        }
+
+        List<Patient> patients = patientService.getPatientsBySocialSecurity(socialSecurity, limit, offset);
+
+        if (patients.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+
+        return ResponseEntity.ok(patients);
     }
 
     @Override
