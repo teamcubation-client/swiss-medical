@@ -29,23 +29,8 @@ public class PacienteServiceImpl implements IPacienteService {
     }
 
     @Override
-    public Paciente getPacienteByDni(String dni) {
-        Paciente paciente = pacienteRepository.findByDni(dni);
-
-        if (paciente == null) {
-            throw new PacienteNoEncontradoException();
-        }
-        return paciente;
-    }
-
-    @Override
-    public List<Paciente> getPacienteByName(String nombre) {
-        return pacienteRepository.findByNombreContainingIgnoreCase(nombre);
-    }
-
-    @Override
     public Paciente addPaciente(Paciente paciente) {
-        if (pacienteRepository.findByDni(paciente.getDni()) != null) {
+        if (pacienteRepository.getByDniFromSP(paciente.getDni()) != null) {
             throw new PacienteDuplicadoException();
         }
         return pacienteRepository.save(paciente);
@@ -57,7 +42,7 @@ public class PacienteServiceImpl implements IPacienteService {
         pacienteRepository.findById(id)
                 .orElseThrow(PacienteNoEncontradoException::new);
 
-        Paciente existingPaciente = pacienteRepository.findByDni(paciente.getDni());
+        Paciente existingPaciente = pacienteRepository.getByDniFromSP(paciente.getDni());
         if (existingPaciente != null)
             throw new PacienteDuplicadoException();
 
@@ -75,7 +60,7 @@ public class PacienteServiceImpl implements IPacienteService {
 
     @Transactional
     @Override
-    public Paciente getByDniFromSP(String dni) {
+    public Paciente getByDni(String dni) {
         Paciente paciente = pacienteRepository.getByDniFromSP(dni);
         if(paciente == null)
             throw new PacienteNoEncontradoException();
@@ -85,13 +70,13 @@ public class PacienteServiceImpl implements IPacienteService {
 
     @Transactional
     @Override
-    public List<Paciente> getPacientesbyNombreFromSP(String nombre) {
+    public List<Paciente> getPacientesbyName(String nombre) {
         return pacienteRepository.getPacientesByNombreFromSP(nombre.toLowerCase());
     }
 
     @Transactional
     @Override
-    public List<Paciente> getPacietesbyObraSocialFromSP(String obraSocial, int limite, int off) {
+    public List<Paciente> getPacietesbyObraSocial(String obraSocial, int limite, int off) {
         return pacienteRepository.getPacietesbyObraSocialFromSP(obraSocial, limite, off);
     }
 }

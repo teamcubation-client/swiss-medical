@@ -11,20 +11,16 @@ public interface IPacienteService {
 
     Paciente getPacienteById(int id) throws PacienteNoEncontradoException;
 
-    Paciente getPacienteByDni(String dni);
-
-    List<Paciente> getPacienteByName(String nombre);
-
     Paciente addPaciente(Paciente pacienteDto);
 
     Paciente updatePaciente(int id, Paciente pacienteDto) throws PacienteNoEncontradoException;
 
     void deletePaciente(int id) throws PacienteNoEncontradoException;
 
-    Paciente getByDniFromSP(String dni);
+    Paciente getByDni(String dni);
 
-    List<Paciente> getPacientesbyNombreFromSP(String nombre);
+    List<Paciente> getPacientesbyName(String nombre);
 
-    List<Paciente> getPacietesbyObraSocialFromSP(String obraSocial, int limite, int off);
+    List<Paciente> getPacietesbyObraSocial(String obraSocial, int limite, int off);
 
 }
