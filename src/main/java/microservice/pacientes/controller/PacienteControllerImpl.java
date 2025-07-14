@@ -61,4 +61,33 @@ public class PacienteControllerImpl implements PacienteController {
         return ResponseEntity.noContent().build();
     }
 
+    @GetMapping("/dni/{dni}")
+    public ResponseEntity<PacienteResponseDTO> getByDniSP(@PathVariable String dni) {
+        Paciente paciente = pacienteService.findByDniSP(dni);
+        PacienteResponseDTO pacienteResponseDTO = PacienteResponseMapper.toDTO(paciente);
+        return ResponseEntity.ok(pacienteResponseDTO);
+    }
+
+
+    @GetMapping("/nombre/{nombre}")
+    public ResponseEntity<PacienteResponseDTO> getByNombreSP(@PathVariable String nombre) {
+        Paciente paciente = pacienteService.findByNombreSP(nombre);
+        PacienteResponseDTO pacienteResponseDTO = PacienteResponseMapper.toDTO(paciente);
+        return ResponseEntity.ok(pacienteResponseDTO);
+    }
+
+
+    @GetMapping("/obra_social")
+    public ResponseEntity<List<PacienteResponseDTO>> getByObraSocialSP(
+            @RequestParam(required = true) String obra_social,
+            @RequestParam(required = true) int page,
+            @RequestParam(required = true) int size
+    ) {
+        int limit = size;
+        int offset = (page - 1) * size; // asumo que page empieza con 1
+        List<Paciente> pacientes = pacienteService.findByObraSocialSP(obra_social, limit, offset);
+        List<PacienteResponseDTO> pacientesResponseDTO = PacienteResponseMapper.toDTO(pacientes);
+        return ResponseEntity.ok(pacientesResponseDTO);
+    }
+
 }

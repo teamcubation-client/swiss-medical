@@ -1,8 +1,8 @@
 package microservice.pacientes.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -11,6 +11,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @Entity
+@AllArgsConstructor
 public class Paciente {
 
     @Id
@@ -23,19 +24,10 @@ public class Paciente {
     @NotBlank(message = "El apellido es obligatorio")
     private String apellido;
 
-    private String obraSocial;
+    private String obra_social;
 
     private String email;
 
     private String telefono;
-
-    public Paciente(String dni, String nombre, String apellido, String obraSocial, String email, String telefono) {
-        this.dni = dni;
-        this.nombre = nombre;
-        this.apellido = apellido;
-        this.obraSocial = obraSocial;
-        this.email = email;
-        this.telefono = telefono;
-    }
 
 }

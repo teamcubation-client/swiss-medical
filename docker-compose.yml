@@ -2,15 +2,16 @@ version: '3.8'
 services:
   mysql:
     image: mysql:8.0
-    container_name: mysqlpacientes
+    container_name: pacientes_stored_procedures
     environment:
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
       MYSQL_DATABASE: ${DB_DATABASE}
       MYSQL_USER: ${DB_USER}
       MYSQL_PASSWORD: ${DB_PASSWORD}
     ports:
-      - "${DB_PORT_IN}:${DB_PORT_OUT}"
+      - "${DB_PORT_HOST}:${DB_PORT_CONTAINER}"
     volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
       - mysql_data:/var/lib/mysql
     restart: unless-stopped
     healthcheck:
@@ -23,13 +24,13 @@ services:
     build: .
     container_name: pacientes-app
     ports:
-      - "${API_PORT_IN}:${API_PORT_OUT}"
+      - "${API_PORT_HOST}:${API_PORT_CONTAINER}"
     depends_on:
       mysql:
         condition: service_healthy
     environment:
       SERVER_PORT: ${API_PORT_IN}
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:${DB_PORT_OUT}/${DB_DATABASE}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:${DB_PORT_CONTAINER}/${DB_DATABASE}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
       SPRING_DATASOURCE_USERNAME: ${DB_USER}
       SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
     restart: unless-stopped

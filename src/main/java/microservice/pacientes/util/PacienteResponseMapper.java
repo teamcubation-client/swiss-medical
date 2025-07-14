@@ -19,7 +19,7 @@ public class PacienteResponseMapper {
                     paciente.getDni(),
                     paciente.getNombre(),
                     paciente.getApellido(),
-                    paciente.getObraSocial()
+                    paciente.getObra_social()
             );
         }
 
