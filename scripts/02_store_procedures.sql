@@ -29,7 +29,7 @@ CREATE PROCEDURE buscar_pacientes_por_obra_social_paginado(
 BEGIN
     SELECT id, dni, first_name, last_name, social_security, email, phone_number, member_number, birth_date, is_active
     FROM patients
-    WHERE social_security = p_social_security
+    WHERE LOWER(social_security) LIKE CONCAT("%", LOWER(p_social_security), "%")
     LIMIT p_limit OFFSET p_offset;
 END$$
 

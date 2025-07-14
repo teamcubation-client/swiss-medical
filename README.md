@@ -311,3 +311,17 @@ networks:
   app-net:
     driver: bridge
 ```
+
+---
+# Implementación de Store Procedures
+
+- Se creó los archivos `init.sql` y `stored_procedures.sql` para definir los procedimientos almacenados y poblar la base de datos con datos de ejemplo.
+- Se aplicó la nomeclatura con un número al inicio de cada archivo para asegurar que se ejecuten en el orden correcto al iniciar el contenedor de MySQL.
+- Se configuró el archivo `docker-compose.yml` para montar estos archivos en el directorio `/docker-entrypoint-initdb.d/` del contenedor MySQL, lo que permite que se ejecuten automáticamente al iniciar el contenedor.
+- Dentro del repositorio se utilizó la anotación `@Query` con `nativeQuery = true` para invocar los procedimientos almacenados desde Java.
+
+```java
+@Query(value = "CALL buscar_paciente_por_dni(:dni)", nativeQuery = true)
+Optional<Paciente> buscarPorDniConSP(@Param("dni") String dni);
+```
+- No olvidar realizar el `build` de la aplicación y el `docker-compose up` para que se creen los contenedores y se ejecuten los scripts de inicialización.
