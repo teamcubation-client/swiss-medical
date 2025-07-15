@@ -8,7 +8,7 @@ services:
       MYSQL_DATABASE: ${MYSQL_DATABASE}
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
     ports:
-      - "3307:3306"
+      - "${DATABASE_PORT_IN}:${DATABASE_PORT_OUT}"
     volumes:
       - mysql_data:/var/lib/mysql
     healthcheck:
@@ -16,27 +16,21 @@ services:
       timeout: 5s
       retries: 10
 
-  pacientes-app:
+  patients-app:
     build: .
-    container_name: pacientes-app
+    container_name: patients-app
     env_file:
       - .env
     depends_on:
       mysql-db:
         condition: service_healthy
     ports:
-      - "8081:8080"
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8081/actuator/health"]
-      interval: 30s
-      timeout: 5s
-      retries: 3
+      - "${APP_PORT_IN}:${APP_PORT_OUT}"
 
 volumes:
   mysql_data:
 
 networks:
   default:
-    name: pacientes-network
+    name: patients-network
 
