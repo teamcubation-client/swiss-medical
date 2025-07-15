@@ -2,6 +2,7 @@ package com.swissmedical.patients.service;
 
 import java.util.List;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.swissmedical.patients.entity.Patient;
@@ -18,13 +19,37 @@ public class PatientService {
         this.patientRepository = patientRepository;
     }
 
-    public List<Patient> getAllPatients() {
-        return patientRepository.findAll();
+    public List<Patient> getAllPatients(String name, int page, int size) {
+        if (page <= 0 || size < 0) {
+            throw new IllegalArgumentException("Limit must be greater than 0 and offset must be non-negative.");
+        }
+
+        if (name.isEmpty()) {
+            return patientRepository.findAllSP(size, (page - 1) * size);
+        }
+
+        List<Patient> patients = patientRepository.findByFirstNameSP(name);
+
+        if (patients.isEmpty()) {
+            throw new PatientNotFoundException("No patients found with name " + name + ".");
+        }
+
+        return patients;
     }
 
     public Patient getPatientByDni(String dni) {
-        return patientRepository.findByDni(dni)
+        return patientRepository.findByDniSP(dni)
                 .orElseThrow(() -> new PatientNotFoundException("Patient with DNI " + dni + " does not exist."));
+    }
+
+    public List<Patient> getPatientsBySocialSecurity(String socialSecurity, int page, int size) {
+        List<Patient> patients = patientRepository.findBySocialSecuritySP(socialSecurity, size, (page - 1) * size);
+
+        if (patients.isEmpty()) {
+            throw new PatientNotFoundException("No patients found with social security " + socialSecurity + ".");
+        }
+
+        return patients;
     }
 
     public List<Patient> getPatientByFirstNameOrLastName(String firstName, String lastName) {

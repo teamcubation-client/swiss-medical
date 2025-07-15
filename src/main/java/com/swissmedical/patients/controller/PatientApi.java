@@ -47,7 +47,7 @@ public interface PatientApi {
                 )
         )
     })
-    public ResponseEntity<List<Patient>> getAll(String firstName, String lastName);
+    public ResponseEntity<List<Patient>> getAll(String firstName, int limit, int offset);
 
     @Operation(summary = "Obtener un paciente por su DNI")
     @ApiResponses({
@@ -80,6 +80,38 @@ public interface PatientApi {
         )
     })
     public ResponseEntity<Patient> getByDni(String dni);
+
+    @Operation(summary = "Buscar pacientes por nombre de Seguro Social con paginación")
+    @ApiResponses({
+        @ApiResponse(
+                responseCode = ResponseCode.OK,
+                description = "Lista de pacientes obtenida correctamente",
+                content = @Content(
+                        mediaType = MediaType.APPLICATION_JSON_VALUE,
+                        array = @ArraySchema(schema = @Schema(implementation = Patient.class))
+                )
+        ),
+        @ApiResponse(
+                responseCode = ResponseCode.NO_CONTENT,
+                description = "No se encontraron pacientes con el Seguro Social especificado",
+                content = @Content(
+                        mediaType = MediaType.APPLICATION_JSON_VALUE,
+                        schema = @Schema(implementation = Void.class)
+                )
+        ),
+        @ApiResponse(
+                responseCode = ResponseCode.INTERNAL_SERVER_ERROR,
+                description = "Error interno del servidor al obtener la lista de pacientes",
+                content = @Content(
+                        mediaType = MediaType.APPLICATION_JSON_VALUE,
+                        schema = @Schema(implementation = HashMap.class,
+                                description = "Mensaje de error",
+                                example = "{\"error\": \"Error interno del servidor\"}"
+                        )
+                )
+        )
+    })
+    public ResponseEntity<List<Patient>> getBySocialSecurity(String socialSecurity, int limit, int offset);
 
     @Operation(summary = "Crear un nuevo paciente")
     @ApiResponses({

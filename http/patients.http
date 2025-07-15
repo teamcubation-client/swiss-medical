@@ -1,10 +1,14 @@
 ### GET Patients
 
-GET http://localhost:8000/api/patients?name=jo
+GET http://localhost:8000/api/patients
 
 ### GET Patient by DNI 
 
-GET http://localhost:8000/api/patients/40128095
+GET http://localhost:8000/api/patients/dni/23456789
+
+### GET Patients by Social Security
+
+GET http://localhost:8000/api/patients/social-security/swiss
 
 ### POST Create Patient
 

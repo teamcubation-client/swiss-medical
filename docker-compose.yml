@@ -2,12 +2,14 @@ services:
   mysql:
     image: mysql:8.0-debian
     container_name: spring_db
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: ${MYSQL_DATABASE}
     ports:
       - "${MYSQL_PORT}:3306"
     volumes:
+      - ./scripts:/docker-entrypoint-initdb.d/
       - ./db_data:/var/lib/mysql
     networks:
       - app-net
@@ -29,7 +31,7 @@ services:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_PARAMS: ${MYSQL_PARAMS}
     ports:
-      - "8000:8000"
+      - "${SERVER_PORT}:8000"
     depends_on:
       mysql:
         condition: service_healthy

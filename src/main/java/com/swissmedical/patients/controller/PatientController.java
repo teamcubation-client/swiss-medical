@@ -34,27 +34,32 @@ public class PatientController implements PatientApi {
 
     @Override
     @GetMapping()
-    public ResponseEntity<List<Patient>> getAll(@RequestParam(defaultValue = "") String firstName,
-                                                @RequestParam(defaultValue = "") String lastName) {
-        if (firstName.isEmpty() || lastName.isEmpty()) {
-            List<Patient> patients = patientService.getAllPatients();
-            return ResponseEntity.ok(patients);
-        }
+    public ResponseEntity<List<Patient>> getAll(@RequestParam(defaultValue = "") String name,
+                                                @RequestParam(defaultValue = "1") int page,
+                                                @RequestParam(defaultValue = "10") int size) {
 
-        List<Patient> patients = patientService.getPatientByFirstNameOrLastName(firstName, lastName);
-
-        if (patients.isEmpty()) {
-            return ResponseEntity.noContent().build();
-        }
-
-        return ResponseEntity.ok(patients);
+       return ResponseEntity.ok(patientService.getAllPatients(name , page, size));
     }
 
     @Override
-    @GetMapping("/{dni}")
+    @GetMapping("/dni/{dni}")
     public ResponseEntity<Patient> getByDni(@PathVariable String dni) {
         return ResponseEntity.ok(patientService.getPatientByDni(dni));
+    }
 
+    @Override
+    @GetMapping("/social-security/{socialSecurity}")
+    public ResponseEntity<List<Patient>> getBySocialSecurity(@PathVariable String socialSecurity,
+                                                             @RequestParam(defaultValue = "1") int page,
+                                                             @RequestParam(defaultValue = "10") int size
+    ) {
+        if (page <= 0 || size < 0) {
+            throw new IllegalArgumentException("Limit must be greater than 0 and offset must be non-negative.");
+        }
+
+        List<Patient> patients = patientService.getPatientsBySocialSecurity(socialSecurity, page, size);
+
+        return ResponseEntity.ok(patients);
     }
 
     @Override
