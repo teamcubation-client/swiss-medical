@@ -34,19 +34,11 @@ public class PatientController implements PatientApi {
 
     @Override
     @GetMapping()
-    public ResponseEntity<List<Patient>> getAll(@RequestParam(defaultValue = "") String name) {
-        if (name.isEmpty()) {
-            List<Patient> patients = patientService.getAllPatients();
-            return ResponseEntity.ok(patients);
-        }
+    public ResponseEntity<List<Patient>> getAll(@RequestParam(defaultValue = "") String name,
+                                                @RequestParam(defaultValue = "1") int page,
+                                                @RequestParam(defaultValue = "10") int size) {
 
-        List<Patient> patients = patientService.getPatientByFirstName(name);
-
-        if (patients.isEmpty()) {
-            return ResponseEntity.noContent().build();
-        }
-
-        return ResponseEntity.ok(patients);
+       return ResponseEntity.ok(patientService.getAllPatients(name , page, size));
     }
 
     @Override
@@ -58,18 +50,14 @@ public class PatientController implements PatientApi {
     @Override
     @GetMapping("/social-security/{socialSecurity}")
     public ResponseEntity<List<Patient>> getBySocialSecurity(@PathVariable String socialSecurity,
-                                                             @RequestParam(defaultValue = "10") int limit,
-                                                             @RequestParam(defaultValue = "0") int offset
+                                                             @RequestParam(defaultValue = "1") int page,
+                                                             @RequestParam(defaultValue = "10") int size
     ) {
-        if (limit <= 0 || offset < 0) {
+        if (page <= 0 || size < 0) {
             throw new IllegalArgumentException("Limit must be greater than 0 and offset must be non-negative.");
         }
 
-        List<Patient> patients = patientService.getPatientsBySocialSecurity(socialSecurity, limit, offset);
-
-        if (patients.isEmpty()) {
-            return ResponseEntity.noContent().build();
-        }
+        List<Patient> patients = patientService.getPatientsBySocialSecurity(socialSecurity, page, size);
 
         return ResponseEntity.ok(patients);
     }

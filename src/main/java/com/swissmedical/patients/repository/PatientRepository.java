@@ -20,11 +20,14 @@ public interface PatientRepository extends JpaRepository<Patient, Long> {
 
     boolean existsByEmail(String email);
 
+    @Query(value = "CALL buscar_pacientes_paginado(:limit, :offset)", nativeQuery = true)
+    List<Patient> findAllSP(int limit, int offset);
+
     @Query(value = "CALL buscar_paciente_por_dni(:dni)", nativeQuery = true)
     Optional<Patient> findByDniSP(String dni);
 
     @Query(value = "CALL buscar_pacientes_por_nombre(:firstName)", nativeQuery = true)
-    List<Patient> findByFirstNameOrLastNameSP(String firstName);
+    List<Patient> findByFirstNameSP(String firstName);
 
     @Query(value = "CALL buscar_pacientes_por_obra_social_paginado(:socialSecurity, :limit, :offset)", nativeQuery =
             true)

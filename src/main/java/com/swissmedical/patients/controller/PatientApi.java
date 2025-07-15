@@ -47,7 +47,7 @@ public interface PatientApi {
                 )
         )
     })
-    public ResponseEntity<List<Patient>> getAll(String firstName);
+    public ResponseEntity<List<Patient>> getAll(String firstName, int limit, int offset);
 
     @Operation(summary = "Obtener un paciente por su DNI")
     @ApiResponses({

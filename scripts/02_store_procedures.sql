@@ -4,6 +4,13 @@ SET CHARACTER SET utf8mb4;
 -- Procedimiento 1: buscar paciente por DNI
 DELIMITER $$
 
+CREATE PROCEDURE buscar_pacientes_paginado(IN p_limit INT, IN p_offset INT)
+BEGIN
+    SELECT id, dni, first_name, last_name, social_security, email, phone_number, member_number, birth_date, is_active
+    FROM patients
+    LIMIT p_limit OFFSET p_offset;
+END$$
+
 CREATE PROCEDURE buscar_paciente_por_dni(IN p_dni VARCHAR(20))
 BEGIN
     SELECT id, dni, first_name, last_name, social_security, email, phone_number, member_number, birth_date, is_active
