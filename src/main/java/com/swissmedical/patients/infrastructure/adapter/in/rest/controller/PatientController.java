@@ -2,7 +2,7 @@ package com.swissmedical.patients.controller;
 
 import java.util.List;
 
-import com.swissmedical.patients.dto.PatientUpdateDto;
+import com.swissmedical.patients.infrastructure.adapter.in.rest.dto.PatientUpdateDto;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.swissmedical.patients.dto.PatientCreateDto;
+import com.swissmedical.patients.infrastructure.adapter.in.rest.dto.PatientCreateDto;
 import com.swissmedical.patients.entity.Patient;
 import com.swissmedical.patients.mappers.PatientMapper;
 import com.swissmedical.patients.service.PatientService;

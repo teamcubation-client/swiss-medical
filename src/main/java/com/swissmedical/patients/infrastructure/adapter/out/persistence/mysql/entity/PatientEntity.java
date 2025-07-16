@@ -1,4 +1,4 @@
-package com.swissmedical.patients.entity;
+package com.swissmedical.patients.infrastructure.adapter.out.persistence.entity;
 
 import java.time.LocalDate;
 
@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Entity
 @Table(name = "patients")
-public class Patient {
+public class PatientEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

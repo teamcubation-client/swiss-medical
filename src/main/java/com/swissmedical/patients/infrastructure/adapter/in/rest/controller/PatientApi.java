@@ -3,14 +3,14 @@ package com.swissmedical.patients.controller;
 import java.util.HashMap;
 import java.util.List;
 
-import com.swissmedical.patients.dto.PatientUpdateDto;
+import com.swissmedical.patients.infrastructure.adapter.in.rest.dto.PatientUpdateDto;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
-import com.swissmedical.patients.dto.PatientCreateDto;
+import com.swissmedical.patients.infrastructure.adapter.in.rest.dto.PatientCreateDto;
 import com.swissmedical.patients.entity.Patient;
 import com.swissmedical.patients.utils.ResponseCode;
 
