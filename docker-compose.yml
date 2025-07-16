@@ -1,0 +1,36 @@
+services:
+  mysql-db:
+    image: mysql:8.0
+    container_name: mysql-db
+    env_file:
+      - .env
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    ports:
+      - "${DATABASE_PORT_IN}:${DATABASE_PORT_OUT}"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u${SPRING_DATASOURCE_USERNAME}", "-p${SPRING_DATASOURCE_PASSWORD}"]
+      timeout: 5s
+      retries: 10
+
+  patients-app:
+    build: .
+    container_name: patients-app
+    env_file:
+      - .env
+    depends_on:
+      mysql-db:
+        condition: service_healthy
+    ports:
+      - "${APP_PORT_IN}:${APP_PORT_OUT}"
+
+volumes:
+  mysql_data:
+
+networks:
+  default:
+    name: patients-network
+
