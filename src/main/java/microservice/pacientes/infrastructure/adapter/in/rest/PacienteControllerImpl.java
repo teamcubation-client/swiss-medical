@@ -1,6 +1,7 @@
 package microservice.pacientes.infrastructure.adapter.in.rest;
 
 import jakarta.validation.Valid;
+import lombok.AllArgsConstructor;
 import microservice.pacientes.application.domain.command.CreatePacienteCommand;
 import microservice.pacientes.application.domain.command.UpdatePacienteCommand;
 import microservice.pacientes.application.domain.model.Paciente;
@@ -21,19 +22,13 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/pacientes")
+@AllArgsConstructor
 public class PacienteControllerImpl implements PacienteController {
 
     private final CreatePacienteUseCase createPacienteUseCase;
     private final DeletePacienteUseCase deletePacienteUseCase;
     private final FindPacienteUseCase findPacienteUseCase;
     private final UpdatePacienteUseCase updatePacienteUseCase;
-
-    public PacienteControllerImpl(CreatePacienteUseCase createPacienteUseCase, DeletePacienteUseCase deletePacienteUseCase, FindPacienteUseCase findPacienteUseCase, UpdatePacienteUseCase updatePacienteUseCase) {
-        this.createPacienteUseCase = createPacienteUseCase;
-        this.deletePacienteUseCase = deletePacienteUseCase;
-        this.findPacienteUseCase = findPacienteUseCase;
-        this.updatePacienteUseCase = updatePacienteUseCase;
-    }
 
     @GetMapping
     public ResponseEntity<List<PacienteResponseDTO>> getAll(@RequestParam(required = false) String nombre) {

@@ -1,5 +1,6 @@
 package microservice.pacientes.application.service;
 
+import lombok.AllArgsConstructor;
 import microservice.pacientes.application.domain.model.Paciente;
 import microservice.pacientes.application.domain.port.in.FindPacienteUseCase;
 import microservice.pacientes.application.domain.port.out.PacienteRepositoryPort;
@@ -7,13 +8,10 @@ import microservice.pacientes.shared.exception.PacienteNoEncontradoException;
 
 import java.util.List;
 
-public class FindPacienteUseCaseImpl implements FindPacienteUseCase {
+@AllArgsConstructor
+public class FindPacienteService implements FindPacienteUseCase {
 
     private final PacienteRepositoryPort pacienteRepositoryPort;
-
-    public FindPacienteUseCaseImpl(PacienteRepositoryPort pacienteRepositoryPort) {
-        this.pacienteRepositoryPort = pacienteRepositoryPort;
-    }
 
     @Override
     public List<Paciente> getAll() {

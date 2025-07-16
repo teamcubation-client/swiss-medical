@@ -1,18 +1,16 @@
 package microservice.pacientes.application.service;
 
+import lombok.AllArgsConstructor;
 import microservice.pacientes.application.domain.command.UpdatePacienteCommand;
 import microservice.pacientes.application.domain.model.Paciente;
 import microservice.pacientes.application.domain.port.in.UpdatePacienteUseCase;
 import microservice.pacientes.application.domain.port.out.PacienteRepositoryPort;
 import microservice.pacientes.shared.exception.PacienteNoEncontradoException;
 
-public class UpdatePacienteUseCaseImpl implements UpdatePacienteUseCase {
+@AllArgsConstructor
+public class UpdatePacienteService implements UpdatePacienteUseCase {
 
     private final PacienteRepositoryPort pacienteRepositoryPort;
-
-    public UpdatePacienteUseCaseImpl(PacienteRepositoryPort pacienteRepositoryPort) {
-        this.pacienteRepositoryPort = pacienteRepositoryPort;
-    }
 
     @Override
     public Paciente update(String dni, UpdatePacienteCommand updatePacienteCommand) throws PacienteNoEncontradoException {

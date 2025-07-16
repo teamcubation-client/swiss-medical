@@ -19,7 +19,7 @@ public class PacienteEntityMapper {
     }
 
     public static List<Paciente> toDomain(List<PacienteEntity> pacientesEntity) {
-        return pacientesEntity.stream().map(PacienteEntityMapper::toDomain).toList();
+        return pacientesEntity.stream().map(PacienteEntityMapper::toDomain).toList(); // method reference
     }
 
     public static PacienteEntity toEntity(Paciente paciente) {

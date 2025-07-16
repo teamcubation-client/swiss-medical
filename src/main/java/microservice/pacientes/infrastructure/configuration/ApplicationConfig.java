@@ -5,10 +5,10 @@ import microservice.pacientes.application.domain.port.in.DeletePacienteUseCase;
 import microservice.pacientes.application.domain.port.in.FindPacienteUseCase;
 import microservice.pacientes.application.domain.port.in.UpdatePacienteUseCase;
 import microservice.pacientes.application.domain.port.out.PacienteRepositoryPort;
-import microservice.pacientes.application.service.CreatePacienteUseCaseImpl;
-import microservice.pacientes.application.service.DeletePacienteUseCaseImpl;
-import microservice.pacientes.application.service.FindPacienteUseCaseImpl;
-import microservice.pacientes.application.service.UpdatePacienteUseCaseImpl;
+import microservice.pacientes.application.service.CreatePacienteService;
+import microservice.pacientes.application.service.DeletePacienteService;
+import microservice.pacientes.application.service.FindPacienteService;
+import microservice.pacientes.application.service.UpdatePacienteService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -18,22 +18,22 @@ public class ApplicationConfig {
 
     @Bean
     public CreatePacienteUseCase createPacienteUseCase(PacienteRepositoryPort pacienteRepositoryPort) {
-        return new CreatePacienteUseCaseImpl(pacienteRepositoryPort);
+        return new CreatePacienteService(pacienteRepositoryPort);
     }
 
     @Bean
     public DeletePacienteUseCase deletePacienteUseCase(PacienteRepositoryPort pacienteRepositoryPort) {
-        return new DeletePacienteUseCaseImpl(pacienteRepositoryPort);
+        return new DeletePacienteService(pacienteRepositoryPort);
     }
 
     @Bean
     public FindPacienteUseCase findPacienteUseCase(PacienteRepositoryPort pacienteRepositoryPort) {
-        return new FindPacienteUseCaseImpl(pacienteRepositoryPort);
+        return new FindPacienteService(pacienteRepositoryPort);
     }
 
     @Bean
     public UpdatePacienteUseCase updatePacienteUseCase(PacienteRepositoryPort pacienteRepositoryPort) {
-        return new UpdatePacienteUseCaseImpl(pacienteRepositoryPort);
+        return new UpdatePacienteService(pacienteRepositoryPort);
     }
 
 }

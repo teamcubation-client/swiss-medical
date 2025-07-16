@@ -1,6 +1,7 @@
 package microservice.pacientes.infrastructure.adapter.out.persistence.mysql.repository;
 
 import jakarta.transaction.Transactional;
+import lombok.AllArgsConstructor;
 import microservice.pacientes.application.domain.model.Paciente;
 import microservice.pacientes.application.domain.port.out.PacienteRepositoryPort;
 import microservice.pacientes.infrastructure.adapter.out.persistence.mysql.mapper.PacienteEntityMapper;
@@ -9,13 +10,10 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
+@AllArgsConstructor
 public class PacienteRepository implements PacienteRepositoryPort {
 
     private final JpaPacienteRepository jpaPacienteRepository;
-
-    public PacienteRepository(JpaPacienteRepository jpaPacienteRepository) {
-        this.jpaPacienteRepository = jpaPacienteRepository;
-    }
 
     @Override
     public List<Paciente> getAll() {
