@@ -1,5 +1,6 @@
 package microservice.pacientes.infrastructure.adapter.in.rest;
 
+import jakarta.validation.Valid;
 import microservice.pacientes.application.domain.command.CreatePacienteCommand;
 import microservice.pacientes.application.domain.command.UpdatePacienteCommand;
 import microservice.pacientes.application.domain.model.Paciente;
@@ -54,7 +55,7 @@ public class PacienteControllerImpl implements PacienteController {
     }
 
     @PostMapping
-    public ResponseEntity<PacienteResponseDTO> create(@RequestBody PacienteRequestDTO pacienteRequestDTO) {
+    public ResponseEntity<PacienteResponseDTO> create(@Valid @RequestBody PacienteRequestDTO pacienteRequestDTO) {
         CreatePacienteCommand createPacienteCommand = PacienteRequestMapper.toCreateCommand(pacienteRequestDTO);
         Paciente paciente = createPacienteUseCase.create(createPacienteCommand);
         PacienteResponseDTO pacienteResponseDTO = PacienteResponseMapper.toDTO(paciente);
@@ -62,7 +63,7 @@ public class PacienteControllerImpl implements PacienteController {
     }
 
     @PutMapping("/{dni}")
-    public ResponseEntity<PacienteResponseDTO> update(@PathVariable String dni, @RequestBody PacienteUpdateDTO pacienteUpdateDTO) {
+    public ResponseEntity<PacienteResponseDTO> update(@PathVariable String dni, @Valid @RequestBody PacienteUpdateDTO pacienteUpdateDTO) {
         UpdatePacienteCommand updatePacienteCommand = PacienteRequestMapper.toUpdateCommand(pacienteUpdateDTO);
         Paciente paciente = updatePacienteUseCase.update(dni, updatePacienteCommand);
         PacienteResponseDTO pacienteResponseDTO = PacienteResponseMapper.toDTO(paciente);

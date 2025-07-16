@@ -18,6 +18,17 @@ Content-Type: application/json
     "telefono": "2920642002"
 }
 
+### POST pacientes incorrecto. deberia dar error.
+POST http://localhost:8080/pacientes
+Content-Type: application/json
+
+{
+  "apellido": "1111",
+  "nombre": "Nicolas"
+}
+
+
+
 ### PUT pacientes
 PUT http://localhost:8080/pacientes/111111
 Content-Type: application/json

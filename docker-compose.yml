@@ -20,20 +20,20 @@ services:
       timeout: 10s
       retries: 5
 
-  app:
-    build: .
-    container_name: pacientes-app
-    ports:
-      - "${API_PORT_HOST}:${API_PORT_CONTAINER}"
-    depends_on:
-      mysql:
-        condition: service_healthy
-    environment:
-      SERVER_PORT: ${API_PORT_CONTAINER}
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:${DB_PORT_CONTAINER}/${DB_DATABASE}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
-      SPRING_DATASOURCE_USERNAME: ${DB_USER}
-      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
-    restart: unless-stopped
+#  app:
+#    build: .
+#    container_name: pacientes-app
+#    ports:
+#      - "${API_PORT_HOST}:${API_PORT_CONTAINER}"
+#    depends_on:
+#      mysql:
+#        condition: service_healthy
+#    environment:
+#      SERVER_PORT: ${API_PORT_CONTAINER}
+#      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:${DB_PORT_CONTAINER}/${DB_DATABASE}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+#      SPRING_DATASOURCE_USERNAME: ${DB_USER}
+#      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
+#    restart: unless-stopped
 
 volumes:
   mysql_data:
