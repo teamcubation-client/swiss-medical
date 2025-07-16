@@ -1,14 +1,10 @@
-package com.practica.crud_pacientes.dto;
+package com.practica.crud_pacientes.infrastructure.adapter.in.rest.dto;
 
 import jakarta.validation.constraints.*;
-import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 
-
-@NoArgsConstructor
-public class PacienteDto {
-
+public class PacienteRequest {
     @NotEmpty(message = "Debe ingresar un nombre.")
     @Size(min = 3, max = 25)
     private String nombre;
@@ -45,28 +41,19 @@ public class PacienteDto {
     @Size(min = 3)
     private String estadoCivil;
 
-    public String getEstadoCivil() {
-        return estadoCivil;
+    public PacienteRequest() {
     }
 
-    public void setEstadoCivil(String estadoCivil) {
-        this.estadoCivil = estadoCivil;
-    }
-
-    public String getDomicilio() {
-        return domicilio;
-    }
-
-    public void setDomicilio(String domicilio) {
+    public PacienteRequest(String nombre, String apellido, String dni, String obraSocial, String email, String telefono, String domicilio, LocalDate fechaNacimiento, String estadoCivil) {
+        this.nombre = nombre;
+        this.apellido = apellido;
+        this.dni = dni;
+        this.obraSocial = obraSocial;
+        this.email = email;
+        this.telefono = telefono;
         this.domicilio = domicilio;
-    }
-
-    public LocalDate getFechaNacimiento() {
-        return fechaNacimiento;
-    }
-
-    public void setFechaNacimiento(LocalDate fechaNacimiento) {
         this.fechaNacimiento = fechaNacimiento;
+        this.estadoCivil = estadoCivil;
     }
 
     public void setNombre(String nombre) {
@@ -93,6 +80,18 @@ public class PacienteDto {
         this.telefono = telefono;
     }
 
+    public void setDomicilio(String domicilio) {
+        this.domicilio = domicilio;
+    }
+
+    public void setFechaNacimiento(LocalDate fechaNacimiento) {
+        this.fechaNacimiento = fechaNacimiento;
+    }
+
+    public void setEstadoCivil(String estadoCivil) {
+        this.estadoCivil = estadoCivil;
+    }
+
     public String getNombre() {
         return nombre;
     }
@@ -115,5 +114,17 @@ public class PacienteDto {
 
     public String getTelefono() {
         return telefono;
+    }
+
+    public String getDomicilio() {
+        return domicilio;
+    }
+
+    public LocalDate getFechaNacimiento() {
+        return fechaNacimiento;
+    }
+
+    public String getEstadoCivil() {
+        return estadoCivil;
     }
 }

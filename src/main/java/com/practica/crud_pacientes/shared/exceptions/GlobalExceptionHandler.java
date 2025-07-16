@@ -1,4 +1,4 @@
-package com.practica.crud_pacientes.exceptions;
+package com.practica.crud_pacientes.shared.exceptions;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;

@@ -1,9 +1,10 @@
-package com.practica.crud_pacientes.controller;
+package com.practica.crud_pacientes.infrastructure.adapter.in.rest.openAPI;
 
-import com.practica.crud_pacientes.dto.PacienteDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import com.practica.crud_pacientes.infrastructure.adapter.in.rest.dto.PacienteRequest;
+import com.practica.crud_pacientes.infrastructure.adapter.in.rest.dto.PacienteResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -22,7 +23,7 @@ public interface PacienteAPI {
                     @ApiResponse(responseCode = "400", description = "Error en la solicitud")
             }
     )
-    ResponseEntity<List<PacienteDto>> getPacientes();
+    ResponseEntity<List<PacienteResponse>> getPacientes();
 
     @Operation(
             summary = "Buscar paciente por ID",
@@ -32,7 +33,7 @@ public interface PacienteAPI {
                     @ApiResponse(responseCode = "404", description = "Paciente inexistente")
             }
     )
-    ResponseEntity<PacienteDto> getPaciente(@PathVariable int id);
+    ResponseEntity<PacienteResponse> getPaciente(@PathVariable int id);
 
     @Operation(
             summary = "Registrar un nuevo paciente",
@@ -42,7 +43,7 @@ public interface PacienteAPI {
                     @ApiResponse(responseCode = "409", description = "Ya existe un paciente con ese DNI")
             }
     )
-    ResponseEntity<PacienteDto> addPaciente(@RequestBody PacienteDto pacienteNuevo);
+    ResponseEntity<PacienteResponse> addPaciente(@RequestBody PacienteRequest pacienteNuevo);
 
     @Operation(
             summary = "Actualizar un paciente existente",
@@ -53,7 +54,7 @@ public interface PacienteAPI {
                     @ApiResponse(responseCode = "400", description = "Los datos que se intentan actualizar son incorrectos")
             }
     )
-    ResponseEntity<PacienteDto> updatePaciente(@PathVariable int id, @RequestBody PacienteDto paciente);
+    ResponseEntity<PacienteResponse> updatePaciente(@PathVariable int id, @RequestBody PacienteRequest paciente);
 
     @Operation(
             summary = "Elimina un paciente",
@@ -73,7 +74,7 @@ public interface PacienteAPI {
                     @ApiResponse(responseCode = "404", description = "Paciente no encontrado")
             }
     )
-    ResponseEntity<PacienteDto> getPacienteByDni(@PathVariable String dni);
+    ResponseEntity<PacienteResponse> getPacienteByDni(@PathVariable String dni);
 
     @Operation(
             summary = "Busca pacientes por su nombre",
@@ -82,7 +83,7 @@ public interface PacienteAPI {
                     @ApiResponse(responseCode = "200", description = "Pacientes encontrados")
             }
     )
-    ResponseEntity<List<PacienteDto>> getPacientesByName(@PathVariable String nombre);
+    ResponseEntity<List<PacienteResponse>> getPacientesByName(@PathVariable String nombre);
 
     @Operation(
             summary = "Busca pacientes por su obra social",
@@ -91,7 +92,7 @@ public interface PacienteAPI {
                     @ApiResponse(responseCode = "200", description = "Pacientes encontrados")
             }
     )
-    ResponseEntity<List<PacienteDto>> getPacientesByObraSocial(@PathVariable String obraSocial,
-                                                                     @RequestParam int limite,
-                                                                     @RequestParam int off);
+    ResponseEntity<List<PacienteResponse>> getPacientesByObraSocial(@PathVariable String obraSocial,
+                                                                    @RequestParam int limite,
+                                                                    @RequestParam int off);
 }

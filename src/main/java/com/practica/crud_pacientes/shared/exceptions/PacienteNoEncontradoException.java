@@ -1,4 +1,4 @@
-package com.practica.crud_pacientes.exceptions;
+package com.practica.crud_pacientes.shared.exceptions;
 
 public class PacienteNoEncontradoException extends RuntimeException{
     public PacienteNoEncontradoException(){
