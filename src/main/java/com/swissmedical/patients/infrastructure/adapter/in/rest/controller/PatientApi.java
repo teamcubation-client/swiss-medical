@@ -1,8 +1,9 @@
-package com.swissmedical.patients.controller;
+package com.swissmedical.patients.infrastructure.adapter.in.rest.controller;
 
 import java.util.HashMap;
 import java.util.List;
 
+import com.swissmedical.patients.infrastructure.adapter.in.rest.dto.PatientResponseDto;
 import com.swissmedical.patients.infrastructure.adapter.in.rest.dto.PatientUpdateDto;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -11,8 +12,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
 import com.swissmedical.patients.infrastructure.adapter.in.rest.dto.PatientCreateDto;
-import com.swissmedical.patients.entity.Patient;
-import com.swissmedical.patients.utils.ResponseCode;
+import com.swissmedical.patients.shared.utils.ResponseCode;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -26,7 +26,7 @@ public interface PatientApi {
                 description = "Lista de pacientes obtenida correctamente",
                 content = @Content(
                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                        array = @ArraySchema(schema = @Schema(implementation = Patient.class))
+                        array = @ArraySchema(schema = @Schema(implementation = PatientResponseDto.class))
         )),
         @ApiResponse(
                 responseCode = ResponseCode.NO_CONTENT,
@@ -47,7 +47,7 @@ public interface PatientApi {
                 )
         )
     })
-    public ResponseEntity<List<Patient>> getAll(String firstName, int limit, int offset);
+    public List<PatientResponseDto> getAll(String firstName, int limit, int offset);
 
     @Operation(summary = "Obtener un paciente por su DNI")
     @ApiResponses({
@@ -56,7 +56,7 @@ public interface PatientApi {
                 description = "Paciente encontrado",
                 content = @Content(
                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                        schema = @Schema(implementation = Patient.class)
+                        schema = @Schema(implementation = PatientResponseDto.class)
                 )
         ),
         @ApiResponse(
@@ -79,7 +79,7 @@ public interface PatientApi {
                 )
         )
     })
-    public ResponseEntity<Patient> getByDni(String dni);
+    public PatientResponseDto getByDni(String dni);
 
     @Operation(summary = "Buscar pacientes por nombre de Seguro Social con paginación")
     @ApiResponses({
@@ -88,7 +88,7 @@ public interface PatientApi {
                 description = "Lista de pacientes obtenida correctamente",
                 content = @Content(
                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                        array = @ArraySchema(schema = @Schema(implementation = Patient.class))
+                        array = @ArraySchema(schema = @Schema(implementation = PatientResponseDto.class))
                 )
         ),
         @ApiResponse(
@@ -111,7 +111,7 @@ public interface PatientApi {
                 )
         )
     })
-    public ResponseEntity<List<Patient>> getBySocialSecurity(String socialSecurity, int limit, int offset);
+    public List<PatientResponseDto> getBySocialSecurity(String socialSecurity, int limit, int offset);
 
     @Operation(summary = "Crear un nuevo paciente")
     @ApiResponses({
@@ -120,7 +120,7 @@ public interface PatientApi {
                 description = "Paciente creado correctamente",
                 content = @Content(
                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                        schema = @Schema(implementation = Patient.class)
+                        schema = @Schema(implementation = PatientResponseDto.class)
                 )
         ),
         @ApiResponse(
@@ -146,7 +146,7 @@ public interface PatientApi {
                 )
         )
     })
-    public ResponseEntity<Patient> create(PatientCreateDto patientCreateDto);
+    public PatientResponseDto create(PatientCreateDto patientCreateDto);
 
     @Operation(summary = "Actualizar un paciente existente")
     @ApiResponses({
@@ -155,7 +155,7 @@ public interface PatientApi {
                 description = "Paciente actualizado correctamente",
                 content = @Content(
                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                        schema = @Schema(implementation = Patient.class)
+                        schema = @Schema(implementation = PatientResponseDto.class)
                 )
         ),
         @ApiResponse(
@@ -189,7 +189,7 @@ public interface PatientApi {
                 )
         )
     })
-    public ResponseEntity<Patient> update(PatientUpdateDto patientUpdateDto, Long id);
+    public PatientResponseDto update(PatientUpdateDto patientUpdateDto, Long id);
 
     @Operation(summary = "Eliminar un paciente por su ID")
     @ApiResponses({

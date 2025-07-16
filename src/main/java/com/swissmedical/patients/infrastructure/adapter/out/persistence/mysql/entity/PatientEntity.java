@@ -1,4 +1,4 @@
-package com.swissmedical.patients.infrastructure.adapter.out.persistence.entity;
+package com.swissmedical.patients.infrastructure.adapter.out.persistence.mysql.entity;
 
 import java.time.LocalDate;
 

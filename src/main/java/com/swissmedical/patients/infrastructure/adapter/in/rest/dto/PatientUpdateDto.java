@@ -1,4 +1,4 @@
-package com.swissmedical.patients.dto;
+package com.swissmedical.patients.infrastructure.adapter.in.rest.dto;
 
 
 import jakarta.validation.constraints.Email;

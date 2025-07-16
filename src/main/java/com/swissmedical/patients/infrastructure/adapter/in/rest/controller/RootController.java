@@ -1,4 +1,4 @@
-package com.swissmedical.patients.controller;
+package com.swissmedical.patients.infrastructure.adapter.in.rest.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;

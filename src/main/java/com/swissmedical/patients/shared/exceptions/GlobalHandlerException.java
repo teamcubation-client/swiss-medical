@@ -1,4 +1,4 @@
-package com.swissmedical.patients.exceptions;
+package com.swissmedical.patients.shared.exceptions;
 
 import java.util.HashMap;
 import java.util.List;

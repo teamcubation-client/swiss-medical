@@ -1,4 +1,4 @@
-package com.swissmedical.patients.utils;
+package com.swissmedical.patients.shared.utils;
 
 public class ResponseCode {
 
