@@ -1,6 +1,3 @@
-## testear bien porque no encuentra, por ejemplo en /obra social si encuentra al paciente 34567890 pero cuando lo busco
-## x dni no lo encuentra. !! importante
-
 ### GET pacientes
 GET http://localhost:8080/pacientes
 Accept: application/json
@@ -26,8 +23,6 @@ Content-Type: application/json
   "apellido": "1111",
   "nombre": "Nicolas"
 }
-
-
 
 ### PUT pacientes
 PUT http://localhost:8080/pacientes/111111
