@@ -1,12 +1,15 @@
--- agregué esto porque si no me tiraba error al crear el container.
+SET NAMES utf8mb4;
+SET CHARACTER SET utf8mb4;
+SET collation_connection = utf8mb4_unicode_ci;
+
 CREATE TABLE IF NOT EXISTS pacientes (
     dni VARCHAR(20) NOT NULL PRIMARY KEY,
-    nombre VARCHAR(255) NOT NULL,
-    apellido VARCHAR(255) NOT NULL,
-    obra_social VARCHAR(255),
-    email VARCHAR(255),
-    telefono VARCHAR(50)
-);
+    nombre VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+    apellido VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+    obra_social VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+    email VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+    telefono VARCHAR(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 
 INSERT INTO pacientes (dni, nombre, apellido, obra_social, email, telefono) VALUES
