@@ -15,7 +15,7 @@ public class PacienteUpdateDTO {
     private String nombre;
     @Pattern(regexp = ".*\\S.*", message = "El apellido no puede ser vacío")
     private String apellido;
-    private String obraSocial;
+    private String obra_social;
     private String email;
     private String telefono;
 }

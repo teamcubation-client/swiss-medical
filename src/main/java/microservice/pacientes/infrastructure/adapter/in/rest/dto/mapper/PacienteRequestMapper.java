@@ -12,7 +12,7 @@ public class PacienteRequestMapper {
                 dto.getDni(),
                 dto.getNombre(),
                 dto.getApellido(),
-                dto.getObraSocial(),
+                dto.getObra_social(),
                 dto.getEmail(),
                 dto.getTelefono()
         );
@@ -22,7 +22,7 @@ public class PacienteRequestMapper {
         return new UpdatePacienteCommand(
                 dto.getNombre(),
                 dto.getApellido(),
-                dto.getObraSocial(),
+                dto.getObra_social(),
                 dto.getEmail(),
                 dto.getTelefono()
         );

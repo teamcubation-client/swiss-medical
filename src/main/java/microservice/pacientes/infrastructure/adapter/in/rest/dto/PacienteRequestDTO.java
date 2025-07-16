@@ -18,7 +18,7 @@ public class PacienteRequestDTO {
     private String nombre;
     @NotBlank(message = "El apellido es obligatorio")
     private String apellido;
-    private String obraSocial;
+    private String obra_social;
     private String email;
     private String telefono;
 }
