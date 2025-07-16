@@ -2,7 +2,7 @@ version: '3.8'
 services:
   mysql:
     image: mysql:8.0
-    container_name: pacientes_stored_procedures
+    container_name: mysqlpacientesSP
     environment:
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
       MYSQL_DATABASE: ${DB_DATABASE}
@@ -29,7 +29,7 @@ services:
       mysql:
         condition: service_healthy
     environment:
-      SERVER_PORT: ${API_PORT_IN}
+      SERVER_PORT: ${API_PORT_CONTAINER}
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql:${DB_PORT_CONTAINER}/${DB_DATABASE}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
       SPRING_DATASOURCE_USERNAME: ${DB_USER}
       SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}

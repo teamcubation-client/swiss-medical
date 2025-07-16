@@ -1,3 +1,6 @@
+## testear bien porque no encuentra, por ejemplo en /obra social si encuentra al paciente 34567890 pero cuando lo busco
+## x dni no lo encuentra. !! importante
+
 ### GET pacientes
 GET http://localhost:8080/pacientes
 Accept: application/json
@@ -24,6 +27,15 @@ Content-Type: application/json
     "apellido": "Girolamo",
     "email": "nicolas.berti69@gmail.com"
 }
+
+### GET paciente by 111111
+GET http://localhost:8080/pacientes/111111
+
+### GET paciente by NAME
+GET http://localhost:8080/pacientes/nombre/Martin
+
+### GET paciente by obra social
+GET http://localhost:8080/pacientes/obra_social?obra_social=OSDE&page=1&size=10
 
 ### GET paciente by DNI with SP
 GET http://localhost:8080/pacientes/dni/90123456

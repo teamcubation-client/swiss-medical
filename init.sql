@@ -1,5 +1,5 @@
 -- agregué esto porque si no me tiraba error al crear el container.
-CREATE TABLE IF NOT EXISTS paciente (
+CREATE TABLE IF NOT EXISTS pacientes (
     dni VARCHAR(20) NOT NULL PRIMARY KEY,
     nombre VARCHAR(255) NOT NULL,
     apellido VARCHAR(255) NOT NULL,
@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS paciente (
 );
 
 
-INSERT INTO paciente (dni, nombre, apellido, obra_social, email, telefono) VALUES
+INSERT INTO pacientes (dni, nombre, apellido, obra_social, email, telefono) VALUES
 ('12345678', 'Carlos', 'Pérez', 'OSDE', 'carlos.perez@example.com', '111-1111'),
 ('23456789', 'Ana', 'Gómez', 'Swiss Medical', 'ana.gomez@example.com', '222-2222'),
 ('34567890', 'Luis', 'Martínez', 'OSDE', 'luis.martinez@example.com', '333-3333'),
@@ -27,7 +27,7 @@ DELIMITER //
 CREATE PROCEDURE buscar_paciente_por_dni(IN p_dni VARCHAR(20))
 BEGIN
     SELECT dni, nombre, apellido, obra_social, email, telefono
-    FROM paciente
+    FROM pacientes
     WHERE dni = p_dni;
 END;
 //
@@ -36,7 +36,7 @@ END;
 CREATE PROCEDURE buscar_pacientes_por_nombre(IN p_nombre VARCHAR(50))
 BEGIN
     SELECT dni, nombre, apellido, obra_social, email, telefono
-    FROM paciente
+    FROM pacientes
     WHERE LOWER(nombre) LIKE CONCAT('%', LOWER(p_nombre), '%');
 END;
 //
@@ -49,7 +49,7 @@ CREATE PROCEDURE buscar_pacientes_por_obra_social_paginado(
 )
 BEGIN
     SELECT dni, nombre, apellido, obra_social, email, telefono
-    FROM paciente
+    FROM pacientes
     WHERE obra_social = p_obra_social
     LIMIT p_limit OFFSET p_offset;
 END;
