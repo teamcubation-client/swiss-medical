@@ -1,0 +1,37 @@
+services:
+  api_pacientes:
+    build: .
+    ports:
+      - "${HOST_PORT}:${CONTAINER_PORT}"
+    depends_on:
+      - db_pacientes
+    environment:
+      SERVER_PORT: ${SERVER_PORT}
+      SPRING_DATASOURCE_URL: "${DB_BASE_MYSQL}:${DB_PORT_CONTAINER}/${DB_DATABASE}?${DB_CONFIG_PARAMS_MYSQL}"
+      SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
+    networks: # Es opcional, pero permite definir explícitamente qué servicios comparten red privada
+      - backend_net #nombre de la red
+
+  db_pacientes:
+    image: mysql:8.0
+    container_name: db_pacientes
+    ports:
+      - "${DB_PORT_HOST}:${DB_PORT_CONTAINER}"
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_USER: ${SPRING_DATASOURCE_USERNAME}
+      MYSQL_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    volumes:
+        - db_data:/var/lib/mysql
+        - ./src/main/resources/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
+        - ./src/main/resources/data.sql:/docker-entrypoint-initdb.d/02-data.sql
+    networks:
+      - backend_net
+
+networks:
+  backend_net:
+
+volumes:
+  db_data:

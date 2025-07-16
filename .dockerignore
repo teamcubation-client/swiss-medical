@@ -1,0 +1,19 @@
+# Ignorar carpetas de compilación y artefactos
+target/
+build/
+
+# Ignorar control de versiones
+.git
+.gitignore
+
+# Variables de entorno con credenciales
+.env
+
+# Archivos de logs
+*.log
+
+# Carpetas de configuraciones y archivos de IDEs
+.idea/
+.vscode/
+nbproject/
+.mvn/
