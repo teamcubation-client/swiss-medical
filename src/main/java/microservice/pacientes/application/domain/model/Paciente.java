@@ -1,6 +1,4 @@
 package microservice.pacientes.application.domain.model;
-
-import javax.persistence.*;
 import lombok.Data;
 
 /**

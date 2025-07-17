@@ -1,7 +1,6 @@
 package microservice.pacientes.infrastructure.adapter.out.persistence;
 
 import microservice.pacientes.application.domain.model.Paciente;
-import microservice.pacientes.infrastructure.adapter.in.controller.PacienteDTO;
 import org.springframework.stereotype.Component;
 
 /**

@@ -1,6 +1,6 @@
 package microservice.pacientes.infrastructure.adapter.out.persistence;
 
-import jdk.jfr.Enabled;
+
 import lombok.Data;
 import lombok.NoArgsConstructor;
 

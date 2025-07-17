@@ -54,12 +54,9 @@ public interface PacientePortOut {
      */
     List<Paciente> findAll();
 
-    @Query(value = "CALL buscar_paciente_por_dni(:dni)", nativeQuery = true)
     Optional<Paciente> buscarPorDniConSP(@Param("dni") String dni);
 
-    @Query(value = "CALL buscar_pacientes_por_nombre(:nombre)", nativeQuery = true)
     List<Paciente> buscarPorNombreConSP(@Param("nombre") String nombre);
 
-    @Query(value = "CALL buscar_pacientes_por_obra_social_paginado(:p_obra_social, :p_limit, :p_offset)", nativeQuery = true)
     List<Paciente> buscarPorObraSocialPaginado(@Param("p_obra_social") String obraSocial, @Param("p_limit") int limit, @Param("p_offset") int offset);
 }
