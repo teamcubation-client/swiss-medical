@@ -33,6 +33,28 @@ public interface IPacienteController {
     })
     ResponseEntity<PatientDTO> findById(Long id);
 
+    @Operation(summary = "Buscar paciente por DNI", description = "Obtiene un paciente específico por su DNI.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Paciente encontrado"),
+            @ApiResponse(responseCode = "204", description = "Paciente no encontrado")
+    })
+    ResponseEntity<PatientDTO> findByDni(String dni);
+
+    @Operation(summary = "Buscar pacientes por nombre", description = "Permite buscar pacientes por nombre parcial (no sensible a mayúsculas/minúsculas).")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Pacientes encontrados"),
+            @ApiResponse(responseCode = "204", description = "Pacientes no encontrados")
+    })
+    ResponseEntity<List<PatientDTO>> searchByFirstName(String firstName);
+
+    @Operation(summary = "Buscar pacientes por seguro de salud", description = "Permite buscar pacientes por seguro de salud.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Pacientes encontrados"),
+            @ApiResponse(responseCode = "204", description = "Pacientes no encontrados")
+    })
+    ResponseEntity<List<PatientDTO>> getByHealthInsurance(
+            String healthInsurance, int page, int size);
+
     @Operation(summary = "Actualizar paciente", description = "Actualiza la información del paciente con los datos proporcionados.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Paciente actualizado"),

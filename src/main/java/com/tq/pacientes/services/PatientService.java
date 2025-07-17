@@ -11,6 +11,7 @@ public interface PatientService {
     Optional<Patient> findById(Long id);
     Optional<Patient> findByDni(String dni);
     List<Patient> searchByFirstName(String firstName);
+    List<Patient> searchByHealthInsurancePaginated(String healthInsurance, int limit, int offset);
     Patient updatePatient(Long id, Patient patientDetails);
     void deletePatient(Long id);
     void activatePatient(Long id);
