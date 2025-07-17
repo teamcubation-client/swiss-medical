@@ -13,11 +13,8 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class ApplicationConfig {
 
-    private PacienteService pacienteService;
     public PacienteService getPacienteService(PacientePortOut pacientePortOut) {
-        if(pacienteService == null)
-            return pacienteService = new PacienteService(pacientePortOut);
-        return pacienteService;
+        return new PacienteService(pacientePortOut); // singleton gestionado x spring
     }
 
     @Bean
