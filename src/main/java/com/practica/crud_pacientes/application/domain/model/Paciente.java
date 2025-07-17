@@ -14,6 +14,9 @@ public class Paciente {
     private LocalDate fechaNacimiento;
     private String estadoCivil;
 
+    public Paciente() {
+    }
+
     public Paciente(int id, String nombre, String apellido, String dni, String obraSocial, String email, String telefono, String domicilio, LocalDate fechaNacimiento, String estadoCivil) {
         this.id = id;
         this.nombre = nombre;

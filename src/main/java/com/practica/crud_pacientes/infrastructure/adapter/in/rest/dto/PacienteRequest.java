@@ -4,6 +4,7 @@ import jakarta.validation.constraints.*;
 
 import java.time.LocalDate;
 
+
 public class PacienteRequest {
     @NotEmpty(message = "Debe ingresar un nombre.")
     @Size(min = 3, max = 25)
