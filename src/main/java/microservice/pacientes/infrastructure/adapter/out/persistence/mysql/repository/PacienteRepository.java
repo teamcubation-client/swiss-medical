@@ -5,11 +5,11 @@ import lombok.AllArgsConstructor;
 import microservice.pacientes.application.domain.model.Paciente;
 import microservice.pacientes.application.domain.port.out.PacientePortOut;
 import microservice.pacientes.infrastructure.adapter.out.persistence.mysql.mapper.PacienteEntityMapper;
-import org.springframework.stereotype.Repository;
+import microservice.pacientes.shared.annotations.PersistenceAdapter;
 import java.util.List;
 import java.util.Optional;
 
-@Repository
+@PersistenceAdapter
 @AllArgsConstructor
 public class PacienteRepository implements PacientePortOut {
 

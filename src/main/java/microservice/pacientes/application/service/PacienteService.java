@@ -10,12 +10,14 @@ import microservice.pacientes.application.domain.port.in.DeletePacienteUseCase;
 import microservice.pacientes.application.domain.port.in.FindPacienteUseCase;
 import microservice.pacientes.application.domain.port.in.UpdatePacienteUseCase;
 import microservice.pacientes.application.domain.port.out.PacientePortOut;
+import microservice.pacientes.shared.annotations.UseCase;
 import microservice.pacientes.shared.exception.PacienteDuplicadoException;
 import microservice.pacientes.shared.exception.PacienteNoEncontradoException;
 
 import java.util.List;
 
 @AllArgsConstructor
+@UseCase
 public class PacienteService implements FindPacienteUseCase, CreatePacienteUseCase, UpdatePacienteUseCase, DeletePacienteUseCase {
     private final PacientePortOut pacientePortOut;
 

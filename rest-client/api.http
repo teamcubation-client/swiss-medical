@@ -44,7 +44,7 @@ GET http://localhost:8080/pacientes/111111
 GET http://localhost:8080/pacientes/nombre/Martin
 
 ### GET paciente by obra social
-GET http://localhost:8080/pacientes/obra_social?obra_social=OSDE&page=1&size=10
+GET http://localhost:8080/pacientes/obra_social?obraSocial=OSDE&page=1&size=10
 
 ### GET paciente by DNI with SP
 GET http://localhost:8080/pacientes/dni/90123456
@@ -62,4 +62,4 @@ GET http://localhost:8080/pacientes/1
 GET http://localhost:8080/pacientes/nombre/Laura
 
 ### GET paciente by obra social with SP
-GET http://localhost:8080/pacientes/obra_social?obra_social=OSDE&page=1&size=2
+GET http://localhost:8080/pacientes/obra_social?obraSocial=OSDE&page=1&size=2
