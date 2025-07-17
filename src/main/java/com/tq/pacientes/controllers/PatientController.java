@@ -1,6 +1,6 @@
 package com.tq.pacientes.controllers;
 
-import com.tq.pacientes.documentation.IPacienteController;
+import com.tq.pacientes.documentation.IPatientController;
 import com.tq.pacientes.dtos.PatientDTO;
 import com.tq.pacientes.mappers.PatientMapper;
 import com.tq.pacientes.models.Patient;
@@ -9,12 +9,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/patients")
-public class PatientController implements IPacienteController {
+public class PatientController implements IPatientController {
 
     private final PatientService patientService;
     private final PatientMapper patientMapper;
@@ -39,10 +40,16 @@ public class PatientController implements IPacienteController {
     ) {
         List<Patient> results;
 
-        if (dni != null) {
-            return patientService.findByDni(dni)
-                    .map(p -> ResponseEntity.ok(List.of(patientMapper.toDto(p))))
-                    .orElse(ResponseEntity.noContent().build());
+        if (dni != null && firstName != null) {
+            results = new ArrayList<>();
+            patientService.findByDni(dni).ifPresent(patient -> {
+                if (patient.getFirstName().equalsIgnoreCase(firstName)) {
+                    results.add(patient);
+                }
+            });
+        } else if (dni != null) {
+            results = new ArrayList<>();
+            patientService.findByDni(dni).ifPresent(results::add);
         } else if (firstName != null) {
             results = patientService.searchByFirstName(firstName);
         } else {
@@ -58,11 +65,54 @@ public class PatientController implements IPacienteController {
                 : ResponseEntity.ok(dtos);
     }
 
+    @GetMapping("/first-name/{firstName}")
+    public ResponseEntity<List<PatientDTO>> searchByFirstName(@PathVariable String firstName) {
+        List<Patient> results = patientService.searchByFirstName(firstName);
+        List<PatientDTO> dtos = results.stream()
+                .map(patientMapper::toDto)
+                .collect(Collectors.toList());
+        return dtos.isEmpty()
+                ? ResponseEntity.noContent().build()
+                : ResponseEntity.ok(dtos);
+    }
+
+    @GetMapping("/dni/{dni}")
+    public ResponseEntity<PatientDTO> findByDni(@PathVariable String dni) {
+        return patientService.findByDni(dni)
+                .map(patient -> ResponseEntity.ok(patientMapper.toDto(patient)))
+                .orElse(ResponseEntity.noContent().build());
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<PatientDTO> findById(@PathVariable Long id) {
         return patientService.findById(id)
                 .map(patient -> ResponseEntity.ok(patientMapper.toDto(patient)))
                 .orElse(ResponseEntity.noContent().build());
+    }
+
+    @GetMapping("/health-insurance")
+    public ResponseEntity<List<PatientDTO>> getByHealthInsurance(
+            @RequestParam String healthInsurance,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+
+        if (page < 0) page = 0;
+        if (size <= 0) size = 10;
+
+        int offset = page * size;
+
+        var patients = patientService.searchByHealthInsurancePaginated(healthInsurance, size, offset);
+
+        if (patients.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+
+        List<PatientDTO> dtos = patients.stream()
+                .map(patientMapper::toDto)
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(dtos);
     }
 
     @PatchMapping("/{id}")

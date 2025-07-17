@@ -53,6 +53,12 @@ public class PatientServiceImpl implements PatientService {
         return patientRepository.findById(id);
     }
 
+
+    @Override
+    public List<Patient> searchByHealthInsurancePaginated(String healthInsurance, int limit, int offset) {
+        return patientRepository.findByHealthInsurancePaginated(healthInsurance, limit, offset);
+    }
+
     @Override
     public Patient updatePatient(Long id, Patient patientDetails) {
         return patientRepository.findById(id)
