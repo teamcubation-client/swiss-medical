@@ -34,7 +34,7 @@ public class PacienteService implements PacienteUseCase {
     @Override
     @Transactional
     public Paciente addPaciente(Paciente paciente) {
-        if(pacienteRepositoryPort.getByDniFromSP(paciente.getDni()) == null)
+        if(pacienteRepositoryPort.getByDni(paciente.getDni()) != null)
             throw new PacienteDuplicadoException();
 
         return pacienteRepositoryPort.save(paciente);
@@ -45,7 +45,7 @@ public class PacienteService implements PacienteUseCase {
     public Paciente updatePaciente(int id, Paciente paciente) throws PacienteNoEncontradoException {
         pacienteRepositoryPort.findById(id);
 
-        Paciente existingPaciente = pacienteRepositoryPort.getByDniFromSP(paciente.getDni());
+        Paciente existingPaciente = pacienteRepositoryPort.getByDni(paciente.getDni());
         if (existingPaciente == null)
             throw new PacienteDuplicadoException();
 
@@ -56,7 +56,7 @@ public class PacienteService implements PacienteUseCase {
     @Override
     @Transactional
     public void deletePaciente(int id) throws PacienteNoEncontradoException {
-        if(!pacienteRepositoryPort.existsById(id))
+        if(Boolean.FALSE.equals(pacienteRepositoryPort.existsById(id)))
             throw new PacienteNoEncontradoException();
 
         pacienteRepositoryPort.deleteById(id);
@@ -65,7 +65,7 @@ public class PacienteService implements PacienteUseCase {
     @Override
     @Transactional
     public Paciente getByDni(String dni) {
-        Paciente paciente = pacienteRepositoryPort.getByDniFromSP(dni);
+        Paciente paciente = pacienteRepositoryPort.getByDni(dni);
         if(paciente == null)
             throw new PacienteNoEncontradoException();
 
@@ -75,12 +75,12 @@ public class PacienteService implements PacienteUseCase {
     @Override
     @Transactional
     public List<Paciente> getPacientesbyName(String nombre) {
-        return pacienteRepositoryPort.getPacientesByNombreFromSP(nombre.toLowerCase());
+        return pacienteRepositoryPort.getPacientesByNombre(nombre.toLowerCase());
     }
 
     @Override
     @Transactional
     public List<Paciente> getPacietesbyObraSocial(String obraSocial, int limite, int off) {
-        return pacienteRepositoryPort.getPacietesbyObraSocialFromSP(obraSocial, limite, off);
+        return pacienteRepositoryPort.getPacietesbyObraSocial(obraSocial, limite, off);
     }
 }

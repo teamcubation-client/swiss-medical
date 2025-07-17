@@ -50,22 +50,22 @@ public class PacienteRepositoryAdapter implements PacienteRepositoryPort {
     }
 
     @Override
-    public Paciente getByDniFromSP(String dni) {
-        PacienteEntity pacienteEntity = pacienteJpaRepository.getByDniFromSP(dni);
+    public Paciente getByDni(String dni) {
+        PacienteEntity pacienteEntity = pacienteJpaRepository.getByDni(dni);
         return PacientePersistanceMapper.mapper.entityToDomain(pacienteEntity);
     }
 
     @Override
-    public List<Paciente> getPacientesByNombreFromSP(String nombre) {
-        List<PacienteEntity> pacientesEntity = pacienteJpaRepository.getPacientesByNombreFromSP(nombre.toLowerCase());
+    public List<Paciente> getPacientesByNombre(String nombre) {
+        List<PacienteEntity> pacientesEntity = pacienteJpaRepository.getPacientesByNombre(nombre.toLowerCase());
         return pacientesEntity.stream()
                 .map(PacientePersistanceMapper.mapper::entityToDomain)
                 .toList();
     }
 
     @Override
-    public List<Paciente> getPacietesbyObraSocialFromSP(String obraSocial, int limite, int off) {
-        List<PacienteEntity> pacientesEntity = pacienteJpaRepository.getPacietesbyObraSocialFromSP(obraSocial, limite, off);
+    public List<Paciente> getPacietesbyObraSocial(String obraSocial, int limite, int off) {
+        List<PacienteEntity> pacientesEntity = pacienteJpaRepository.getPacietesbyObraSocial(obraSocial, limite, off);
         return pacientesEntity.stream()
                 .map(PacientePersistanceMapper.mapper::entityToDomain)
                 .toList();

@@ -9,13 +9,13 @@ import java.util.List;
 
 public interface PacienteJpaRepository extends JpaRepository<PacienteEntity, Integer> {
     @Procedure(procedureName = "buscar_paciente_por_dni")
-    PacienteEntity getByDniFromSP(@Param("p_dni") String dni);
+    PacienteEntity getByDni(@Param("p_dni") String dni);
 
     @Procedure(procedureName = "buscar_pacientes_por_nombre")
-    List<PacienteEntity> getPacientesByNombreFromSP(@Param("p_nombre") String nombre);
+    List<PacienteEntity> getPacientesByNombre(@Param("p_nombre") String nombre);
 
     @Procedure(procedureName = "buscar_pacientes_por_obra_social_paginado")
-    List<PacienteEntity> getPacietesbyObraSocialFromSP(
+    List<PacienteEntity> getPacietesbyObraSocial(
             @Param("p_obra_social") String obraSocial,
             @Param("p_limit") int limite,
             @Param("p_offset") int off

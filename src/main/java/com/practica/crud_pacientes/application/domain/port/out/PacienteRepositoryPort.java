@@ -10,7 +10,7 @@ public interface PacienteRepositoryPort {
     Paciente findById(int id);
     Boolean existsById(int id);
     void deleteById(int id);
-    Paciente getByDniFromSP(String dni);
-    List<Paciente> getPacientesByNombreFromSP(String nombre);
-    List<Paciente> getPacietesbyObraSocialFromSP(String obraSocial, int limite, int off);
+    Paciente getByDni(String dni);
+    List<Paciente> getPacientesByNombre(String nombre);
+    List<Paciente> getPacietesbyObraSocial(String obraSocial, int limite, int off);
 }
