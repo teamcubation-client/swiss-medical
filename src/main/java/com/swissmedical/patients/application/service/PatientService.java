@@ -2,7 +2,7 @@ package com.swissmedical.patients.application.service;
 
 import com.swissmedical.patients.application.domain.model.Patient;
 import com.swissmedical.patients.application.domain.ports.in.PatientUseCase;
-import com.swissmedical.patients.application.domain.ports.out.PatientRepository;
+import com.swissmedical.patients.application.domain.ports.out.PatientRepositoryPort;
 import com.swissmedical.patients.shared.exceptions.PatientDuplicateException;
 import com.swissmedical.patients.shared.exceptions.PatientNotFoundException;
 import com.swissmedical.patients.shared.utils.ErrorMessages;
@@ -13,9 +13,9 @@ import java.util.List;
 @Service
 public class PatientService implements PatientUseCase {
 
-  private final PatientRepository patientRepository;
+  private final PatientRepositoryPort patientRepository;
 
-  public PatientService(PatientRepository patientRepository) {
+  public PatientService(PatientRepositoryPort patientRepository) {
     this.patientRepository = patientRepository;
   }
 

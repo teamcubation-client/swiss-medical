@@ -5,7 +5,7 @@ import com.swissmedical.patients.application.domain.model.Patient;
 import java.util.List;
 import java.util.Optional;
 
-public interface PatientRepository {
+public interface PatientRepositoryPort {
 
   Patient save(Patient patient);
 

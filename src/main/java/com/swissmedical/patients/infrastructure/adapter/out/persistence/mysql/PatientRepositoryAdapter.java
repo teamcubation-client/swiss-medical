@@ -1,7 +1,7 @@
 package com.swissmedical.patients.infrastructure.adapter.out.persistence.mysql;
 
 import com.swissmedical.patients.application.domain.model.Patient;
-import com.swissmedical.patients.application.domain.ports.out.PatientRepository;
+import com.swissmedical.patients.application.domain.ports.out.PatientRepositoryPort;
 import com.swissmedical.patients.infrastructure.adapter.out.persistence.mysql.entity.PatientEntity;
 import com.swissmedical.patients.infrastructure.adapter.out.persistence.mysql.mapper.PatientEntityMapper;
 import com.swissmedical.patients.shared.exceptions.PatientNotFoundException;
@@ -11,11 +11,11 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public class PatientRepositoryImpl implements PatientRepository {
+public class PatientRepositoryAdapter implements PatientRepositoryPort {
 
   private final PatientJpaRepository patientJpaRepository;
 
-  public PatientRepositoryImpl(PatientJpaRepository patientJpaRepository) {
+  public PatientRepositoryAdapter(PatientJpaRepository patientJpaRepository) {
     this.patientJpaRepository = patientJpaRepository;
   }
 

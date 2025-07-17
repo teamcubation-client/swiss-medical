@@ -408,3 +408,65 @@ networks:
 Optional<Paciente> buscarPorDniConSP(@Param("dni") String dni);
 ```
 - No olvidar realizar el `build` de la aplicación y el `docker-compose up` para que se creen los contenedores y se ejecuten los scripts de inicialización.
+
+---
+# Refactorización a Arquitectura Hexagonal
+
+- Se reorganizó el proyecto para adoptar una arquitectura hexagonal, separando claramente las capas de dominio y de infrastructura.
+- Se definieron los puertos de entrada y salida para el dominio, permitiendo que la lógica de negocio no dependa de detalles técnicos como JPA o REST.
+- Se implementaron adaptadores para conectar el dominio con la infraestructura, manteniendo el núcleo del negocio independiente de las tecnologías externas.
+
+## Nueva Estructura del Proyecto
+
+```bash
+src/
+└── main/
+    └── java/
+        └── com.swissmedical/
+            └── pacients/
+                ├── application/
+                │   ├── domain/
+                │   │   ├── model/
+                │   │   │   └── Patient.java
+                │   │   └── port/
+                │   │       ├── in/
+                |   |           └── PatienteUseCase.java
+                │   │       └── out/
+                │   │           └── PatienteRepositoryPort.java
+                │   └── service/
+                │       └── PatienteService.java
+                ├── infrastructure/
+                │   ├── adapter/
+                │   |    ├── in/rest/
+                │   |    │   ├── controller/
+                │   |    │   |   ├── PatientApi.java
+                │   |    │   |   ├── PatientController.java
+                │   |    │   |   └── RootController.java 
+                │   |    │   └── dto/
+                │   |    │   |   ├── PatientCreateDto.java
+                │   |    │   |   ├── PatientUpdateDto.java
+                │   |    │   |   └── PatientResponseDto.java
+                │   |    │   └── mapper/ 
+                │   |    │   |   ├── PatientCreateMapper.java
+                │   |    │   |   ├── PatientUpdateMapper.java
+                │   |    │   |   └── PatientResponseMapper.java
+                │   |    └── out/persistence/mysql/
+                │   |        ├── entity/
+                │   |        │   └── PatientEntity.java
+                │   |        ├── mapper/
+                │   |        │   └── PatientEntityMapper.java
+                │   |        └── repository/
+                │   |            ├── PatientJpaRepository.java
+                │   |            └── PatientRepositoryAdapter.java
+                │   └── config/
+                │       └── OpenApiConfig.java
+                └── shared/
+                    └── exceptions/
+                    |   ├── GlobalExceptionHandler.java
+                    |   ├── PatientNotFoundException.java
+                    |   └── PatientDuplicatedException.java
+                    └── utils/
+                        ├── ErrorMessages.java
+                        └── ResponseCode.java
+                    
+```
