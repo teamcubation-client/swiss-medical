@@ -28,7 +28,7 @@ Content-Type: application/json
 }
 
 ### PUT pacientes
-PUT http://localhost:8080/pacientes/111111
+PUT http://localhost:8080/pacientes/86754321
 Content-Type: application/json
 
 {

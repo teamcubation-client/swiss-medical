@@ -17,16 +17,16 @@ public class UpdatePacienteCommand {
     private final String telefono;
 
     public UpdatePacienteCommand(String nombre, String apellido, String obraSocial, String email, String telefono) {
-        if(!PacienteValidator.isValidNombre(nombre)) {
+        if(nombre != null && !PacienteValidator.isValidNombre(nombre)) {
             throw new PacienteArgumentoInvalido("El nombre es inválido");
         }
-        if(!PacienteValidator.isValidApellido(apellido)) {
+        if(apellido != null && !PacienteValidator.isValidApellido(apellido)) {
             throw new PacienteArgumentoInvalido("El apellido es inválido");
         }
-        if(!PacienteValidator.isValidEmail(email)) {
+        if(email != null && !PacienteValidator.isValidEmail(email)) {
             throw new PacienteArgumentoInvalido("El email es inválido");
         }
-        if(!PacienteValidator.isValidTelefono(telefono)) {
+        if(telefono != null && !PacienteValidator.isValidTelefono(telefono)) {
             throw new PacienteArgumentoInvalido("El teléfono es inválido");
         }
         this.nombre = nombre;
