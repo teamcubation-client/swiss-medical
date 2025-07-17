@@ -1,4 +1,4 @@
-package swissmedical.dto;
+package microservice.pacientes.infrastructure.adapter.in.controller;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.PastOrPresent;

@@ -1,4 +1,4 @@
-package swissmedical.exception;
+package microservice.pacientes.shared;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

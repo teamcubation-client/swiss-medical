@@ -1,4 +1,4 @@
-package swissmedical.exception;
+package microservice.pacientes.shared;
 
 /**
  * Excepcion cuando se intenta registrar un paciente con un DNI existente

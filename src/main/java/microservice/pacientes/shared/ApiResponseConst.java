@@ -1,4 +1,4 @@
-package swissmedical.controller;
+package microservice.pacientes.shared;
 
 public class ApiResponseConst {
     public static final String CODE_OK = "200";

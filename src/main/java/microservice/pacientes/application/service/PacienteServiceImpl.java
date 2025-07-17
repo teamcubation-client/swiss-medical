@@ -1,31 +1,23 @@
-package swissmedical.service.impl;
+package microservice.pacientes.application.service;
 
-import swissmedical.model.Paciente;
-import swissmedical.repository.PacienteRepository;
-import swissmedical.service.PacienteService;
-import java.util.List;
+import lombok.AllArgsConstructor;
+import microservice.pacientes.application.domain.model.Paciente;
+import microservice.pacientes.application.domain.port.in.PacientePortIn;
+import microservice.pacientes.application.domain.port.out.PacientePortOut;
+import microservice.pacientes.shared.PacienteDuplicadoException;
+import microservice.pacientes.shared.PacienteNotFoundException;
 import org.springframework.stereotype.Service;
-import swissmedical.exception.PacienteDuplicadoException;
-import swissmedical.exception.PacienteNotFoundException;
-import swissmedical.dto.PacienteDTO;
-import swissmedical.mapper.PacienteMapper;
-import java.util.stream.Collectors;
 
-/**
- * Implementacion del servicio de pacientes
- * Contiene la logica de negocio para crear, consultar, actualizar y eliminar pacientes
- */
+import javax.transaction.Transactional;
+import java.util.List;
+
+
 @Service
-public class PacienteServiceImpl implements PacienteService {
+@AllArgsConstructor
+@Transactional
+public class PacienteServiceImpl implements PacientePortIn {
 
-    private final PacienteRepository pacienteRepository;
-    private final PacienteMapper pacienteMapper;
-
-    public PacienteServiceImpl(PacienteRepository pacienteRepository, PacienteMapper pacienteMapper) {
-        this.pacienteRepository = pacienteRepository;
-        this.pacienteMapper = pacienteMapper;
-    }
-
+    private final PacientePortOut pacientePortOut;
     /**
      * Crea un nuevo paciente en el sistema, con excepcion si el DNI ya existe
      * @param paciente entidad Paciente a crear
@@ -34,12 +26,12 @@ public class PacienteServiceImpl implements PacienteService {
      */
     @Override
     public Paciente crearPaciente(Paciente paciente) {
-        pacienteRepository.findByDni(paciente.getDni())
+        pacientePortOut.findByDni(paciente.getDni())
                 .ifPresent(p -> {
                     throw new PacienteDuplicadoException(paciente.getDni());
                 });
 
-        return pacienteRepository.save(paciente);
+        return pacientePortOut.save(paciente);
     }
 
     /**
@@ -50,7 +42,7 @@ public class PacienteServiceImpl implements PacienteService {
      */
     @Override
     public Paciente obtenerPacientePorId(Long id) {
-        return pacienteRepository.findById(id)
+        return pacientePortOut.findById(id)
                 .orElseThrow(() -> PacienteNotFoundException.porId(id));
     }
 
@@ -60,7 +52,7 @@ public class PacienteServiceImpl implements PacienteService {
      */
     @Override
     public List<Paciente> listarPacientes() {
-        return pacienteRepository.findAll();
+        return pacientePortOut.findAll();
     }
 
     /**
@@ -70,10 +62,10 @@ public class PacienteServiceImpl implements PacienteService {
      */
     @Override
     public void eliminarPaciente(Long id) {
-        Paciente paciente = pacienteRepository.findById(id)
+        Paciente paciente = pacientePortOut.findById(id)
                 .orElseThrow(() -> PacienteNotFoundException.porId(id));
 
-        pacienteRepository.delete(paciente);
+        pacientePortOut.deleteById(id);
     }
 
     /**
@@ -83,7 +75,7 @@ public class PacienteServiceImpl implements PacienteService {
      */
     @Override
     public Paciente buscarPorDni(String dni) {
-        Paciente paciente = pacienteRepository.findByDni(dni).orElse(null);
+        Paciente paciente = pacientePortOut.findByDni(dni).orElse(null);
         return paciente;
     }
 
@@ -94,7 +86,7 @@ public class PacienteServiceImpl implements PacienteService {
      */
     @Override
     public List<Paciente> buscarPorNombreParcial(String nombre) {
-        List<Paciente> pacientes = pacienteRepository.findByNombreContainingIgnoreCase(nombre);
+        List<Paciente> pacientes = pacientePortOut.findByNombreContainingIgnoreCase(nombre);
         return pacientes;
     }
 
@@ -107,7 +99,7 @@ public class PacienteServiceImpl implements PacienteService {
      */
     @Override
     public Paciente actualizarPaciente(Long id, Paciente paciente) {
-        Paciente existente = pacienteRepository.findById(id)
+        Paciente existente = pacientePortOut.findById(id)
                 .orElseThrow(() -> PacienteNotFoundException.porId(id));
 
         if (paciente.getNombre() != null) {
@@ -135,34 +127,34 @@ public class PacienteServiceImpl implements PacienteService {
             existente.setFechaAlta(paciente.getFechaAlta());
         }
         existente.setEstado(paciente.isEstado());
-        return pacienteRepository.save(existente);
+        return pacientePortOut.save(existente);
     }
 
     @Override
     public Paciente desactivarPaciente(Long id) {
-        Paciente paciente = pacienteRepository.findById(id)
+        Paciente paciente = pacientePortOut.findById(id)
                 .orElseThrow(() -> PacienteNotFoundException.porId(id));
         paciente.setEstado(false);
-        return pacienteRepository.save(paciente);
+        return pacientePortOut.save(paciente);
     }
 
     @Override
     public Paciente activarPaciente(Long id) {
-        Paciente paciente = pacienteRepository.findById(id)
+        Paciente paciente = pacientePortOut.findById(id)
                 .orElseThrow(() -> PacienteNotFoundException.porId(id));
         paciente.setEstado(true);
-        return pacienteRepository.save(paciente);
+        return pacientePortOut.save(paciente);
     }
 
     @Override
     public Paciente buscarPorDniConSP(String dni) {
-        return pacienteRepository.buscarPorDniConSP(dni)
-            .orElseThrow(() -> PacienteNotFoundException.porDni(dni));
+        return pacientePortOut.buscarPorDniConSP(dni)
+                .orElseThrow(() -> PacienteNotFoundException.porDni(dni));
     }
 
     @Override
     public List<Paciente> buscarPorNombreConSP(String nombre) {
-        List<Paciente> paciente = pacienteRepository.buscarPorNombreConSP(nombre);
+        List<Paciente> paciente = pacientePortOut.buscarPorNombreConSP(nombre);
         if (paciente == null || paciente.isEmpty()) {
             throw PacienteNotFoundException.porNombre(nombre);
         }
@@ -171,11 +163,11 @@ public class PacienteServiceImpl implements PacienteService {
 
     @Override
     public List<Paciente> buscarPorObraSocialPaginado(String obraSocial, int limit, int offset) {
-        List<Paciente> paciente = pacienteRepository.buscarPorObraSocialPaginado(obraSocial, limit, offset);
+        List<Paciente> paciente = pacientePortOut.buscarPorObraSocialPaginado(obraSocial, limit, offset);
         if (paciente == null || paciente.isEmpty()) {
             throw PacienteNotFoundException.porObraSocial(obraSocial);
         }
         return paciente;
     }
 
-} 
+}

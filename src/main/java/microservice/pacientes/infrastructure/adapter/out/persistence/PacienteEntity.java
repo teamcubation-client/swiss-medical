@@ -1,15 +1,20 @@
-package swissmedical.model;
+package microservice.pacientes.infrastructure.adapter.out.persistence;
+
+import jdk.jfr.Enabled;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import lombok.Data;
 
 /**
  * Entidad que representa a un paciente
  * Contiene informacion personal y de contacto, ademas de la obra social al que pertenece el paciente
  */
-@Entity
 @Data
-public class Paciente {
+@Entity
+@NoArgsConstructor
+@Table (name ="paciente")
+public class PacienteEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     /** Identificador unico del paciente */
@@ -33,8 +38,4 @@ public class Paciente {
     /** Estado del paciente (true=activo, false=inactivo) */
     private boolean estado;
 
-    /**
-     * Constructor vacio requerido por JPA
-     */
-    public Paciente() {}
 } 

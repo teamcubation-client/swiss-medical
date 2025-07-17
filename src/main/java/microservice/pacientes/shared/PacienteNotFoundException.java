@@ -1,4 +1,4 @@
-package swissmedical.exception;
+package microservice.pacientes.shared;
 
 /**
  * Excepcion cuando no se encuentra un paciente con el ID especificado

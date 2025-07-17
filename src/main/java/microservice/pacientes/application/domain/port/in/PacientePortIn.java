@@ -1,14 +1,10 @@
-package swissmedical.service;
+package microservice.pacientes.application.domain.port.in;
 
-import swissmedical.model.Paciente;
+import microservice.pacientes.application.domain.model.Paciente;
+
 import java.util.List;
-import swissmedical.dto.PacienteDTO;
 
-/**
- * Servicio para la gestion de pacientes.
- * Define las operaciones principales para crear, consultar, actualizar y eliminar pacientes.
- */
-public interface PacienteService {
+public interface PacientePortIn {
     /**
      * Crea un nuevo paciente en el sistema.
      * @param paciente entidad Paciente a crear
