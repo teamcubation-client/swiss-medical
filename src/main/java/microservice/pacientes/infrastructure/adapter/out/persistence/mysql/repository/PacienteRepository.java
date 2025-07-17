@@ -3,7 +3,7 @@ package microservice.pacientes.infrastructure.adapter.out.persistence.mysql.repo
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import microservice.pacientes.application.domain.model.Paciente;
-import microservice.pacientes.application.domain.port.out.PacienteRepositoryPort;
+import microservice.pacientes.application.domain.port.out.PacientePortOut;
 import microservice.pacientes.infrastructure.adapter.out.persistence.mysql.mapper.PacienteEntityMapper;
 import org.springframework.stereotype.Repository;
 import java.util.List;
@@ -11,7 +11,7 @@ import java.util.Optional;
 
 @Repository
 @AllArgsConstructor
-public class PacienteRepository implements PacienteRepositoryPort {
+public class PacienteRepository implements PacientePortOut {
 
     private final JpaPacienteRepository jpaPacienteRepository;
 
@@ -37,9 +37,8 @@ public class PacienteRepository implements PacienteRepositoryPort {
     }
 
     @Override
-    public boolean delete(Paciente paciente) {
+    public void delete(Paciente paciente) {
         jpaPacienteRepository.delete(PacienteEntityMapper.toEntity(paciente));
-        return true;
     }
 
     @Override

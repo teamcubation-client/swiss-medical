@@ -6,14 +6,14 @@ import microservice.pacientes.application.domain.model.Paciente;
 public class CreatePacienteMapper {
 
     public static Paciente toEntity(CreatePacienteCommand command) {
-        return new Paciente(
-                command.getDni(),
-                command.getNombre(),
-                command.getApellido(),
-                command.getObra_social(),
-                command.getEmail(),
-                command.getTelefono()
-        );
+        return Paciente.builder()
+                .dni(command.getDni())
+                .nombre(command.getNombre())
+                .apellido(command.getApellido())
+                .obraSocial(command.getObraSocial())
+                .email(command.getEmail())
+                .telefono(command.getTelefono())
+                .build();
     }
 
 }

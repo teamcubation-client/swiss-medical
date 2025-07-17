@@ -15,11 +15,12 @@ public class PacienteResponseMapper {
         }
 
         public static PacienteResponseDTO toDTO(Paciente paciente) {
-            return new PacienteResponseDTO(
-                    paciente.getDni(),
-                    paciente.getNombre(),
-                    paciente.getApellido(),
-                    paciente.getObra_social()
-            );
+            return PacienteResponseDTO.builder()
+                    .dni(paciente.getDni())
+                    .nombre(paciente.getNombre())
+                    .apellido(paciente.getApellido())
+                    .obraSocial(paciente.getObraSocial())
+                    .build();
         }
+
 }

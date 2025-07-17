@@ -23,7 +23,7 @@ public interface JpaPacienteRepository extends JpaRepository<PacienteEntity, Str
     Optional<PacienteEntity> findByNombreSP(@Param("p_nombre") String nombre);
 
     @Procedure(procedureName = "buscar_pacientes_por_obra_social_paginado")
-    List<PacienteEntity> findByObraSocialSP(@Param("p_obra_social") String obraSocial, @Param("p_limit") int limit, @Param("p_offset") int offset);
+    List<PacienteEntity> findByObraSocialSP(@Param("p_obraSocial") String obraSocial, @Param("p_limit") int limit, @Param("p_offset") int offset);
 
 
 }

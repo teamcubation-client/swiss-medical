@@ -1,5 +1,6 @@
 package microservice.pacientes.infrastructure.adapter.in.rest.advice;
 
+import microservice.pacientes.shared.exception.PacienteArgumentoInvalido;
 import microservice.pacientes.shared.exception.PacienteDuplicadoException;
 import microservice.pacientes.shared.exception.PacienteException;
 import microservice.pacientes.shared.exception.PacienteNoEncontradoException;
@@ -23,6 +24,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiError> handlePacienteDuplicado(PacienteDuplicadoException ex) {
         ApiError error = new ApiError(ex.getMessage(), 409);
         return new ResponseEntity<>(error, HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(PacienteArgumentoInvalido.class)
+    public ResponseEntity<ApiError> handlePacienteArgumentoInvalido(PacienteArgumentoInvalido ex) {
+        ApiError error = new ApiError(ex.getMessage(), 400);
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

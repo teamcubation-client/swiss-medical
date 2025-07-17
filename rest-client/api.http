@@ -7,13 +7,16 @@ POST http://localhost:8080/pacientes
 Content-Type: application/json
 
 {
-    "dni": "111111",
+    "dni": "86754321",
     "nombre": "Nicolas",
     "apellido": "Berti",
     "obraSocial": "OSDE",
     "email": "nicolas.berti@teamcubation.com",
-    "telefono": "2920642002"
+    "telefono": "123456798"
 }
+
+### GET paciente by dni: 86754321
+GET http://localhost:8080/pacientes/86754321
 
 ### POST pacientes incorrecto. deberia dar error.
 POST http://localhost:8080/pacientes

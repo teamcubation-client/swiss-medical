@@ -1,16 +1,11 @@
 package microservice.pacientes.infrastructure.adapter.in.rest.dto;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.Builder;
+import lombok.Data;
 
-@AllArgsConstructor
-@NoArgsConstructor
-@Getter
-@Setter
+@Data
+@Builder
 public class PacienteRequestDTO {
     @NotBlank(message = "El DNI es obligatorio")
     private String dni;
@@ -18,7 +13,7 @@ public class PacienteRequestDTO {
     private String nombre;
     @NotBlank(message = "El apellido es obligatorio")
     private String apellido;
-    private String obra_social;
+    private String obraSocial;
     private String email;
     private String telefono;
 }

@@ -1,16 +1,17 @@
 package microservice.pacientes.infrastructure.adapter.out.persistence.mysql.entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.Builder;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @Entity
+@Builder
 @AllArgsConstructor
 @Table(name = "pacientes")
 public class PacienteEntity {
@@ -21,7 +22,7 @@ public class PacienteEntity {
     private String nombre;
     @NotBlank(message = "El apellido es obligatorio")
     private String apellido;
-    private String obra_social;
+    private String obraSocial;
     private String email;
     private String telefono;
 }

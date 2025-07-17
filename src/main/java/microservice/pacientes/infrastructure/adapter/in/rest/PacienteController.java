@@ -1,129 +1,104 @@
 package microservice.pacientes.infrastructure.adapter.in.rest;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
+import lombok.AllArgsConstructor;
+import microservice.pacientes.application.domain.command.CreatePacienteCommand;
+import microservice.pacientes.application.domain.command.UpdatePacienteCommand;
+import microservice.pacientes.application.domain.model.Paciente;
+import microservice.pacientes.application.domain.port.in.CreatePacienteUseCase;
+import microservice.pacientes.application.domain.port.in.DeletePacienteUseCase;
+import microservice.pacientes.application.domain.port.in.FindPacienteUseCase;
+import microservice.pacientes.application.domain.port.in.UpdatePacienteUseCase;
+import microservice.pacientes.infrastructure.adapter.in.rest.docs.PacienteControllerDocs;
 import microservice.pacientes.infrastructure.adapter.in.rest.dto.PacienteRequestDTO;
 import microservice.pacientes.infrastructure.adapter.in.rest.dto.PacienteResponseDTO;
 import microservice.pacientes.infrastructure.adapter.in.rest.dto.PacienteUpdateDTO;
+import microservice.pacientes.infrastructure.adapter.in.rest.dto.mapper.PacienteRequestMapper;
+import microservice.pacientes.infrastructure.adapter.in.rest.dto.mapper.PacienteResponseMapper;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 
-public interface PacienteController {
+@RestController
+@RequestMapping("/pacientes")
+@AllArgsConstructor
+public class PacienteController implements PacienteControllerDocs {
 
-    @Operation(
-            summary = "Obtener todos los pacientes",
-            description = "Devuelve los datos de todos los pacientes registrados"
-    )
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Pacientes encontrados. Incluye lista vacía."),
-            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
-    })
-    ResponseEntity<List<PacienteResponseDTO>> getAll(
-            @Parameter(
-                    description = "Nombre parcial o completo para filtrar los pacientes. Opcional.",
-                    required = false
-            )
-            String nombre
-    );
+    private final CreatePacienteUseCase createPacienteUseCase;
+    private final DeletePacienteUseCase deletePacienteUseCase;
+    private final FindPacienteUseCase findPacienteUseCase;
+    private final UpdatePacienteUseCase updatePacienteUseCase;
 
-    @Operation(
-            summary = "Obtener un paciente según su DNI",
-            description = "Devuelve los datos del paciente buscado por DNI"
-    )
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Paciente encontrado"),
-            @ApiResponse(responseCode = "204", description = "Paciente no encontrado"),
-            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
-    })
-    ResponseEntity<PacienteResponseDTO> getByDni(
-            @Parameter(
-                    description = "DNI del paciente",
-                    required = true
-            )
-            String dni
-    );
+    @GetMapping
+    public ResponseEntity<List<PacienteResponseDTO>> getAll(@RequestParam(required = false) String nombre) {
+        List<Paciente> pacientes;
+        if(nombre != null){
+            pacientes = findPacienteUseCase.getByNombreContainingIgnoreCase(nombre);
+        } else {
+            pacientes = findPacienteUseCase.getAll();
+        }
+        List<PacienteResponseDTO> pacientesResponseDTO = PacienteResponseMapper.toDTO(pacientes);
+        return ResponseEntity.ok(pacientesResponseDTO);
+    }
 
-    @Operation(
-            summary = "Crea un nuevo paciente",
-            description = "Devuelve los datos del paciente creado"
-    )
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Paciente creado"),
-            @ApiResponse(responseCode = "409", description = "Paciente duplicado"),
-            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
-    })
-    ResponseEntity<PacienteResponseDTO> create(PacienteRequestDTO pacienteRequestDTO);
+    @GetMapping("/{dni}")
+    public ResponseEntity<PacienteResponseDTO> getByDni(@PathVariable String dni) {
+        Paciente paciente = findPacienteUseCase.getByDni(dni);
+        PacienteResponseDTO pacienteResponseDTO = PacienteResponseMapper.toDTO(paciente);
+        return ResponseEntity.ok(pacienteResponseDTO);
+    }
 
-    @Operation(
-            summary = "Actualiza parcial o totalmente un paciente",
-            description = "Devuelve los datos del paciente actualizado"
-    )
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Paciente actualizado"),
-            @ApiResponse(responseCode = "204", description = "Paciente no encontrado"),
-            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
-    })
-    ResponseEntity<PacienteResponseDTO> update(String dni, PacienteUpdateDTO pacienteUpdateDTO);
+    @PostMapping
+    public ResponseEntity<PacienteResponseDTO> create(@Valid @RequestBody PacienteRequestDTO pacienteRequestDTO) {
+        CreatePacienteCommand createPacienteCommand = PacienteRequestMapper.toCreateCommand(pacienteRequestDTO);
+        Paciente paciente = createPacienteUseCase.create(createPacienteCommand);
+        PacienteResponseDTO pacienteResponseDTO = PacienteResponseMapper.toDTO(paciente);
+        return ResponseEntity.status(HttpStatus.CREATED).body(pacienteResponseDTO);
+    }
 
-    @Operation(
-            summary = "Elimina un paciente"
-    )
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Paciente eliminado"),
-            @ApiResponse(responseCode = "204", description = "Paciente no encontrado"),
-            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
-    })
-    ResponseEntity<Void> delete(String dni);
+    @PutMapping("/{dni}")
+    public ResponseEntity<PacienteResponseDTO> update(@PathVariable String dni, @Valid @RequestBody PacienteUpdateDTO pacienteUpdateDTO) {
+        UpdatePacienteCommand updatePacienteCommand = PacienteRequestMapper.toUpdateCommand(pacienteUpdateDTO);
+        Paciente paciente = updatePacienteUseCase.update(dni, updatePacienteCommand);
+        PacienteResponseDTO pacienteResponseDTO = PacienteResponseMapper.toDTO(paciente);
+        return ResponseEntity.ok(pacienteResponseDTO);
+    }
 
-    @Operation(
-            summary = "Obtener un paciente según su DNI usando SP",
-            description = "Devuelve los datos del paciente buscado por DNI"
-    )
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Paciente encontrado"),
-            @ApiResponse(responseCode = "204", description = "Paciente no encontrado"),
-            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
-    })
-    ResponseEntity<PacienteResponseDTO> getByDniSP(String dni);
+    @DeleteMapping("/{dni}")
+    public ResponseEntity<Void> delete(@PathVariable String dni) {
+        deletePacienteUseCase.delete(dni);
+        return ResponseEntity.noContent().build();
+    }
 
-    @Operation(
-            summary = "Obtener un paciente según su nombre usando SP",
-            description = "Devuelve los datos del paciente buscado por DNI"
-    )
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Paciente encontrado"),
-            @ApiResponse(responseCode = "204", description = "Paciente no encontrado"),
-            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
-    })
-    ResponseEntity<PacienteResponseDTO> getByNombreSP(String nombre);
-
-    @Operation(
-            summary = "Obtener todos los pacientes según cierta obra social usando SP y paginación",
-            description = "Devuelve los datos de todos los pacientes con cierta obra social"
-    )
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Pacientes encontrados. Incluye lista vacía."),
-            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
-    })
-    ResponseEntity<List<PacienteResponseDTO>> getByObraSocialSP(
-            @Parameter(
-                    description = "Obra social",
-                    required = true
-            )
-            String obraSocial,
-            @Parameter(
-                    description = "Página",
-                    required = true
-            )
-            int page,
-            @Parameter(
-                    description = "Tamaño de la página",
-                    required = true
-            )
-            int size);
+    @GetMapping("/dni/{dni}")
+    public ResponseEntity<PacienteResponseDTO> getByDniSP(@PathVariable String dni) {
+        Paciente paciente = findPacienteUseCase.getByDni(dni);
+        PacienteResponseDTO pacienteResponseDTO = PacienteResponseMapper.toDTO(paciente);
+        return ResponseEntity.ok(pacienteResponseDTO);
+    }
 
 
+    @GetMapping("/nombre/{nombre}")
+    public ResponseEntity<PacienteResponseDTO> getByNombreSP(@PathVariable String nombre) {
+        Paciente paciente = findPacienteUseCase.getByNombre(nombre);
+        PacienteResponseDTO pacienteResponseDTO = PacienteResponseMapper.toDTO(paciente);
+        return ResponseEntity.ok(pacienteResponseDTO);
+    }
+
+
+    @GetMapping("/obra_social")
+    public ResponseEntity<List<PacienteResponseDTO>> getByObraSocialSP(
+            @RequestParam(required = true) String obraSocial,
+            @RequestParam(required = true) int page,
+            @RequestParam(required = true) int size
+    ) {
+        int limit = size;
+        int offset = (page - 1) * size; // asumo que page empieza con 1
+        List<Paciente> pacientes = findPacienteUseCase.getByObraSocial(obraSocial, limit, offset);
+        List<PacienteResponseDTO> pacientesResponseDTO = PacienteResponseMapper.toDTO(pacientes);
+        return ResponseEntity.ok(pacientesResponseDTO);
+    }
 
 }

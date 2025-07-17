@@ -1,17 +1,13 @@
 package microservice.pacientes.infrastructure.adapter.in.rest.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.Builder;
+import lombok.Data;
 
-@Getter
-@Setter
-@AllArgsConstructor
-@NoArgsConstructor
+@Data
+@Builder
 public class PacienteResponseDTO {
     private String dni;
     private String nombre;
     private String apellido;
-    private String obra_social;
+    private String obraSocial;
 }

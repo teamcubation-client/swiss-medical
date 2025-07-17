@@ -8,29 +8,30 @@ import java.util.List;
 public class PacienteEntityMapper {
 
     public static Paciente toDomain(PacienteEntity pacienteEntity) {
-        return new Paciente(
-                pacienteEntity.getDni(),
-                pacienteEntity.getNombre(),
-                pacienteEntity.getApellido(),
-                pacienteEntity.getObra_social(),
-                pacienteEntity.getEmail(),
-                pacienteEntity.getTelefono()
-        );
+        return Paciente.builder()
+                .dni(pacienteEntity.getDni())
+                .nombre(pacienteEntity.getNombre())
+                .apellido(pacienteEntity.getApellido())
+                .obraSocial(pacienteEntity.getObraSocial())
+                .email(pacienteEntity.getEmail())
+                .telefono(pacienteEntity.getTelefono())
+                .build();
     }
+
 
     public static List<Paciente> toDomain(List<PacienteEntity> pacientesEntity) {
         return pacientesEntity.stream().map(PacienteEntityMapper::toDomain).toList(); // method reference
     }
 
     public static PacienteEntity toEntity(Paciente paciente) {
-        return new PacienteEntity(
-                paciente.getDni(),
-                paciente.getNombre(),
-                paciente.getApellido(),
-                paciente.getObra_social(),
-                paciente.getEmail(),
-                paciente.getTelefono()
-        );
+        return PacienteEntity.builder()
+                .dni(paciente.getDni())
+                .nombre(paciente.getNombre())
+                .apellido(paciente.getApellido())
+                .obraSocial(paciente.getObraSocial())
+                .email(paciente.getEmail())
+                .telefono(paciente.getTelefono())
+                .build();
     }
 
 }
