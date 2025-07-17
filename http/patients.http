@@ -1,6 +1,6 @@
 ### GET Patients
 
-GET http://localhost:8000/api/patients
+GET http://localhost:8000/api/patients?page=1&size=15
 
 ### GET Patient by DNI 
 

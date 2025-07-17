@@ -5,6 +5,7 @@ import com.swissmedical.patients.application.domain.ports.in.PatientUseCase;
 import com.swissmedical.patients.application.domain.ports.out.PatientRepository;
 import com.swissmedical.patients.shared.exceptions.PatientDuplicateException;
 import com.swissmedical.patients.shared.exceptions.PatientNotFoundException;
+import com.swissmedical.patients.shared.utils.ErrorMessages;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,7 +22,7 @@ public class PatientService implements PatientUseCase {
   @Override
   public List<Patient> getAll(String name, int page, int size) {
     if (page <= 0 || size < 0) {
-      throw new IllegalArgumentException("Limit must be greater than 0 and offset must be non-negative.");
+      throw new IllegalArgumentException(ErrorMessages.LIMIT_OFFSET_INVALID);
     }
 
     if (name.isEmpty()) {
@@ -31,7 +32,7 @@ public class PatientService implements PatientUseCase {
     List<Patient> patients = patientRepository.findByFirstName(name);
 
     if (patients.isEmpty()) {
-      throw new PatientNotFoundException("No patients found with name " + name + ".");
+      throw new PatientNotFoundException(String.format(ErrorMessages.PATIENT_NOT_FOUND_BY_NAME, name));
     }
 
     return patients;
@@ -40,7 +41,7 @@ public class PatientService implements PatientUseCase {
   @Override
   public Patient getByDni(String dni) {
     return patientRepository.findByDni(dni)
-            .orElseThrow(() -> new PatientNotFoundException("Patient with DNI " + dni + " does not exist."));
+            .orElseThrow(() -> new PatientNotFoundException(String.format(ErrorMessages.PATIENT_NOT_FOUND_BY_DNI, dni)));
   }
 
   @Override
@@ -48,7 +49,7 @@ public class PatientService implements PatientUseCase {
     List<Patient> patients = patientRepository.findBySocialSecurity(socialSecurity, size, (page - 1) * size);
 
     if (patients.isEmpty()) {
-      throw new PatientNotFoundException("No patients found with social security " + socialSecurity + ".");
+      throw new PatientNotFoundException(String.format(ErrorMessages.PATIENT_NOT_FOUND_BY_SOCIAL_SECURITY, socialSecurity));
     }
 
     return patients;
@@ -57,11 +58,11 @@ public class PatientService implements PatientUseCase {
   @Override
   public Patient create(Patient patient) {
     if (patientRepository.existsByDni(patient.getDni())) {
-      throw new PatientDuplicateException("Patient with DNI " + patient.getDni() + " already exists.");
+      throw new PatientDuplicateException(String.format(ErrorMessages.PATIENT_DNI_DUPLICATE, patient.getDni()));
     }
 
     if (patientRepository.existsByEmail(patient.getEmail())) {
-      throw new PatientDuplicateException("Patient with email " + patient.getEmail() + " already exists.");
+      throw new PatientDuplicateException(String.format(ErrorMessages.PATIENT_EMAIL_DUPLICATE, patient.getEmail()));
     }
 
     return patientRepository.save(patient);
@@ -70,7 +71,7 @@ public class PatientService implements PatientUseCase {
   @Override
   public Patient update(Long id, Patient patientDetails) {
     Patient existingPatient = patientRepository.findById(id)
-            .orElseThrow(() -> new PatientNotFoundException("Patient with ID " + id + " does not exist."));
+            .orElseThrow(() -> new PatientNotFoundException(String.format(ErrorMessages.PATIENT_NOT_FOUND_BY_ID, id)));
 
     existingPatient.setFirstName(patientDetails.getFirstName());
     existingPatient.setLastName(patientDetails.getLastName());
@@ -85,7 +86,7 @@ public class PatientService implements PatientUseCase {
   @Override
   public void delete(Long id) {
     if (!patientRepository.existsById(id)) {
-      throw new PatientNotFoundException("Patient with ID " + id + " does not exist.");
+      throw new PatientNotFoundException(String.format(ErrorMessages.PATIENT_NOT_FOUND_BY_ID, id));
     }
     patientRepository.delete(id);
   }

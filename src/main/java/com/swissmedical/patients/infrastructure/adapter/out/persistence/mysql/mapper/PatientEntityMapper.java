@@ -6,10 +6,6 @@ import com.swissmedical.patients.infrastructure.adapter.out.persistence.mysql.en
 public class PatientEntityMapper {
 
   public static Patient toDomain(PatientEntity patientEntity) {
-    if (patientEntity == null) {
-      return null;
-    }
-
     Patient patient = new Patient();
     patient.setId(patientEntity.getId());
     patient.setFirstName(patientEntity.getFirstName());
@@ -26,10 +22,6 @@ public class PatientEntityMapper {
   }
 
   public static PatientEntity toEntity(Patient patient) {
-    if (patient == null) {
-      return null;
-    }
-
     PatientEntity patientEntity = new PatientEntity();
     patientEntity.setId(patient.getId());
     patientEntity.setFirstName(patient.getFirstName());
