@@ -8,33 +8,31 @@ import java.time.LocalDate;
 public class PatientCreateMapper {
 
   static public Patient toDomain(PatientCreateDto patientCreateDto) {
-    Patient patient = new Patient();
-    patient.setFirstName(patientCreateDto.getFirstName());
-    patient.setLastName(patientCreateDto.getLastName());
-    patient.setEmail(patientCreateDto.getEmail());
-    patient.setPhoneNumber(patientCreateDto.getPhoneNumber());
-    patient.setDni(patientCreateDto.getDni());
-    patient.setSocialSecurity(patientCreateDto.getSocialSecurity());
-    patient.setMemberNumber(patientCreateDto.getMemberNumber());
-    patient.setBirthDate(LocalDate.parse(patientCreateDto.getBirthDate()));
-    patient.setActive(patientCreateDto.isActive());
-
-    return patient;
+    return Patient.builder()
+            .firstName(patientCreateDto.getFirstName())
+            .lastName(patientCreateDto.getLastName())
+            .email(patientCreateDto.getEmail())
+            .phoneNumber(patientCreateDto.getPhoneNumber())
+            .dni(patientCreateDto.getDni())
+            .memberNumber(patientCreateDto.getMemberNumber())
+            .birthDate(LocalDate.parse(patientCreateDto.getBirthDate()))
+            .isActive(patientCreateDto.isActive())
+            .socialSecurity(patientCreateDto.getSocialSecurity())
+            .build();
   }
 
   public static PatientCreateDto toDto(Patient patient) {
-    PatientCreateDto dto = new PatientCreateDto();
-    dto.setFirstName(patient.getFirstName());
-    dto.setLastName(patient.getLastName());
-    dto.setEmail(patient.getEmail());
-    dto.setPhoneNumber(patient.getPhoneNumber());
-    dto.setDni(patient.getDni());
-    dto.setSocialSecurity(patient.getSocialSecurity());
-    dto.setMemberNumber(patient.getMemberNumber());
-    dto.setBirthDate(patient.getBirthDate().toString());
-    dto.setActive(patient.isActive());
-
-    return dto;
+    return PatientCreateDto.builder()
+            .firstName(patient.getFirstName())
+            .lastName(patient.getLastName())
+            .email(patient.getEmail())
+            .phoneNumber(patient.getPhoneNumber())
+            .dni(patient.getDni())
+            .memberNumber(patient.getMemberNumber())
+            .birthDate(patient.getBirthDate().toString())
+            .isActive(patient.isActive())
+            .socialSecurity(patient.getSocialSecurity())
+            .build();
   }
 
 }

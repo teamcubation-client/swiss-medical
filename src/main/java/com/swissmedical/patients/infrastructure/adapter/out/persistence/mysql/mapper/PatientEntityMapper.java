@@ -6,34 +6,32 @@ import com.swissmedical.patients.infrastructure.adapter.out.persistence.mysql.en
 public class PatientEntityMapper {
 
   public static Patient toDomain(PatientEntity patientEntity) {
-    Patient patient = new Patient();
-    patient.setId(patientEntity.getId());
-    patient.setFirstName(patientEntity.getFirstName());
-    patient.setLastName(patientEntity.getLastName());
-    patient.setEmail(patientEntity.getEmail());
-    patient.setPhoneNumber(patientEntity.getPhoneNumber());
-    patient.setDni(patientEntity.getDni());
-    patient.setMemberNumber(patientEntity.getMemberNumber());
-    patient.setBirthDate(patientEntity.getBirthDate());
-    patient.setActive(patientEntity.isActive());
-    patient.setSocialSecurity(patientEntity.getSocialSecurity());
-
-    return patient;
+    return Patient.builder()
+        .id(patientEntity.getId())
+        .firstName(patientEntity.getFirstName())
+        .lastName(patientEntity.getLastName())
+        .email(patientEntity.getEmail())
+        .phoneNumber(patientEntity.getPhoneNumber())
+        .dni(patientEntity.getDni())
+        .memberNumber(patientEntity.getMemberNumber())
+        .birthDate(patientEntity.getBirthDate())
+        .isActive(patientEntity.isActive())
+        .socialSecurity(patientEntity.getSocialSecurity())
+        .build();
   }
 
   public static PatientEntity toEntity(Patient patient) {
-    PatientEntity patientEntity = new PatientEntity();
-    patientEntity.setId(patient.getId());
-    patientEntity.setFirstName(patient.getFirstName());
-    patientEntity.setLastName(patient.getLastName());
-    patientEntity.setEmail(patient.getEmail());
-    patientEntity.setPhoneNumber(patient.getPhoneNumber());
-    patientEntity.setDni(patient.getDni());
-    patientEntity.setMemberNumber(patient.getMemberNumber());
-    patientEntity.setBirthDate(patient.getBirthDate());
-    patientEntity.setActive(patient.isActive());
-    patientEntity.setSocialSecurity(patient.getSocialSecurity());
-
-    return patientEntity;
+    return PatientEntity.builder()
+        .id(patient.getId())
+        .firstName(patient.getFirstName())
+        .lastName(patient.getLastName())
+        .email(patient.getEmail())
+        .phoneNumber(patient.getPhoneNumber())
+        .dni(patient.getDni())
+        .memberNumber(patient.getMemberNumber())
+        .birthDate(patient.getBirthDate())
+        .isActive(patient.isActive())
+        .socialSecurity(patient.getSocialSecurity())
+        .build();
   }
 }
