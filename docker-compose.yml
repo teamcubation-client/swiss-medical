@@ -10,6 +10,7 @@ services:
       SPRING_DATASOURCE_URL: "${DB_BASE_MYSQL}:${DB_PORT_CONTAINER}/${DB_DATABASE}?${DB_CONFIG_PARAMS_MYSQL}"
       SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
       SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
+      SPRING_PROFILES_ACTIVE: docker
     networks: # Es opcional, pero permite definir explícitamente qué servicios comparten red privada
       - backend_net #nombre de la red
 
