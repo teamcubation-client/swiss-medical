@@ -1,6 +1,6 @@
 package com.tq.pacientes.controllers;
 
-import com.tq.pacientes.documentation.IPacienteController;
+import com.tq.pacientes.documentation.IPatientController;
 import com.tq.pacientes.dtos.PatientDTO;
 import com.tq.pacientes.mappers.PatientMapper;
 import com.tq.pacientes.models.Patient;
@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/patients")
-public class PatientController implements IPacienteController {
+public class PatientController implements IPatientController {
 
     private final PatientService patientService;
     private final PatientMapper patientMapper;

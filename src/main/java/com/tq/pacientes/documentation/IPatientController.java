@@ -10,7 +10,7 @@ import org.springframework.http.ResponseEntity;
 import java.util.List;
 
 @Tag(name = "Pacientes", description = "API de Pacientes")
-public interface IPacienteController {
+public interface IPatientController {
 
     @Operation(summary = "Crear un paciente", description = "Registra un nuevo paciente en el sistema. El DNI debe ser único. Si el DNI ya existe, se devuelve un error 409.")
     @ApiResponses(value = {
