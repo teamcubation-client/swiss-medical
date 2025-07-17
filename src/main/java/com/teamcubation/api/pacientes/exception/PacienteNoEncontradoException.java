@@ -5,4 +5,7 @@ public class PacienteNoEncontradoException extends RuntimeException {
             super("Paciente con ID: " + id + " no encontrado");
         }
 
+        public PacienteNoEncontradoException(String dni) {
+            super("Paciente con DNI: " + dni + " no encontrado");
+        }
 }

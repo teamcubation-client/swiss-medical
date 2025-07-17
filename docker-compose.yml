@@ -10,6 +10,7 @@ services:
       SPRING_DATASOURCE_URL: "${DB_BASE_MYSQL}:${DB_PORT_CONTAINER}/${DB_DATABASE}?${DB_CONFIG_PARAMS_MYSQL}"
       SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
       SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
+      SPRING_PROFILES_ACTIVE: docker
     networks: # Es opcional, pero permite definir explícitamente qué servicios comparten red privada
       - backend_net #nombre de la red
 
@@ -25,8 +26,8 @@ services:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
     volumes:
         - db_data:/var/lib/mysql
-        - ./src/main/resources/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
-        - ./src/main/resources/data.sql:/docker-entrypoint-initdb.d/02-data.sql
+        - ./script/init.sql:/docker-entrypoint-initdb.d/01-init.sql
+        - ./script/store_procedures.sql:/docker-entrypoint-initdb.d/02-store_procedures.sql
     networks:
       - backend_net
 

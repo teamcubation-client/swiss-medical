@@ -40,4 +40,26 @@ public interface IPacienteAPI {
             @Parameter(description = "ID único del paciente", example = "1")
             long id
     );
+
+    @Operation(summary = "Buscar paciente por DNI")
+    ResponseEntity<PacienteResponse> obtenerPorDNI(
+            @Parameter(description = "DNI completo del paciente", example = "12345678")
+            String dni
+    );
+
+    @Operation(summary = "Buscar paciente por nombre")
+    ResponseEntity<List<PacienteResponse>> obtenerPorNombre(
+            @Parameter(description = "Nombre parcial o completo del paciente", example = "Ana")
+            String nombre
+    );
+
+    @Operation(summary = "Buscar paciente por obra social")
+    ResponseEntity<List<PacienteResponse>> obtenerPorObraSocial(
+            @Parameter(description = "Nombre parcial o completo de obra social", example = "Swiss Medical")
+            String obraSocial,
+            @Parameter(description = "Número de página (0 basado)", example = "0")
+            int page,
+            @Parameter(description = "Cantidad de elementos por página", example = "10")
+            int size
+    );
 }

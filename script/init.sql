@@ -1,3 +1,13 @@
+CREATE TABLE IF NOT EXISTS pacientes  (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL,
+    apellido VARCHAR(100) NOT NULL,
+    dni VARCHAR(20) NOT NULL UNIQUE,
+    obra_social VARCHAR(100),
+    email VARCHAR(150),
+    telefono VARCHAR(50)
+);
+
 INSERT INTO pacientes (nombre, apellido, dni, obra_social, email, telefono)
 VALUES
 ('Juan', 'Pérez', '12345678', 'Swiss Medical', 'juan.perez@mail.com', '1122334455'),

@@ -65,4 +65,35 @@ public class PacienteController implements IPacienteAPI {
         return ResponseEntity.noContent().build();
     }
 
+    @Override
+    @GetMapping("/dni/{dni}")
+    public ResponseEntity<PacienteResponse> obtenerPorDNI(@PathVariable String dni) {
+        Paciente response = pacienteService.obtenerPorDNI(dni);
+        return ResponseEntity.ok(PacienteMapper.toResponse(response));
+    }
+
+    @Override
+    @GetMapping("/nombre/{nombre}")
+    public ResponseEntity<List<PacienteResponse>> obtenerPorNombre(@PathVariable String nombre) {
+        List<Paciente> pacientes = pacienteService.obtenerPorNombre(nombre);
+        List<PacienteResponse> response = new ArrayList<>();
+        for(Paciente paciente : pacientes) {
+            response.add(PacienteMapper.toResponse(paciente));
+        }
+        return ResponseEntity.ok(response);
+    }
+
+    @Override
+    @GetMapping("/obra-social")
+    public ResponseEntity<List<PacienteResponse>> obtenerPorObraSocial(@RequestParam String obraSocial,
+                                                                       @RequestParam int page,
+                                                                       @RequestParam int size) {
+        List<Paciente> pacientes = pacienteService.obtenerPorObraSocial(obraSocial, page, size);
+        List<PacienteResponse> response = new ArrayList<>();
+        for (Paciente paciente : pacientes) {
+            response.add(PacienteMapper.toResponse(paciente));
+        }
+        return ResponseEntity.ok(response);
+    }
+
 }

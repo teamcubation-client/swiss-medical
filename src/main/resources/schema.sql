@@ -1,9 +1,0 @@
-CREATE TABLE IF NOT EXISTS pacientes  (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    nombre VARCHAR(100) NOT NULL,
-    apellido VARCHAR(100) NOT NULL,
-    dni VARCHAR(20) NOT NULL UNIQUE,
-    obra_social VARCHAR(100),
-    email VARCHAR(150),
-    telefono VARCHAR(50)
-);

@@ -3,30 +3,32 @@ package com.teamcubation.api.pacientes.service;
 import com.teamcubation.api.pacientes.exception.PacienteDuplicadoException;
 import com.teamcubation.api.pacientes.exception.PacienteNoEncontradoException;
 import com.teamcubation.api.pacientes.model.Paciente;
-import com.teamcubation.api.pacientes.repository.PacienteRepository;
+import com.teamcubation.api.pacientes.repository.IPacienteRepository;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 
 @Service
 public class PacienteService implements IPacienteService {
 
-    private final PacienteRepository pacienteRepository;
+    private final IPacienteRepository pacienteRepository;
     private static final String CAMPO_DNI = "DNI";
 
-    public PacienteService(PacienteRepository pacienteRepository) {
+    public PacienteService(IPacienteRepository pacienteRepository) {
         this.pacienteRepository = pacienteRepository;
     }
 
     @Override
+    @Transactional
     public Paciente crear(Paciente paciente) {
-        Optional<Paciente> existente = pacienteRepository.buscarPorDNI(paciente.getDni());
+        Optional<Paciente> existente = pacienteRepository.findByDniSP(paciente.getDni());
 
         if (existente.isPresent()) {
             throw new PacienteDuplicadoException(CAMPO_DNI, paciente.getDni());
         }
-        return pacienteRepository.guardar(paciente);
+        return pacienteRepository.save(paciente);
     }
 
     @Override
@@ -36,32 +38,50 @@ public class PacienteService implements IPacienteService {
 
     @Override
     public Paciente obtenerPorID(long id) {
-        return this.pacienteRepository.buscarPorID(id)
+        return this.pacienteRepository.findById(id)
                 .orElseThrow(() -> new PacienteNoEncontradoException(id));
     }
 
     @Override
-    public Paciente actualizarPorID(long id, Paciente paciente) {
-        Paciente existente = pacienteRepository.buscarPorID(id)
+    public Paciente obtenerPorDNI(String dni) {
+        return pacienteRepository.findByDniSP(dni)
+                .orElseThrow(() -> new PacienteNoEncontradoException("DNI: " + dni));
+    }
+
+    @Override
+    public List<Paciente> obtenerPorNombre(String nombre) {
+        return pacienteRepository.findByNombreSP(nombre);
+    }
+
+    @Override
+    public List<Paciente> obtenerPorObraSocial(String obraSocial, int page, int size) {
+        return pacienteRepository.findByObraSocialPaginadoSP(obraSocial, size, page * size);
+    }
+
+    @Override
+    @Transactional
+    public Paciente actualizarPorID(long id, Paciente datosActualizados) {
+        Paciente paciente = pacienteRepository.findById(id)
                 .orElseThrow(() -> new PacienteNoEncontradoException(id));
 
-        if (paciente.getDni() != null) {
-            Optional<Paciente> pacienteDNIDuplicado = pacienteRepository.buscarPorDNI(paciente.getDni());
+        if (datosActualizados.getDni() != null) {
+            Optional<Paciente> pacienteDNIDuplicado = pacienteRepository.findByDni(datosActualizados.getDni());
             boolean dniUsadoPorOtro = pacienteDNIDuplicado.isPresent() && !pacienteDNIDuplicado.get().getId().equals(id);
             if (dniUsadoPorOtro) {
-                throw new PacienteDuplicadoException(CAMPO_DNI, paciente.getDni());
+                throw new PacienteDuplicadoException(CAMPO_DNI, datosActualizados.getDni());
             }
         }
 
-        copiarCamposNoNulos(paciente, existente);
-        return pacienteRepository.actualizarPorID(id, paciente);
+        copiarCamposNoNulos(datosActualizados, paciente);
+        return pacienteRepository.save(paciente);
     }
 
     @Override
+    @Transactional
     public void borrarPorID(long id) {
-        pacienteRepository.buscarPorID(id)
+        pacienteRepository.findById(id)
                 .orElseThrow(() -> new PacienteNoEncontradoException(id));
-        pacienteRepository.borrarPorID(id);
+        pacienteRepository.deleteById(id);
     }
 
     /**
