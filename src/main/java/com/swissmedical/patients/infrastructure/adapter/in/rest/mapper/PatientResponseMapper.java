@@ -9,7 +9,7 @@ import com.swissmedical.patients.infrastructure.adapter.in.rest.dto.PatientRespo
 
 public class PatientResponseMapper {
 
-    static public Patient toDomain(PatientResponseDto patientResponseDto) {
+    public static Patient toDomain(PatientResponseDto patientResponseDto) {
         return Patient.builder()
                 .id(patientResponseDto.getId())
                 .firstName(patientResponseDto.getFirstName())
@@ -24,7 +24,7 @@ public class PatientResponseMapper {
                 .build();
     }
 
-    static public PatientResponseDto toDto(Patient patient) {
+    public static PatientResponseDto toDto(Patient patient) {
         return PatientResponseDto.builder()
                 .id(patient.getId())
                 .firstName(patient.getFirstName())

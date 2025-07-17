@@ -10,15 +10,15 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PatientResponseDto {
-    public Long id;
-    public String firstName;
-    public String lastName;
-    public String email;
-    public String phoneNumber;
-    public String dni;
-    public String memberNumber;
-    public String birthDate;
-    public boolean isActive;
-    public String socialSecurity;
+    private Long id;
+    private String firstName;
+    private String lastName;
+    private String email;
+    private String phoneNumber;
+    private String dni;
+    private String memberNumber;
+    private String birthDate;
+    private boolean isActive;
+    private String socialSecurity;
 
 }

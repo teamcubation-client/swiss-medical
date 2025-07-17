@@ -9,6 +9,7 @@ import com.swissmedical.patients.infrastructure.adapter.in.rest.dto.PatientUpdat
 import com.swissmedical.patients.infrastructure.adapter.in.rest.mapper.PatientCreateMapper;
 import com.swissmedical.patients.infrastructure.adapter.in.rest.mapper.PatientResponseMapper;
 import com.swissmedical.patients.infrastructure.adapter.in.rest.mapper.PatientUpdateMapper;
+import com.swissmedical.patients.shared.utils.DefaultValuesController;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -37,9 +38,9 @@ public class PatientController implements PatientApi {
 
     @Override
     @GetMapping()
-    public List<PatientResponseDto> getAll(@RequestParam(defaultValue = "") String name,
-                                           @RequestParam(defaultValue = "1") int page,
-                                           @RequestParam(defaultValue = "10") int size) {
+    public List<PatientResponseDto> getAll(@RequestParam(defaultValue = DefaultValuesController.NAME) String name,
+                                           @RequestParam(defaultValue = DefaultValuesController.PAGE) int page,
+                                           @RequestParam(defaultValue = DefaultValuesController.SIZE) int size) {
 
        return patientService.getAll(name, page, size)
                 .stream()
@@ -57,9 +58,8 @@ public class PatientController implements PatientApi {
     @Override
     @GetMapping("/social-security/{socialSecurity}")
     public List<PatientResponseDto> getBySocialSecurity(@PathVariable String socialSecurity,
-                                                             @RequestParam(defaultValue = "1") int page,
-                                                             @RequestParam(defaultValue = "10") int size
-    ) {
+                                                        @RequestParam(defaultValue = DefaultValuesController.PAGE) int page,
+                                                        @RequestParam(defaultValue = DefaultValuesController.SIZE) int size) {
         return patientService.getBySocialSecurity(socialSecurity, page, size)
                 .stream()
                 .map(PatientResponseMapper::toDto)
