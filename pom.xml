@@ -12,7 +12,7 @@
 
 	<groupId>com.teamcubation</groupId>
 	<artifactId>api.pacientes</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0.0-SNAPSHOT</version>
 	<name>api.pacientes</name>
 	<description>Proyecto demo de gestión de pacientes</description>
 	<url/>

@@ -1,4 +1,4 @@
-package com.teamcubation.api.pacientes.exception;
+package com.teamcubation.api.pacientes.shared.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,18 +17,18 @@ public class GlobalExceptionHandler {
                 .body(ex.getMessage());
     }
 
-    @ExceptionHandler(PacienteNoEncontradoException.class)
-    public ResponseEntity<String> handlePacienteNotFound(PacienteNoEncontradoException ex) {
+    @ExceptionHandler(PatientNotFoundException.class)
+    public ResponseEntity<String> handlePacienteNotFound(PatientNotFoundException ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
     }
 
-    @ExceptionHandler(PacienteDuplicadoException.class)
-    public ResponseEntity<String> handlePacienteDuplicado(PacienteDuplicadoException ex) {
+    @ExceptionHandler(DuplicatedPatientException.class)
+    public ResponseEntity<String> handlePacienteDuplicado(DuplicatedPatientException ex) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
     }
 
-    @ExceptionHandler(PacienteNoActualizadoException.class)
-    public ResponseEntity<String> handlePacienteNoActualizado(PacienteNoActualizadoException ex) {
+    @ExceptionHandler(PatientDniAlreadyInUse.class)
+    public ResponseEntity<String> handlePacienteNoActualizado(PatientDniAlreadyInUse ex) {
         return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(ex.getMessage());
     }
 

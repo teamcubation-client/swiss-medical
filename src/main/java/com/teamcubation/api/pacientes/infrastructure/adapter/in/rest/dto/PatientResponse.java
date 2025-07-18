@@ -1,18 +1,18 @@
-package com.teamcubation.api.pacientes.dto;
+package com.teamcubation.api.pacientes.infrastructure.adapter.in.rest.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @Schema(description = "Respuesta con datos de un paciente")
-public class PacienteResponse {
+public class PatientResponse {
 
     @Schema(description = "Identificador único del paciente", example = "123")
     private Long id;
 
     @Schema(description = "Nombre del paciente", example = "María")
-    private String nombre;
+    private String name;
 
     @Schema(description = "Apellido del paciente", example = "Gómez")
-    private String apellido;
+    private String lastName;
 
     @Schema(description = "Documento Nacional de Identidad", example = "12345678")
     private String dni;
@@ -25,20 +25,20 @@ public class PacienteResponse {
         this.id = id;
     }
 
-    public String getNombre() {
-        return nombre;
+    public String getName() {
+        return name;
     }
 
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public String getApellido() {
-        return apellido;
+    public String getLastName() {
+        return lastName;
     }
 
-    public void setApellido(String apellido) {
-        this.apellido = apellido;
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
     }
 
     public String getDni() {
