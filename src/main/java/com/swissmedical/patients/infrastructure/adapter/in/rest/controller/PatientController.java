@@ -38,46 +38,50 @@ public class PatientController implements PatientApi {
 
     @Override
     @GetMapping()
-    public List<PatientResponseDto> getAll(@RequestParam(defaultValue = DefaultValuesController.NAME) String name,
-                                           @RequestParam(defaultValue = DefaultValuesController.PAGE) int page,
-                                           @RequestParam(defaultValue = DefaultValuesController.SIZE) int size) {
-
-       return patientService.getAll(name, page, size)
+    public ResponseEntity<List<PatientResponseDto>> getAll(
+            @RequestParam(defaultValue = DefaultValuesController.NAME) String name,
+            @RequestParam(defaultValue = DefaultValuesController.PAGE) int page,
+            @RequestParam(defaultValue = DefaultValuesController.SIZE) int size
+    ) {
+       return ResponseEntity.ok(patientService.getAll(name, page, size)
                 .stream()
                 .map(PatientResponseMapper::toDto)
-                .toList();
+                .toList());
     }
 
     @Override
     @GetMapping("/dni/{dni}")
-    public PatientResponseDto getByDni(@PathVariable String dni) {
-        Patient patient = patientService.getByDni(dni);
-        return PatientResponseMapper.toDto(patient);
+    public ResponseEntity<PatientResponseDto> getByDni(@PathVariable String dni) {
+        return ResponseEntity.ok(PatientResponseMapper.toDto(patientService.getByDni(dni)));
     }
 
     @Override
     @GetMapping("/social-security/{socialSecurity}")
-    public List<PatientResponseDto> getBySocialSecurity(@PathVariable String socialSecurity,
-                                                        @RequestParam(defaultValue = DefaultValuesController.PAGE) int page,
-                                                        @RequestParam(defaultValue = DefaultValuesController.SIZE) int size) {
-        return patientService.getBySocialSecurity(socialSecurity, page, size)
+    public ResponseEntity<List<PatientResponseDto>> getBySocialSecurity(
+            @PathVariable String socialSecurity,
+            @RequestParam(defaultValue = DefaultValuesController.PAGE) int page,
+            @RequestParam(defaultValue = DefaultValuesController.SIZE) int size
+    ) {
+        return ResponseEntity.ok(patientService.getBySocialSecurity(socialSecurity, page, size)
                 .stream()
                 .map(PatientResponseMapper::toDto)
-                .toList();
+                .toList());
     }
 
     @Override
     @PostMapping()
-    public PatientResponseDto create(@Valid @RequestBody PatientCreateDto patientCreateDto) {
+    public ResponseEntity<PatientResponseDto> create(@Valid @RequestBody PatientCreateDto patientCreateDto) {
         Patient patient = PatientCreateMapper.toDomain(patientCreateDto);
-        return PatientResponseMapper.toDto(patientService.create(patient));
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(PatientResponseMapper.toDto(patientService.create(patient)));
     }
 
     @Override
     @PutMapping("/{id}")
-    public PatientResponseDto update(@Valid @RequestBody PatientUpdateDto patientUpdateDto, @PathVariable Long id) {
+    public ResponseEntity<PatientResponseDto> update(@Valid @RequestBody PatientUpdateDto patientUpdateDto, @PathVariable Long id) {
         Patient patientDetails = PatientUpdateMapper.toDomain(patientUpdateDto);
-        return PatientResponseMapper.toDto(patientService.update(id, patientDetails));
+        return ResponseEntity.ok(PatientResponseMapper.toDto(patientService.update(id, patientDetails)));
     }
 
     @Override

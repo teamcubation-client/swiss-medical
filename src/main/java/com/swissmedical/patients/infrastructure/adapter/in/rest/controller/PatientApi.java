@@ -47,7 +47,7 @@ public interface PatientApi {
                 )
         )
     })
-    public List<PatientResponseDto> getAll(String firstName, int limit, int offset);
+    public ResponseEntity<List<PatientResponseDto>> getAll(String firstName, int limit, int offset);
 
     @Operation(summary = "Obtener un paciente por su DNI")
     @ApiResponses({
@@ -79,7 +79,7 @@ public interface PatientApi {
                 )
         )
     })
-    public PatientResponseDto getByDni(String dni);
+    public ResponseEntity<PatientResponseDto> getByDni(String dni);
 
     @Operation(summary = "Buscar pacientes por nombre de Seguro Social con paginación")
     @ApiResponses({
@@ -111,7 +111,7 @@ public interface PatientApi {
                 )
         )
     })
-    public List<PatientResponseDto> getBySocialSecurity(String socialSecurity, int limit, int offset);
+    public ResponseEntity<List<PatientResponseDto>> getBySocialSecurity(String socialSecurity, int limit, int offset);
 
     @Operation(summary = "Crear un nuevo paciente")
     @ApiResponses({
@@ -146,7 +146,7 @@ public interface PatientApi {
                 )
         )
     })
-    public PatientResponseDto create(PatientCreateDto patientCreateDto);
+    public ResponseEntity<PatientResponseDto> create(PatientCreateDto patientCreateDto);
 
     @Operation(summary = "Actualizar un paciente existente")
     @ApiResponses({
@@ -189,7 +189,7 @@ public interface PatientApi {
                 )
         )
     })
-    public PatientResponseDto update(PatientUpdateDto patientUpdateDto, Long id);
+    public ResponseEntity<PatientResponseDto> update(PatientUpdateDto patientUpdateDto, Long id);
 
     @Operation(summary = "Eliminar un paciente por su ID")
     @ApiResponses({
