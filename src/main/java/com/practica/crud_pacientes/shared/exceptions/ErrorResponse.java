@@ -1,4 +1,4 @@
-package com.practica.crud_pacientes.exceptions;
+package com.practica.crud_pacientes.shared.exceptions;
 
 
 import java.time.LocalDateTime;
