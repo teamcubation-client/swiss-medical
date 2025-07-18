@@ -1,6 +1,6 @@
 ### GET Patients
 
-GET http://localhost:8000/api/patients
+GET http://localhost:8000/api/patients?page=1&size=15
 
 ### GET Patient by DNI 
 
@@ -21,7 +21,9 @@ Content-Type: application/json
   "dni": "40128092",
   "email": "john@gmail.com",
   "phoneNumber": "1234567890",
-  "socialSecurity": "Swiss Medical"
+  "socialSecurity": "Swiss Medical",
+  "memberNumber": "1234567851",
+   "birthDate": "1990-01-01"
 }
 
 ### PUT Update Patient

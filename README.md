@@ -201,6 +201,89 @@ Optional<Paciente> buscarPorDniConSP(@Param("dni") String dni);
 - El script SQL debe ejecutarse automáticamente en la creación del contenedor.
 - Resolver las búsquedas solicitadas usando exclusivamente los stored procedures implementados.
 
+
+## 🧩 Fase 7: Migración a Arquitectura Hexagonal (Ports & Adapters)
+
+### 🎯 Objetivo
+
+- Reestructurar el microservicio para adoptar una arquitectura hexagonal, también conocida como Arquitectura de Puertos y Adaptadores, donde el dominio central queda aislado de las tecnologías externas (frameworks, base de datos, web, etc.).
+- 
+### ✅ Módulo 7-A: Propuesta de Estructura de Carpetas
+
+```bash
+src/
+└── main/
+    └── java/
+        └── microservice/
+            └── pacientes/
+                ├── application/
+                │   ├── domain/
+                │   │   ├── model/
+                │   │   │   └── Paciente.java
+                │   │   └── port/
+                │   │       ├── in/
+                │   │       └── out/
+                │   └── service/
+                │       └── PacienteService.java
+                ├── infrastructure/
+                │   └── adapter/
+                │       ├── in/rest/
+                │       └── out/persistence/
+                └── shared/
+                    └── ...
+```
+
+### ✅ Módulo 7-B: Principios a Aplicar
+
+- La capa `domain` es el núcleo del sistema, y no depende de ninguna tecnología.
+    - Contiene los modelos (Paciente) y los puertos (port/in y port/out).
+    - Los puertos definen interfaces, no implementaciones.
+- La capa `application` implementa la lógica de negocio (los casos de uso) orquestando los puertos.
+- La capa `infrastructure` contiene los adaptadores que se conectan a tecnologías externas como Spring MVC, JPA, Swagger, etc.
+  - `adapter/in/rest` conecta el mundo web (controllers).
+  - `adapter/out/persistence` conecta con la base de datos (repositorios, entidades JPA, mapeadores).
+- shared agrupa componentes transversales como excepciones.
+
+### ✅ Módulo 7-C: Migración guiada a Arquitectura Hexagonal
+
+- Migrá el proyecto desde MVC a una arquitectura hexagonal basada en puertos y adaptadores, reorganizando responsabilidades según las siguientes acciones:
+
+#### 📌 Pasos a seguir
+1. Modelo de dominio (Paciente)
+    - Ubicación: application.domain.model
+    - Representa el paciente dentro del negocio. 
+    - Sin anotaciones de frameworks.
+2. Definir puertos (interfaces)
+   - port.in: PacienteUseCase define las operaciones disponibles.
+   - port.out: PacienteRepositoryPort define cómo se accede a los datos.
+3. Casos de uso (PacienteService)
+   - Ubicación: application.service
+   - Implementa PacienteUseCase, usa PacienteRepositoryPort.
+4. Controlador REST
+   - Ubicación: infrastructure.adapter.in.rest
+   - Se conecta solo con PacienteUseCase. No accede a entidades ni repos directamente.
+5. Adapter de persistencia
+   - Ubicación: infrastructure.adapter.out.persistence
+   - Implementa PacienteRepositoryPort usando JpaRepository y stored procedures. 
+   - Incluye clase PacienteEntity con anotaciones JPA.
+6. DTOs REST (PacienteRequest, PacienteResponse) 
+   - Ubicación: infrastructure.adapter.in.rest.dto
+   - Modelos para entrada y salida de la API.
+   - Solo contienen los datos necesarios para el cliente. 
+   - Permiten cambiar la interfaz sin afectar al dominio ni a la base de datos.
+7. Mappers
+    - Ubicación según el adapter correspondiente (rest.mapper, persistence.mapper)
+    - Transforman entre modelos:
+        - REST ↔ Dominio
+        - Persistencia ↔ Dominio
+
+## 🧠 Buenas prácticas a reforzar
+
+- Cada capa solo conoce las capas más internas.
+- El dominio es independiente de tecnología.
+- Los puertos son contratos; los adapters los implementan.
+- Los DTOs y entidades son detalles técnicos, no parte del modelo central.
+
 ---
 # 📝 Check List
 
@@ -325,3 +408,65 @@ networks:
 Optional<Paciente> buscarPorDniConSP(@Param("dni") String dni);
 ```
 - No olvidar realizar el `build` de la aplicación y el `docker-compose up` para que se creen los contenedores y se ejecuten los scripts de inicialización.
+
+---
+# Refactorización a Arquitectura Hexagonal
+
+- Se reorganizó el proyecto para adoptar una arquitectura hexagonal, separando claramente las capas de dominio y de infrastructura.
+- Se definieron los puertos de entrada y salida para el dominio, permitiendo que la lógica de negocio no dependa de detalles técnicos como JPA o REST.
+- Se implementaron adaptadores para conectar el dominio con la infraestructura, manteniendo el núcleo del negocio independiente de las tecnologías externas.
+
+## Nueva Estructura del Proyecto
+
+```bash
+src/
+└── main/
+    └── java/
+        └── com.swissmedical/
+            └── pacients/
+                ├── application/
+                │   ├── domain/
+                │   │   ├── model/
+                │   │   │   └── Patient.java
+                │   │   └── port/
+                │   │       ├── in/
+                |   |           └── PatienteUseCase.java
+                │   │       └── out/
+                │   │           └── PatienteRepositoryPort.java
+                │   └── service/
+                │       └── PatienteService.java
+                ├── infrastructure/
+                │   ├── adapter/
+                │   |    ├── in/rest/
+                │   |    │   ├── controller/
+                │   |    │   |   ├── PatientApi.java
+                │   |    │   |   ├── PatientController.java
+                │   |    │   |   └── RootController.java 
+                │   |    │   └── dto/
+                │   |    │   |   ├── PatientCreateDto.java
+                │   |    │   |   ├── PatientUpdateDto.java
+                │   |    │   |   └── PatientResponseDto.java
+                │   |    │   └── mapper/ 
+                │   |    │   |   ├── PatientCreateMapper.java
+                │   |    │   |   ├── PatientUpdateMapper.java
+                │   |    │   |   └── PatientResponseMapper.java
+                │   |    └── out/persistence/mysql/
+                │   |        ├── entity/
+                │   |        │   └── PatientEntity.java
+                │   |        ├── mapper/
+                │   |        │   └── PatientEntityMapper.java
+                │   |        └── repository/
+                │   |            ├── PatientJpaRepository.java
+                │   |            └── PatientRepositoryAdapter.java
+                │   └── config/
+                │       └── OpenApiConfig.java
+                └── shared/
+                    └── exceptions/
+                    |   ├── GlobalExceptionHandler.java
+                    |   ├── PatientNotFoundException.java
+                    |   └── PatientDuplicatedException.java
+                    └── utils/
+                        ├── ErrorMessages.java
+                        └── ResponseCode.java
+                    
+```
