@@ -10,6 +10,7 @@ import microservice.pacientes.application.domain.port.in.DeletePacienteUseCase;
 import microservice.pacientes.application.domain.port.in.FindPacienteUseCase;
 import microservice.pacientes.application.domain.port.in.UpdatePacienteUseCase;
 import microservice.pacientes.application.domain.port.out.PacientePortOut;
+import microservice.pacientes.application.domain.validator.PacienteValidator;
 import microservice.pacientes.shared.annotations.UseCase;
 import microservice.pacientes.shared.exception.PacienteDuplicadoException;
 import microservice.pacientes.shared.exception.PacienteNoEncontradoException;
@@ -20,12 +21,14 @@ import java.util.List;
 @UseCase
 public class PacienteService implements FindPacienteUseCase, CreatePacienteUseCase, UpdatePacienteUseCase, DeletePacienteUseCase {
     private final PacientePortOut pacientePortOut;
+    private final PacienteValidator pacienteValidator;
 
     @Override
     public Paciente create(CreatePacienteCommand createPacienteCommand) throws PacienteDuplicadoException {
         Paciente paciente = CreatePacienteMapper.toEntity(createPacienteCommand);
         if (pacientePortOut.existsByDni(paciente.getDni()))
             throw new PacienteDuplicadoException();
+        pacienteValidator.validate(paciente);
         return pacientePortOut.save(paciente);
     }
 
@@ -76,6 +79,8 @@ public class PacienteService implements FindPacienteUseCase, CreatePacienteUseCa
         if (updatePacienteCommand.getObraSocial() != null) paciente.setObraSocial(updatePacienteCommand.getObraSocial());
         if (updatePacienteCommand.getEmail() != null) paciente.setEmail(updatePacienteCommand.getEmail());
         if (updatePacienteCommand.getTelefono() != null) paciente.setTelefono(updatePacienteCommand.getTelefono());
+
+        pacienteValidator.validate(paciente);
 
         return pacientePortOut.save(paciente);
     }
