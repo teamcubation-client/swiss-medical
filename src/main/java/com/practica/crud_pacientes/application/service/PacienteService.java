@@ -1,5 +1,6 @@
 package com.practica.crud_pacientes.application.service;
 
+import com.practica.crud_pacientes.application.domain.port.out.PacienteEventPublisher;
 import com.practica.crud_pacientes.shared.exceptions.PacienteNoEncontradoException;
 import com.practica.crud_pacientes.application.domain.model.Paciente;
 import com.practica.crud_pacientes.application.domain.port.in.PacienteUseCase;
@@ -14,9 +15,11 @@ import java.util.List;
 public class PacienteService implements PacienteUseCase {
 
     private final PacienteRepositoryPort pacienteRepositoryPort;
+    private final PacienteEventPublisher eventPublisher;
 
-    public PacienteService(PacienteRepositoryPort pacienteRepositoryPort) {
+    public PacienteService(PacienteRepositoryPort pacienteRepositoryPort, PacienteEventPublisher eventPublisher) {
         this.pacienteRepositoryPort = pacienteRepositoryPort;
+        this.eventPublisher = eventPublisher;
     }
 
     @Override
@@ -37,7 +40,10 @@ public class PacienteService implements PacienteUseCase {
         if(pacienteRepositoryPort.getByDni(paciente.getDni()) != null)
             throw new PacienteDuplicadoException();
 
-        return pacienteRepositoryPort.save(paciente);
+        Paciente pacienteCreado = pacienteRepositoryPort.save(paciente);
+        eventPublisher.publishPaienteCreado(pacienteCreado);
+
+        return pacienteCreado;
     }
 
     @Override
@@ -46,7 +52,7 @@ public class PacienteService implements PacienteUseCase {
         pacienteRepositoryPort.findById(id);
 
         Paciente existingPaciente = pacienteRepositoryPort.getByDni(paciente.getDni());
-        if (existingPaciente == null)
+        if (existingPaciente != null)
             throw new PacienteDuplicadoException();
 
         paciente.setId(id);
@@ -59,7 +65,9 @@ public class PacienteService implements PacienteUseCase {
         if(Boolean.FALSE.equals(pacienteRepositoryPort.existsById(id)))
             throw new PacienteNoEncontradoException();
 
+        Paciente pacienteAEliminar = pacienteRepositoryPort.findById(id);
         pacienteRepositoryPort.deleteById(id);
+        eventPublisher.publishPacienteEliminado(pacienteAEliminar);
     }
 
     @Override
