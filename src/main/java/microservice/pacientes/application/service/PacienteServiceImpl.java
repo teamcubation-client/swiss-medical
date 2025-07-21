@@ -161,14 +161,14 @@ public class PacienteServiceImpl implements PacientePortInWrite, PacientePortInR
     @Override
     @Transactional (readOnly = true)
     public Paciente buscarByDni(String dni) {
-        return pacientePortOutRead.buscarPorDniConSP(dni)
+        return pacientePortOutRead.buscarByDni(dni)
                 .orElseThrow(() -> PacienteNotFoundException.porDni(dni));
     }
 
     @Override
     @Transactional (readOnly = true)
     public List<Paciente> buscarByNombre(String nombre) {
-        List<Paciente> paciente = pacientePortOutRead.buscarPorNombreConSP(nombre);
+        List<Paciente> paciente = pacientePortOutRead.buscarByNombre(nombre);
         if (paciente == null || paciente.isEmpty()) {
             throw PacienteNotFoundException.porNombre(nombre);
         }
