@@ -2,7 +2,8 @@ package microservice.pacientes.infrastructure.adapter.out.persistence;
 
 import lombok.AllArgsConstructor;
 import microservice.pacientes.application.domain.model.Paciente;
-import microservice.pacientes.application.domain.port.out.PacientePortOut;
+import microservice.pacientes.application.domain.port.out.PacientePortOutRead;
+import microservice.pacientes.application.domain.port.out.PacientePortOutWrite;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -11,7 +12,7 @@ import java.util.stream.Collectors;
 
 @Component
 @AllArgsConstructor
-public class PacientePersistenceAdapter implements PacientePortOut {
+public class PacientePersistenceAdapter implements PacientePortOutRead, PacientePortOutWrite {
     private final PacienteRepository pacienteRepository;
 
     @Override

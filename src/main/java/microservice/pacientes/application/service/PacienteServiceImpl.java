@@ -2,8 +2,10 @@ package microservice.pacientes.application.service;
 
 import lombok.AllArgsConstructor;
 import microservice.pacientes.application.domain.model.Paciente;
-import microservice.pacientes.application.domain.port.in.PacientePortIn;
-import microservice.pacientes.application.domain.port.out.PacientePortOut;
+import microservice.pacientes.application.domain.port.in.PacientePortInRead;
+import microservice.pacientes.application.domain.port.in.PacientePortInWrite;
+import microservice.pacientes.application.domain.port.out.PacientePortOutRead;
+import microservice.pacientes.application.domain.port.out.PacientePortOutWrite;
 import microservice.pacientes.shared.PacienteDuplicadoException;
 import microservice.pacientes.shared.PacienteNotFoundException;
 import org.springframework.stereotype.Service;
@@ -15,9 +17,10 @@ import java.util.List;
 @Service
 @AllArgsConstructor
 
-public class PacienteServiceImpl implements PacientePortIn {
+public class PacienteServiceImpl implements PacientePortInWrite, PacientePortInRead {
 
-    private final PacientePortOut pacientePortOut;
+    private final PacientePortOutRead pacientePortOutRead;
+    private final PacientePortOutWrite pacientePortOutWrite;
     /**
      * Crea un nuevo paciente en el sistema, con excepcion si el DNI ya existe
      * @param paciente entidad Paciente a crear
@@ -27,12 +30,12 @@ public class PacienteServiceImpl implements PacientePortIn {
     @Override
     @Transactional
     public Paciente crearPaciente(Paciente paciente) {
-        pacientePortOut.findByDni(paciente.getDni())
+        pacientePortOutRead.findByDni(paciente.getDni())
                 .ifPresent(p -> {
                     throw new PacienteDuplicadoException(paciente.getDni());
                 });
 
-        return pacientePortOut.save(paciente);
+        return pacientePortOutWrite.save(paciente);
     }
 
     /**
@@ -44,7 +47,7 @@ public class PacienteServiceImpl implements PacientePortIn {
     @Override
     @Transactional (readOnly = true)
     public Paciente obtenerPacientePorId(Long id) {
-        return pacientePortOut.findById(id)
+        return pacientePortOutRead.findById(id)
                 .orElseThrow(() -> PacienteNotFoundException.porId(id));
     }
 
@@ -55,7 +58,7 @@ public class PacienteServiceImpl implements PacientePortIn {
     @Override
     @Transactional (readOnly = true)
     public List<Paciente> listarPacientes() {
-        return pacientePortOut.findAll();
+        return pacientePortOutRead.findAll();
     }
 
     /**
@@ -66,10 +69,10 @@ public class PacienteServiceImpl implements PacientePortIn {
     @Override
     @Transactional
     public void eliminarPaciente(Long id) {
-        Paciente paciente = pacientePortOut.findById(id)
+        Paciente paciente = pacientePortOutRead.findById(id)
                 .orElseThrow(() -> PacienteNotFoundException.porId(id));
 
-        pacientePortOut.deleteById(id);
+        pacientePortOutWrite.deleteById(id);
     }
 
     /**
@@ -80,7 +83,7 @@ public class PacienteServiceImpl implements PacientePortIn {
     @Override
     @Transactional (readOnly = true)
     public Paciente buscarPorDni(String dni) {
-        Paciente paciente = pacientePortOut.findByDni(dni).orElse(null);
+        Paciente paciente = pacientePortOutRead.findByDni(dni).orElse(null);
         return paciente;
     }
 
@@ -92,7 +95,7 @@ public class PacienteServiceImpl implements PacientePortIn {
     @Override
     @Transactional (readOnly = true)
     public List<Paciente> buscarPorNombreParcial(String nombre) {
-        List<Paciente> pacientes = pacientePortOut.findByNombreContainingIgnoreCase(nombre);
+        List<Paciente> pacientes = pacientePortOutRead.findByNombreContainingIgnoreCase(nombre);
         return pacientes;
     }
 
@@ -106,7 +109,7 @@ public class PacienteServiceImpl implements PacientePortIn {
     @Override
     @Transactional
     public Paciente actualizarPaciente(Long id, Paciente paciente) {
-        Paciente existente = pacientePortOut.findById(id)
+        Paciente existente = pacientePortOutRead.findById(id)
                 .orElseThrow(() -> PacienteNotFoundException.porId(id));
 
         if (paciente.getNombre() != null) {
@@ -134,38 +137,38 @@ public class PacienteServiceImpl implements PacientePortIn {
             existente.setFechaAlta(paciente.getFechaAlta());
         }
         existente.setEstado(paciente.isEstado());
-        return pacientePortOut.save(existente);
+        return pacientePortOutWrite.save(existente);
     }
 
     @Override
     @Transactional
     public Paciente desactivarPaciente(Long id) {
-        Paciente paciente = pacientePortOut.findById(id)
+        Paciente paciente = pacientePortOutRead.findById(id)
                 .orElseThrow(() -> PacienteNotFoundException.porId(id));
         paciente.setEstado(false);
-        return pacientePortOut.save(paciente);
+        return pacientePortOutWrite.save(paciente);
     }
 
     @Override
     @Transactional
     public Paciente activarPaciente(Long id) {
-        Paciente paciente = pacientePortOut.findById(id)
+        Paciente paciente = pacientePortOutRead.findById(id)
                 .orElseThrow(() -> PacienteNotFoundException.porId(id));
         paciente.setEstado(true);
-        return pacientePortOut.save(paciente);
+        return pacientePortOutWrite.save(paciente);
     }
 
     @Override
     @Transactional (readOnly = true)
     public Paciente buscarByDni(String dni) {
-        return pacientePortOut.buscarPorDniConSP(dni)
+        return pacientePortOutRead.buscarPorDniConSP(dni)
                 .orElseThrow(() -> PacienteNotFoundException.porDni(dni));
     }
 
     @Override
     @Transactional (readOnly = true)
     public List<Paciente> buscarByNombre(String nombre) {
-        List<Paciente> paciente = pacientePortOut.buscarPorNombreConSP(nombre);
+        List<Paciente> paciente = pacientePortOutRead.buscarPorNombreConSP(nombre);
         if (paciente == null || paciente.isEmpty()) {
             throw PacienteNotFoundException.porNombre(nombre);
         }
@@ -175,7 +178,7 @@ public class PacienteServiceImpl implements PacientePortIn {
     @Override
     @Transactional (readOnly = true)
     public List<Paciente> buscarPorObraSocialPaginado(String obraSocial, int limit, int offset) {
-        List<Paciente> paciente = pacientePortOut.buscarPorObraSocialPaginado(obraSocial, limit, offset);
+        List<Paciente> paciente = pacientePortOutRead.buscarPorObraSocialPaginado(obraSocial, limit, offset);
         if (paciente == null || paciente.isEmpty()) {
             throw PacienteNotFoundException.porObraSocial(obraSocial);
         }

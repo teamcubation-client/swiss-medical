@@ -1,10 +1,10 @@
 package microservice.pacientes.infrastructure.adapter.in.controller;
 
 import lombok.AllArgsConstructor;
-import microservice.pacientes.application.domain.port.in.PacientePortIn;
+import microservice.pacientes.application.domain.port.in.PacientePortInRead;
+import microservice.pacientes.application.domain.port.in.PacientePortInWrite;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,7 +24,8 @@ import javax.validation.Valid;
 @RequestMapping("/api/pacientes")
 @AllArgsConstructor
 public class PacienteController implements PacienteApi {
-    private final PacientePortIn pacientePortIn;
+    private final PacientePortInWrite pacientePortInWrite;
+    private final PacientePortInRead pacientePortInRead;
 
     /**
      * Obtiene la lista de todos los pacientes registrados
@@ -32,7 +33,7 @@ public class PacienteController implements PacienteApi {
      */
     @GetMapping
     public ResponseEntity<List<PacienteDTO>> listarPacientes() {
-        List<PacienteDTO> dtos = pacientePortIn.listarPacientes().stream()
+        List<PacienteDTO> dtos = pacientePortInRead.listarPacientes().stream()
                 .map(PacienteResponseMapper::toDTO)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(dtos);
@@ -46,7 +47,7 @@ public class PacienteController implements PacienteApi {
     @PostMapping
     public ResponseEntity<PacienteDTO> crearPaciente(@Valid @RequestBody PacienteDTO pacienteDTO) {
         Paciente paciente = PacienteResponseMapper.toModel(pacienteDTO);
-        Paciente creado = pacientePortIn.crearPaciente(paciente);
+        Paciente creado = pacientePortInWrite.crearPaciente(paciente);
         return ResponseEntity.status(HttpStatus.CREATED).body(PacienteResponseMapper.toDTO(creado));
     }
 
@@ -58,7 +59,7 @@ public class PacienteController implements PacienteApi {
 
     @GetMapping("/{id}")
     public ResponseEntity<PacienteDTO> obtenerPaciente(@PathVariable Long id) {
-        Paciente paciente = pacientePortIn.obtenerPacientePorId(id);
+        Paciente paciente = pacientePortInRead.obtenerPacientePorId(id);
         if (paciente == null)
             return ResponseEntity.notFound().build();
         return ResponseEntity.ok(PacienteResponseMapper.toDTO(paciente));
@@ -71,7 +72,7 @@ public class PacienteController implements PacienteApi {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminarPaciente(@PathVariable Long id) {
-        pacientePortIn.eliminarPaciente(id);
+        pacientePortInWrite.eliminarPaciente(id);
         return ResponseEntity.noContent().build();
     }
 
@@ -83,7 +84,7 @@ public class PacienteController implements PacienteApi {
 
     @GetMapping("/buscar/dni")
     public ResponseEntity<PacienteDTO> buscarPorDni(@RequestParam String dni) {
-        Paciente paciente = pacientePortIn.buscarPorDni(dni);
+        Paciente paciente = pacientePortInRead.buscarPorDni(dni);
         if (paciente == null)
             return ResponseEntity.notFound().build();
         return ResponseEntity.ok(PacienteResponseMapper.toDTO(paciente));
@@ -97,7 +98,7 @@ public class PacienteController implements PacienteApi {
 
     @GetMapping("/buscar/nombre")
     public ResponseEntity<List<PacienteDTO>> buscarPorNombre(@RequestParam String nombre) {
-        List<PacienteDTO> pacienteDTOs = pacientePortIn.buscarPorNombreParcial(nombre)
+        List<PacienteDTO> pacienteDTOs = pacientePortInRead.buscarPorNombreParcial(nombre)
                 .stream()
                 .map(PacienteResponseMapper::toDTO)
                 .collect(Collectors.toList());
@@ -116,7 +117,7 @@ public class PacienteController implements PacienteApi {
     @PutMapping("/{id}")
     public ResponseEntity<PacienteDTO> actualizarPaciente(@PathVariable Long id, @RequestBody PacienteDTO pacienteDTO) {
         Paciente paciente = PacienteResponseMapper.toModel(pacienteDTO);
-        Paciente actualizado = pacientePortIn.actualizarPaciente(id, paciente);
+        Paciente actualizado = pacientePortInWrite.actualizarPaciente(id, paciente);
         if (actualizado == null)
             return ResponseEntity.notFound().build();
         return ResponseEntity.ok(PacienteResponseMapper.toDTO(actualizado));
@@ -125,21 +126,21 @@ public class PacienteController implements PacienteApi {
     @PatchMapping("/{id}/activar")
     @Override
     public ResponseEntity<PacienteDTO> activarPaciente(@PathVariable Long id) {
-        Paciente activado = pacientePortIn.activarPaciente(id);
+        Paciente activado = pacientePortInWrite.activarPaciente(id);
         return ResponseEntity.ok(PacienteResponseMapper.toDTO(activado));
     }
 
     @PatchMapping("/{id}/desactivar")
     @Override
     public ResponseEntity<PacienteDTO> desactivarPaciente(@PathVariable Long id) {
-        Paciente desactivado = pacientePortIn.desactivarPaciente(id);
+        Paciente desactivado = pacientePortInWrite.desactivarPaciente(id);
         return ResponseEntity.ok(PacienteResponseMapper.toDTO(desactivado));
     }
 
     @GetMapping("/activos")
     @Override
     public ResponseEntity<List<PacienteDTO>> listarPacientesActivos() {
-        List<PacienteDTO> activos = pacientePortIn.listarPacientes().stream()
+        List<PacienteDTO> activos = pacientePortInRead.listarPacientes().stream()
                 .filter(Paciente::isEstado)
                 .map(PacienteResponseMapper::toDTO)
                 .collect(Collectors.toList());
@@ -149,7 +150,7 @@ public class PacienteController implements PacienteApi {
     @GetMapping("/inactivos")
     @Override
     public ResponseEntity<List<PacienteDTO>> listarPacientesInactivos() {
-        List<PacienteDTO> inactivos = pacientePortIn.listarPacientes().stream()
+        List<PacienteDTO> inactivos = pacientePortInRead.listarPacientes().stream()
                 .filter(p -> !p.isEstado())
                 .map(PacienteResponseMapper::toDTO)
                 .collect(Collectors.toList());
@@ -163,7 +164,7 @@ public class PacienteController implements PacienteApi {
      */
     @GetMapping("/sp/buscar/dni/{dni}")
     public ResponseEntity<PacienteDTO> buscarByDni(@PathVariable String dni) {
-        Paciente paciente = pacientePortIn.buscarByDni(dni);
+        Paciente paciente = pacientePortInRead.buscarByDni(dni);
         PacienteDTO dto = PacienteResponseMapper.toDTO(paciente);
         return ResponseEntity.ok(dto);
     }
@@ -175,7 +176,7 @@ public class PacienteController implements PacienteApi {
      */
     @GetMapping("/sp/buscar/nombre/{nombre}")
     public ResponseEntity<List<PacienteDTO>> buscarByNombre(@PathVariable String nombre) {
-        List<Paciente> paciente = pacientePortIn.buscarByNombre(nombre);
+        List<Paciente> paciente = pacientePortInRead.buscarByNombre(nombre);
         List<PacienteDTO> dto = paciente.stream()
                 .map(PacienteResponseMapper::toDTO)
                 .collect(Collectors.toList());
@@ -194,7 +195,7 @@ public class PacienteController implements PacienteApi {
             @RequestParam String obraSocial,
             @RequestParam(defaultValue = "10") int limit,
             @RequestParam(defaultValue = "0") int offset) {
-        List<Paciente> paciente = pacientePortIn.buscarPorObraSocialPaginado(obraSocial, limit, offset);
+        List<Paciente> paciente = pacientePortInRead.buscarPorObraSocialPaginado(obraSocial, limit, offset);
         List<PacienteDTO> dto = paciente.stream()
                 .map(PacienteResponseMapper::toDTO)
                 .collect(Collectors.toList());
