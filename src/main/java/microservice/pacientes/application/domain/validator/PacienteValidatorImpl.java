@@ -2,6 +2,7 @@ package microservice.pacientes.application.domain.validator;
 
 import lombok.AllArgsConstructor;
 import microservice.pacientes.application.domain.model.Paciente;
+import microservice.pacientes.application.domain.validator.rules.PacienteValidatorRule;
 
 import java.util.List;
 

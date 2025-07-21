@@ -1,29 +1,36 @@
 package microservice.pacientes.infrastructure.adapter.out.persistence.mysql.mapper;
 
+import lombok.AllArgsConstructor;
 import microservice.pacientes.application.domain.model.Paciente;
+import microservice.pacientes.application.domain.factory.PacienteFactory;
 import microservice.pacientes.infrastructure.adapter.out.persistence.mysql.entity.PacienteEntity;
+import microservice.pacientes.shared.annotations.Mapper;
 
 import java.util.List;
 
+@AllArgsConstructor
+@Mapper
 public class PacienteEntityMapper {
 
-    public static Paciente toDomain(PacienteEntity pacienteEntity) {
-        return Paciente.builder()
-                .dni(pacienteEntity.getDni())
-                .nombre(pacienteEntity.getNombre())
-                .apellido(pacienteEntity.getApellido())
-                .obraSocial(pacienteEntity.getObraSocial())
-                .email(pacienteEntity.getEmail())
-                .telefono(pacienteEntity.getTelefono())
-                .build();
+    private final PacienteFactory pacienteFactory;
+
+    public Paciente toDomain(PacienteEntity pacienteEntity) {
+        return pacienteFactory.create(
+                pacienteEntity.getDni(),
+                pacienteEntity.getNombre(),
+                pacienteEntity.getApellido(),
+                pacienteEntity.getObraSocial(),
+                pacienteEntity.getEmail(),
+                pacienteEntity.getTelefono()
+        );
     }
 
 
-    public static List<Paciente> toDomain(List<PacienteEntity> pacientesEntity) {
-        return pacientesEntity.stream().map(PacienteEntityMapper::toDomain).toList(); // method reference
+    public List<Paciente> toDomain(List<PacienteEntity> pacientesEntity) {
+        return pacientesEntity.stream().map(this::toDomain).toList(); // method reference
     }
 
-    public static PacienteEntity toEntity(Paciente paciente) {
+    public PacienteEntity toEntity(Paciente paciente) {
         return PacienteEntity.builder()
                 .dni(paciente.getDni())
                 .nombre(paciente.getNombre())

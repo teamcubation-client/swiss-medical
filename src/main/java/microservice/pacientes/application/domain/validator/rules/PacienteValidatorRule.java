@@ -1,4 +1,4 @@
-package microservice.pacientes.application.domain.validator;
+package microservice.pacientes.application.domain.validator.rules;
 
 import microservice.pacientes.application.domain.model.Paciente;
 import microservice.pacientes.shared.exception.PacienteArgumentoInvalido;

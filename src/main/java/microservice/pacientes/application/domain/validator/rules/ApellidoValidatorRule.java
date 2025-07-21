@@ -2,7 +2,6 @@ package microservice.pacientes.application.domain.validator.rules;
 
 import lombok.AllArgsConstructor;
 import microservice.pacientes.application.domain.model.Paciente;
-import microservice.pacientes.application.domain.validator.PacienteValidatorRule;
 import microservice.pacientes.shared.exception.PacienteArgumentoInvalido;
 
 @AllArgsConstructor
