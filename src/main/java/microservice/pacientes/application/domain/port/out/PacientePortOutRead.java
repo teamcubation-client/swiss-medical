@@ -16,9 +16,9 @@ public interface PacientePortOutRead {
 
     List<Paciente> findAll();
 
-    Optional<Paciente> buscarPorDniConSP(@Param("dni") String dni);
+    Optional<Paciente> buscarByDni(@Param("dni") String dni);
 
-    List<Paciente> buscarPorNombreConSP(@Param("nombre") String nombre);
+    List<Paciente> buscarByNombre(@Param("nombre") String nombre);
 
     List<Paciente> buscarPorObraSocialPaginado(@Param("p_obra_social") String obraSocial, @Param("p_limit") int limit, @Param("p_offset") int offset);
 }

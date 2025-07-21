@@ -30,13 +30,13 @@ public class PacientePersistenceAdapter implements PacientePortOutRead, Paciente
     }
 
     @Override
-    public Optional<Paciente> buscarPorDniConSP(String dni) {
+    public Optional<Paciente> buscarByDni(String dni) {
         return pacienteRepository.buscarByDni(dni)
                 .map(PacienteMapper::toModel);
     }
 
     @Override
-    public List<Paciente> buscarPorNombreConSP(String nombre) {
+    public List<Paciente> buscarByNombre(String nombre) {
         return pacienteRepository.buscarByNombre(nombre).stream()
                 .map(PacienteMapper::toModel)
                 .collect(Collectors.toList());
