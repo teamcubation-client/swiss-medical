@@ -23,10 +23,8 @@ import javax.validation.Valid;
 @RestController
 @RequestMapping("/api/pacientes")
 @AllArgsConstructor
-@Component
-public class PacienteController implements IPacienteController {
+public class PacienteController implements PacienteApi {
     private final PacientePortIn pacientePortIn;
-    private final PacienteResponseMapper pacienteResponseMapper;
 
     /**
      * Obtiene la lista de todos los pacientes registrados
@@ -35,7 +33,7 @@ public class PacienteController implements IPacienteController {
     @GetMapping
     public ResponseEntity<List<PacienteDTO>> listarPacientes() {
         List<PacienteDTO> dtos = pacientePortIn.listarPacientes().stream()
-                .map(pacienteResponseMapper::toDTO)
+                .map(PacienteResponseMapper::toDTO)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(dtos);
     }
@@ -47,9 +45,9 @@ public class PacienteController implements IPacienteController {
      */
     @PostMapping
     public ResponseEntity<PacienteDTO> crearPaciente(@Valid @RequestBody PacienteDTO pacienteDTO) {
-        Paciente paciente = pacienteResponseMapper.toModel(pacienteDTO);
+        Paciente paciente = PacienteResponseMapper.toModel(pacienteDTO);
         Paciente creado = pacientePortIn.crearPaciente(paciente);
-        return ResponseEntity.status(HttpStatus.CREATED).body(pacienteResponseMapper.toDTO(creado));
+        return ResponseEntity.status(HttpStatus.CREATED).body(PacienteResponseMapper.toDTO(creado));
     }
 
     /**
@@ -63,7 +61,7 @@ public class PacienteController implements IPacienteController {
         Paciente paciente = pacientePortIn.obtenerPacientePorId(id);
         if (paciente == null)
             return ResponseEntity.notFound().build();
-        return ResponseEntity.ok(pacienteResponseMapper.toDTO(paciente));
+        return ResponseEntity.ok(PacienteResponseMapper.toDTO(paciente));
     }
     
     /**
@@ -88,7 +86,7 @@ public class PacienteController implements IPacienteController {
         Paciente paciente = pacientePortIn.buscarPorDni(dni);
         if (paciente == null)
             return ResponseEntity.notFound().build();
-        return ResponseEntity.ok(pacienteResponseMapper.toDTO(paciente));
+        return ResponseEntity.ok(PacienteResponseMapper.toDTO(paciente));
     }
 
     /**
@@ -101,7 +99,7 @@ public class PacienteController implements IPacienteController {
     public ResponseEntity<List<PacienteDTO>> buscarPorNombre(@RequestParam String nombre) {
         List<PacienteDTO> pacienteDTOs = pacientePortIn.buscarPorNombreParcial(nombre)
                 .stream()
-                .map(pacienteResponseMapper::toDTO)
+                .map(PacienteResponseMapper::toDTO)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(pacienteDTOs);
     }
@@ -117,25 +115,25 @@ public class PacienteController implements IPacienteController {
 
     @PutMapping("/{id}")
     public ResponseEntity<PacienteDTO> actualizarPaciente(@PathVariable Long id, @RequestBody PacienteDTO pacienteDTO) {
-        Paciente paciente = pacienteResponseMapper.toModel(pacienteDTO);
+        Paciente paciente = PacienteResponseMapper.toModel(pacienteDTO);
         Paciente actualizado = pacientePortIn.actualizarPaciente(id, paciente);
         if (actualizado == null)
             return ResponseEntity.notFound().build();
-        return ResponseEntity.ok(pacienteResponseMapper.toDTO(actualizado));
+        return ResponseEntity.ok(PacienteResponseMapper.toDTO(actualizado));
     }
 
     @PatchMapping("/{id}/activar")
     @Override
     public ResponseEntity<PacienteDTO> activarPaciente(@PathVariable Long id) {
         Paciente activado = pacientePortIn.activarPaciente(id);
-        return ResponseEntity.ok(pacienteResponseMapper.toDTO(activado));
+        return ResponseEntity.ok(PacienteResponseMapper.toDTO(activado));
     }
 
     @PatchMapping("/{id}/desactivar")
     @Override
     public ResponseEntity<PacienteDTO> desactivarPaciente(@PathVariable Long id) {
         Paciente desactivado = pacientePortIn.desactivarPaciente(id);
-        return ResponseEntity.ok(pacienteResponseMapper.toDTO(desactivado));
+        return ResponseEntity.ok(PacienteResponseMapper.toDTO(desactivado));
     }
 
     @GetMapping("/activos")
@@ -143,7 +141,7 @@ public class PacienteController implements IPacienteController {
     public ResponseEntity<List<PacienteDTO>> listarPacientesActivos() {
         List<PacienteDTO> activos = pacientePortIn.listarPacientes().stream()
                 .filter(Paciente::isEstado)
-                .map(pacienteResponseMapper::toDTO)
+                .map(PacienteResponseMapper::toDTO)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(activos);
     }
@@ -153,7 +151,7 @@ public class PacienteController implements IPacienteController {
     public ResponseEntity<List<PacienteDTO>> listarPacientesInactivos() {
         List<PacienteDTO> inactivos = pacientePortIn.listarPacientes().stream()
                 .filter(p -> !p.isEstado())
-                .map(pacienteResponseMapper::toDTO)
+                .map(PacienteResponseMapper::toDTO)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(inactivos);
     }
@@ -166,7 +164,7 @@ public class PacienteController implements IPacienteController {
     @GetMapping("/sp/buscar/dni/{dni}")
     public ResponseEntity<PacienteDTO> buscarByDni(@PathVariable String dni) {
         Paciente paciente = pacientePortIn.buscarByDni(dni);
-        PacienteDTO dto = pacienteResponseMapper.toDTO(paciente);
+        PacienteDTO dto = PacienteResponseMapper.toDTO(paciente);
         return ResponseEntity.ok(dto);
     }
 
@@ -179,7 +177,7 @@ public class PacienteController implements IPacienteController {
     public ResponseEntity<List<PacienteDTO>> buscarByNombre(@PathVariable String nombre) {
         List<Paciente> paciente = pacientePortIn.buscarByNombre(nombre);
         List<PacienteDTO> dto = paciente.stream()
-                .map(pacienteResponseMapper::toDTO)
+                .map(PacienteResponseMapper::toDTO)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(dto);
     }
@@ -198,7 +196,7 @@ public class PacienteController implements IPacienteController {
             @RequestParam(defaultValue = "0") int offset) {
         List<Paciente> paciente = pacientePortIn.buscarPorObraSocialPaginado(obraSocial, limit, offset);
         List<PacienteDTO> dto = paciente.stream()
-                .map(pacienteResponseMapper::toDTO)
+                .map(PacienteResponseMapper::toDTO)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(dto);
     }

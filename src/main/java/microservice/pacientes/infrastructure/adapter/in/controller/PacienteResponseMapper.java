@@ -1,19 +1,25 @@
 package microservice.pacientes.infrastructure.adapter.in.controller;
 
-import org.springframework.stereotype.Component;
+import microservice.pacientes.shared.PacienteNotFoundException;
 import microservice.pacientes.application.domain.model.Paciente;
 
 /**
  * Mapper para convertir entre entidades Paciente y sus DTO
  * Facilita la transformacion de datos entre las capas de persistencia y presentacion
  */
-@Component
-public class PacienteResponseMapper {
+public final class PacienteResponseMapper {
+
+
+    //impide una instanciacion
+    private PacienteResponseMapper() {}
+
     /**
      * Convierte un Paciente a PacienteDTO
      */
-    public PacienteDTO toDTO(Paciente paciente) {
-        if (paciente == null) return null;
+    public static PacienteDTO toDTO(Paciente paciente) {
+        if (paciente == null){
+            throw PacienteNotFoundException.porId(null);
+        };
         PacienteDTO dto = new PacienteDTO();
         dto.setId(paciente.getId());
         dto.setNombre(paciente.getNombre());
@@ -31,7 +37,7 @@ public class PacienteResponseMapper {
     /**
      * Convierte un Paciente DTO a Paciente
      */
-    public Paciente toModel(PacienteDTO pacienteDTO) {
+    public static Paciente toModel(PacienteDTO pacienteDTO) {
         Paciente paciente = new Paciente();
         paciente.setId(pacienteDTO.getId());
         paciente.setNombre(pacienteDTO.getNombre());

@@ -7,14 +7,14 @@ import microservice.pacientes.application.domain.port.out.PacientePortOut;
 import microservice.pacientes.shared.PacienteDuplicadoException;
 import microservice.pacientes.shared.PacienteNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.transaction.Transactional;
 import java.util.List;
 
 
 @Service
 @AllArgsConstructor
-@Transactional
+
 public class PacienteServiceImpl implements PacientePortIn {
 
     private final PacientePortOut pacientePortOut;
@@ -25,6 +25,7 @@ public class PacienteServiceImpl implements PacientePortIn {
      * @throws PacienteDuplicadoException si ya existe un paciente con el mismo DNI
      */
     @Override
+    @Transactional
     public Paciente crearPaciente(Paciente paciente) {
         pacientePortOut.findByDni(paciente.getDni())
                 .ifPresent(p -> {
@@ -41,6 +42,7 @@ public class PacienteServiceImpl implements PacientePortIn {
      * @throws PacienteNotFoundException si no se encuentra el paciente
      */
     @Override
+    @Transactional (readOnly = true)
     public Paciente obtenerPacientePorId(Long id) {
         return pacientePortOut.findById(id)
                 .orElseThrow(() -> PacienteNotFoundException.porId(id));
@@ -51,6 +53,7 @@ public class PacienteServiceImpl implements PacientePortIn {
      * @return lista de pacientes
      */
     @Override
+    @Transactional (readOnly = true)
     public List<Paciente> listarPacientes() {
         return pacientePortOut.findAll();
     }
@@ -61,6 +64,7 @@ public class PacienteServiceImpl implements PacientePortIn {
      * @throws PacienteNotFoundException si no se encuentra el paciente
      */
     @Override
+    @Transactional
     public void eliminarPaciente(Long id) {
         Paciente paciente = pacientePortOut.findById(id)
                 .orElseThrow(() -> PacienteNotFoundException.porId(id));
@@ -74,6 +78,7 @@ public class PacienteServiceImpl implements PacientePortIn {
      * @return paciente encontrado o null si no existe
      */
     @Override
+    @Transactional (readOnly = true)
     public Paciente buscarPorDni(String dni) {
         Paciente paciente = pacientePortOut.findByDni(dni).orElse(null);
         return paciente;
@@ -85,6 +90,7 @@ public class PacienteServiceImpl implements PacientePortIn {
      * @return lista de pacientes que coinciden con el parametro
      */
     @Override
+    @Transactional (readOnly = true)
     public List<Paciente> buscarPorNombreParcial(String nombre) {
         List<Paciente> pacientes = pacientePortOut.findByNombreContainingIgnoreCase(nombre);
         return pacientes;
@@ -98,6 +104,7 @@ public class PacienteServiceImpl implements PacientePortIn {
      * @throws PacienteNotFoundException si no se encuentra el paciente
      */
     @Override
+    @Transactional
     public Paciente actualizarPaciente(Long id, Paciente paciente) {
         Paciente existente = pacientePortOut.findById(id)
                 .orElseThrow(() -> PacienteNotFoundException.porId(id));
@@ -131,6 +138,7 @@ public class PacienteServiceImpl implements PacientePortIn {
     }
 
     @Override
+    @Transactional
     public Paciente desactivarPaciente(Long id) {
         Paciente paciente = pacientePortOut.findById(id)
                 .orElseThrow(() -> PacienteNotFoundException.porId(id));
@@ -139,6 +147,7 @@ public class PacienteServiceImpl implements PacientePortIn {
     }
 
     @Override
+    @Transactional
     public Paciente activarPaciente(Long id) {
         Paciente paciente = pacientePortOut.findById(id)
                 .orElseThrow(() -> PacienteNotFoundException.porId(id));
@@ -147,12 +156,14 @@ public class PacienteServiceImpl implements PacientePortIn {
     }
 
     @Override
+    @Transactional (readOnly = true)
     public Paciente buscarByDni(String dni) {
         return pacientePortOut.buscarPorDniConSP(dni)
                 .orElseThrow(() -> PacienteNotFoundException.porDni(dni));
     }
 
     @Override
+    @Transactional (readOnly = true)
     public List<Paciente> buscarByNombre(String nombre) {
         List<Paciente> paciente = pacientePortOut.buscarPorNombreConSP(nombre);
         if (paciente == null || paciente.isEmpty()) {
@@ -162,6 +173,7 @@ public class PacienteServiceImpl implements PacientePortIn {
     }
 
     @Override
+    @Transactional (readOnly = true)
     public List<Paciente> buscarPorObraSocialPaginado(String obraSocial, int limit, int offset) {
         List<Paciente> paciente = pacientePortOut.buscarPorObraSocialPaginado(obraSocial, limit, offset);
         if (paciente == null || paciente.isEmpty()) {

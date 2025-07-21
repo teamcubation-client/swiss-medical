@@ -10,7 +10,7 @@ import java.util.List;
 import static microservice.pacientes.infrastructure.adapter.in.controller.ApiResponseConst.*;
 
 
-public interface IPacienteController {
+public interface PacienteApi {
     @Operation(summary = "Listar pacientes", description = "Lista todos los pacientes en el sistema", tags = {"Paciente"})
     @ApiResponses(value = {
         @ApiResponse(responseCode = CODE_OK, description = DESC_LIST),
