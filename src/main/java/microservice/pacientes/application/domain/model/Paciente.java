@@ -1,4 +1,5 @@
 package microservice.pacientes.application.domain.model;
+import lombok.Builder;
 import lombok.Data;
 
 /**
@@ -6,6 +7,7 @@ import lombok.Data;
  * Contiene informacion personal y de contacto, ademas de la obra social al que pertenece el paciente
  */
 @Data
+@Builder
 public class Paciente {
     private long id;
     private String nombre;

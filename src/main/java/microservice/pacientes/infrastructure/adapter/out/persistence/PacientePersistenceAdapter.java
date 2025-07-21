@@ -13,60 +13,59 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class PacientePersistenceAdapter implements PacientePortOut {
     private final PacienteRepository pacienteRepository;
-    private final PacienteMapper pacienteMapper;
 
     @Override
     public Optional<Paciente> findByDni(String dni) {
         return pacienteRepository.findByDni(dni)
-                .map(pacienteMapper::toModel);
+                .map(PacienteMapper::toModel);
     }
 
     @Override
     public List<Paciente> findByNombreContainingIgnoreCase(String nombre) {
         List<PacienteEntity> pacienteEntityList = pacienteRepository.findByNombreContainingIgnoreCase(nombre);
         return pacienteEntityList.stream()
-                .map(pacienteMapper::toModel)
+                .map(PacienteMapper::toModel)
                 .collect(Collectors.toList());
     }
 
     @Override
     public Optional<Paciente> buscarPorDniConSP(String dni) {
         return pacienteRepository.buscarPorDniConSP(dni)
-                .map(pacienteMapper::toModel);
+                .map(PacienteMapper::toModel);
     }
 
     @Override
     public List<Paciente> buscarPorNombreConSP(String nombre) {
         return pacienteRepository.buscarPorNombreConSP(nombre).stream()
-                .map(pacienteMapper::toModel)
+                .map(PacienteMapper::toModel)
                 .collect(Collectors.toList());
     }
 
     @Override
     public List<Paciente> buscarPorObraSocialPaginado(String obraSocial, int limit, int offset) {
         return pacienteRepository.buscarPorObraSocialPaginado(obraSocial, limit, offset).stream()
-                .map(pacienteMapper::toModel)
+                .map(PacienteMapper::toModel)
                 .collect(Collectors.toList());
     }
 
     @Override
     public Optional<Paciente> findById(Long id) {
         return pacienteRepository.findById(id)
-                .map(pacienteMapper::toModel);
+                .map(PacienteMapper::toModel);
     }
 
     @Override
     public Paciente save(Paciente paciente) {
-        PacienteEntity entity = pacienteMapper.toEntity(paciente);
+        PacienteEntity entity = PacienteMapper.toEntity(paciente);
         PacienteEntity saved = pacienteRepository.save(entity);
-        return pacienteMapper.toModel(saved);
+        return PacienteMapper.toModel(saved);
     }
 
     @Override
     public Paciente update(Paciente paciente) {
-        PacienteEntity entity = pacienteMapper.toEntity(paciente);
+        PacienteEntity entity = PacienteMapper.toEntity(paciente);
         PacienteEntity updated = pacienteRepository.save(entity);
-        return pacienteMapper.toModel(updated);
+        return PacienteMapper.toModel(updated);
     }
 
     @Override
@@ -77,7 +76,7 @@ public class PacientePersistenceAdapter implements PacientePortOut {
     @Override
     public List<Paciente> findAll() {
         return pacienteRepository.findAll().stream()
-                .map(pacienteMapper::toModel)
+                .map(PacienteMapper::toModel)
                 .collect(Collectors.toList());
     }
 }

@@ -20,36 +20,36 @@ public final class PacienteResponseMapper {
         if (paciente == null){
             throw PacienteNotFoundException.porId(null);
         };
-        PacienteDTO dto = new PacienteDTO();
-        dto.setId(paciente.getId());
-        dto.setNombre(paciente.getNombre());
-        dto.setApellido(paciente.getApellido());
-        dto.setDni(paciente.getDni());
-        dto.setObraSocial(paciente.getObraSocial());
-        dto.setEmail(paciente.getEmail());
-        dto.setTelefono(paciente.getTelefono());
-        dto.setTipoPlanObraSocial(paciente.getTipoPlanObraSocial());
-        dto.setFechaAlta(paciente.getFechaAlta());
-        dto.setEstado(paciente.isEstado());
-        return dto;
+        return PacienteDTO.builder()
+                .id(paciente.getId())
+                .nombre(paciente.getNombre())
+                .apellido(paciente.getApellido())
+                .dni(paciente.getDni())
+                .obraSocial(paciente.getObraSocial())
+                .email(paciente.getEmail())
+                .telefono(paciente.getTelefono())
+                .tipoPlanObraSocial(paciente.getTipoPlanObraSocial())
+                .fechaAlta(paciente.getFechaAlta())
+                .estado(paciente.isEstado())
+                .build();
     }
 
     /**
      * Convierte un Paciente DTO a Paciente
      */
     public static Paciente toModel(PacienteDTO pacienteDTO) {
-        Paciente paciente = new Paciente();
-        paciente.setId(pacienteDTO.getId());
-        paciente.setNombre(pacienteDTO.getNombre());
-        paciente.setApellido(pacienteDTO.getApellido());
-        paciente.setDni(pacienteDTO.getDni());
-        paciente.setObraSocial(pacienteDTO.getObraSocial());
-        paciente.setEmail(pacienteDTO.getEmail());
-        paciente.setTelefono(pacienteDTO.getTelefono());
-        paciente.setTipoPlanObraSocial(pacienteDTO.getTipoPlanObraSocial());
-        paciente.setFechaAlta(pacienteDTO.getFechaAlta());
-        paciente.setEstado(pacienteDTO.isEstado());
-        return paciente;
+        return Paciente.builder()
+                .id(pacienteDTO.getId())
+                .nombre(pacienteDTO.getNombre())
+                .apellido(pacienteDTO.getApellido())
+                .dni(pacienteDTO.getDni())
+                .obraSocial(pacienteDTO.getObraSocial())
+                .email(pacienteDTO.getEmail())
+                .telefono(pacienteDTO.getTelefono())
+                .tipoPlanObraSocial(pacienteDTO.getTipoPlanObraSocial())
+                .fechaAlta(pacienteDTO.getFechaAlta())
+                .estado(pacienteDTO.isEstado())
+                .build();
     }
 
 } 

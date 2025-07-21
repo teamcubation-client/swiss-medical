@@ -1,6 +1,8 @@
 package microservice.pacientes.infrastructure.adapter.out.persistence;
 
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -12,6 +14,8 @@ import javax.persistence.*;
  */
 @Data
 @Entity
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor
 @Table (name ="paciente")
 public class PacienteEntity {
