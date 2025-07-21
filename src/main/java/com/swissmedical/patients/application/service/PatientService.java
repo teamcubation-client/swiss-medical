@@ -1,7 +1,7 @@
 package com.swissmedical.patients.application.service;
 
 import com.swissmedical.patients.application.domain.model.Patient;
-import com.swissmedical.patients.application.domain.ports.in.PatientUseCase;
+import com.swissmedical.patients.application.domain.ports.in.*;
 import com.swissmedical.patients.application.domain.ports.out.PatientRepositoryPort;
 import com.swissmedical.patients.shared.exceptions.PatientDuplicateException;
 import com.swissmedical.patients.shared.exceptions.PatientNotFoundException;
@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public class PatientService implements PatientUseCase {
+public class PatientService implements GetPatientUseCase, CreatePatientUseCase, UpdatePatientUseCase, DeletePatientUseCase {
 
   private final PatientRepositoryPort patientRepository;
 

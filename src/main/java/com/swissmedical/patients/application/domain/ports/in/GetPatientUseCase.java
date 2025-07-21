@@ -5,17 +5,11 @@ import com.swissmedical.patients.shared.exceptions.PatientNotFoundException;
 
 import java.util.List;
 
-public interface PatientUseCase {
+public interface GetPatientUseCase {
 
   List<Patient> getAll(String name, int page, int size) throws IllegalArgumentException, PatientNotFoundException;
 
   Patient getByDni(String dni) throws PatientNotFoundException;
 
   List<Patient> getBySocialSecurity(String socialSecurity, int page, int size) throws PatientNotFoundException;
-
-  Patient create(Patient patient) throws PatientNotFoundException;
-
-  Patient update(Long id, Patient patientDetails) throws PatientNotFoundException;
-
-  void delete(Long id) throws PatientNotFoundException;
 }

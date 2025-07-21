@@ -1,40 +1,36 @@
 package com.swissmedical.patients.infrastructure.adapter.in.rest.controller;
 
-import java.util.List;
-
 import com.swissmedical.patients.application.domain.model.Patient;
 import com.swissmedical.patients.application.service.PatientService;
+import com.swissmedical.patients.infrastructure.adapter.in.rest.dto.PatientCreateDto;
 import com.swissmedical.patients.infrastructure.adapter.in.rest.dto.PatientResponseDto;
 import com.swissmedical.patients.infrastructure.adapter.in.rest.dto.PatientUpdateDto;
 import com.swissmedical.patients.infrastructure.adapter.in.rest.mapper.PatientCreateMapper;
 import com.swissmedical.patients.infrastructure.adapter.in.rest.mapper.PatientResponseMapper;
 import com.swissmedical.patients.infrastructure.adapter.in.rest.mapper.PatientUpdateMapper;
 import com.swissmedical.patients.shared.utils.DefaultValuesController;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import com.swissmedical.patients.infrastructure.adapter.in.rest.dto.PatientCreateDto;
+import java.util.List;
 
-import jakarta.validation.Valid;
+@RestController
+@RequestMapping("/api/patients")
+@Tag(name = "Gestión de Pacientes", description = "API para administrar pacientes del sistema")
+public class PatientControllerProxy implements PatientApi {
 
-@Component
-public class PatientController implements PatientApi {
+  private final PatientController patientController;
+  private final Logger logger = LoggerFactory.getLogger(PatientControllerProxy.class);
 
-  private final PatientService patientService;
-
-  public PatientController(PatientService patientService) {
-    this.patientService = patientService;
+  public PatientControllerProxy(PatientController patientController) {
+    this.patientController = patientController;
   }
+
 
   @Override
   @GetMapping()
@@ -43,16 +39,15 @@ public class PatientController implements PatientApi {
           @RequestParam(defaultValue = DefaultValuesController.PAGE) int page,
           @RequestParam(defaultValue = DefaultValuesController.SIZE) int size
   ) {
-    return ResponseEntity.ok(patientService.getAll(name, page, size)
-            .stream()
-            .map(PatientResponseMapper::toDto)
-            .toList());
+    logger.info("Obteniendo pacientes con nombre: {}, página: {}, cantidad: {}", name, page, size);
+    return patientController.getAll(name, page, size);
   }
 
   @Override
   @GetMapping("/dni/{dni}")
   public ResponseEntity<PatientResponseDto> getByDni(@PathVariable String dni) {
-    return ResponseEntity.ok(PatientResponseMapper.toDto(patientService.getByDni(dni)));
+    logger.info("Obteniendo pacientes por DNI: {}", dni);
+    return patientController.getByDni(dni);
   }
 
   @Override
@@ -62,34 +57,28 @@ public class PatientController implements PatientApi {
           @RequestParam(defaultValue = DefaultValuesController.PAGE) int page,
           @RequestParam(defaultValue = DefaultValuesController.SIZE) int size
   ) {
-    return ResponseEntity.ok(patientService.getBySocialSecurity(socialSecurity, page, size)
-            .stream()
-            .map(PatientResponseMapper::toDto)
-            .toList());
+    logger.info("Obteniendo pacientres por seguro social: {}, página: {}, cantidad: {}", socialSecurity, page, size);
+    return patientController.getBySocialSecurity(socialSecurity, page, size);
   }
 
   @Override
   @PostMapping()
   public ResponseEntity<PatientResponseDto> create(@Valid @RequestBody PatientCreateDto patientCreateDto) {
-    Patient patient = PatientCreateMapper.toDomain(patientCreateDto);
-    return ResponseEntity
-            .status(HttpStatus.CREATED)
-            .body(PatientResponseMapper.toDto(patientService.create(patient)));
+    logger.info("Creando nuevo paciente: {}", patientCreateDto);
+    return patientController.create(patientCreateDto);
   }
 
   @Override
   @PutMapping("/{id}")
   public ResponseEntity<PatientResponseDto> update(@Valid @RequestBody PatientUpdateDto patientUpdateDto, @PathVariable Long id) {
-    Patient patientDetails = PatientUpdateMapper.toDomain(patientUpdateDto);
-    return ResponseEntity.ok(PatientResponseMapper.toDto(patientService.update(id, patientDetails)));
+    logger.info("Actualizando paciente con ID: {}, data: {}", id, patientUpdateDto);
+    return patientController.update(patientUpdateDto, id);
   }
 
   @Override
   @DeleteMapping("/{id}")
   public ResponseEntity<Void> delete(@PathVariable Long id) {
-    patientService.delete(id);
-
-    return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    logger.info("Borrando paciente con ID: {}", id);
+    return patientController.delete(id);
   }
-
 }
