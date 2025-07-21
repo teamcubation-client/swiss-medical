@@ -1,7 +1,7 @@
 package com.teamcubation.api.pacientes.infrastructure.adapter.out.persistence.repository;
 
 import com.teamcubation.api.pacientes.application.domain.model.Patient;
-import com.teamcubation.api.pacientes.application.domain.port.out.IPatientPortOut;
+import com.teamcubation.api.pacientes.application.domain.port.out.PatientPortOut;
 import com.teamcubation.api.pacientes.infrastructure.adapter.out.persistence.entity.PatientEntity;
 import com.teamcubation.api.pacientes.infrastructure.adapter.out.persistence.mapper.PatientPersistenceMapper;
 import org.springframework.stereotype.Component;
@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Component
-public class PatientRepository implements IPatientPortOut {
+public class PatientRepository implements PatientPortOut {
     private final IPatientRepository iPatientRepository;
 
     public PatientRepository(IPatientRepository iPatientRepository) {
@@ -21,7 +21,7 @@ public class PatientRepository implements IPatientPortOut {
     @Override
     public Patient save(Patient patient) {
         PatientEntity patientEntity = PatientPersistenceMapper.toEntity(patient);
-        PatientEntity saved = iPatientRepository.save(patientEntity);
+        PatientEntity saved = this.iPatientRepository.save(patientEntity);
         return PatientPersistenceMapper.toDomain(saved);
     }
 

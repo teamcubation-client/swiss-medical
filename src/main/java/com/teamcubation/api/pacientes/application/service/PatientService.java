@@ -1,8 +1,8 @@
 package com.teamcubation.api.pacientes.application.service;
 
 import com.teamcubation.api.pacientes.application.domain.model.Patient;
-import com.teamcubation.api.pacientes.application.domain.port.in.IPatientPortIn;
-import com.teamcubation.api.pacientes.application.domain.port.out.IPatientPortOut;
+import com.teamcubation.api.pacientes.application.domain.port.in.PatientPortIn;
+import com.teamcubation.api.pacientes.application.domain.port.out.PatientPortOut;
 import com.teamcubation.api.pacientes.shared.exception.DuplicatedPatientException;
 import com.teamcubation.api.pacientes.shared.exception.PatientDniAlreadyInUse;
 import com.teamcubation.api.pacientes.shared.exception.PatientNotFoundException;
@@ -13,62 +13,62 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class PatientService implements IPatientPortIn {
+public class PatientService implements PatientPortIn {
 
-    private final IPatientPortOut iPatientPortOut;
+    private final PatientPortOut patientPortOut;
     private static final String DNI_FIELD = "DNI";
 
-    public PatientService(IPatientPortOut iPatientPortOut){
-        this.iPatientPortOut = iPatientPortOut;
+    public PatientService(PatientPortOut patientPortOut){
+        this.patientPortOut = patientPortOut;
     }
 
     @Override
     @Transactional
     public Patient create(Patient patient) {
-        Optional<Patient> patientFound = this.iPatientPortOut.findByDni(patient.getDni());
+        Optional<Patient> patientFound = this.patientPortOut.findByDni(patient.getDni());
 
         if(patientFound.isPresent()){
             throw new DuplicatedPatientException(DNI_FIELD, patient.getDni());
         }
-        return iPatientPortOut.save(patient);
+        return this.patientPortOut.save(patient);
     }
 
     @Override
     public List<Patient> getAll(String dni, String name) {
-        return this.iPatientPortOut.findAll(dni, name);
+        return this.patientPortOut.findAll(dni, name);
     }
 
     @Override
     public Patient getById(long id) {
-        return this.iPatientPortOut.findById(id)
+        return this.patientPortOut.findById(id)
                 .orElseThrow(() -> new PatientNotFoundException(id));
     }
 
     @Override
     public Patient getByDni(String dni) {
-        return this.iPatientPortOut.findByDni(dni)
+        return this.patientPortOut.findByDni(dni)
                 .orElseThrow(() -> new PatientNotFoundException(dni));
     }
 
     @Override
     public List<Patient> getByName(String name) {
-        return this.iPatientPortOut.findByName(name);
+        return this.patientPortOut.findByName(name);
     }
 
     @Override
     public List<Patient> getByHealthInsuranceProvider(String healthInsuranceProvider, int page, int size) {
-        return this.iPatientPortOut.findByHealthInsuranceProvider(healthInsuranceProvider, size, page * size);
+        return this.patientPortOut.findByHealthInsuranceProvider(healthInsuranceProvider, size, page * size);
     }
 
     @Override
     @Transactional
     public Patient updateById(long id, Patient patientUpdated) {
-        Patient patient = this.iPatientPortOut.findById(id)
+        Patient patient = this.patientPortOut.findById(id)
                 .orElseThrow(() -> new PatientNotFoundException(id));
 
         if(patientUpdated.getDni() != null) {
             String dni = patientUpdated.getDni();
-            Optional<Patient> patientDuplicatedDNI = this.iPatientPortOut.findByDni(dni);
+            Optional<Patient> patientDuplicatedDNI = this.patientPortOut.findByDni(dni);
             boolean alreadyInUse = patientDuplicatedDNI.isPresent() && !patientDuplicatedDNI.get().getId().equals(id);
             if (alreadyInUse) {
                 throw new PatientDniAlreadyInUse(id);
@@ -76,15 +76,15 @@ public class PatientService implements IPatientPortIn {
         }
 
         copyNotNull(patientUpdated, patient);
-        return this.iPatientPortOut.save(patient);
+        return this.patientPortOut.save(patient);
     }
 
     @Override
     @Transactional
     public void deleteById(long id) {
-        this.iPatientPortOut.findById(id)
+        this.patientPortOut.findById(id)
                 .orElseThrow(() -> new PatientNotFoundException(id));
-        this.iPatientPortOut.deleteById(id);
+        this.patientPortOut.deleteById(id);
     }
 
     /**

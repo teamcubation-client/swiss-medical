@@ -4,7 +4,7 @@ import com.teamcubation.api.pacientes.application.domain.model.Patient;
 
 import java.util.List;
 
-public interface IPatientPortIn {
+public interface PatientPortIn {
     Patient create(Patient patient);
     List<Patient> getAll(String dni, String name);
     Patient getById(long id);

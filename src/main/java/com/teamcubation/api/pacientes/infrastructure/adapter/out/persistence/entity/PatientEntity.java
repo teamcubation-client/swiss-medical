@@ -3,7 +3,7 @@ package com.teamcubation.api.pacientes.infrastructure.adapter.out.persistence.en
 import javax.persistence.*;
 
 @Entity
-@Table(name = "pacientes")
+@Table(name = "paciente")
 public class PatientEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

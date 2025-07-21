@@ -5,7 +5,7 @@ import com.teamcubation.api.pacientes.application.domain.model.Patient;
 import java.util.List;
 import java.util.Optional;
 
-public interface IPatientPortOut {
+public interface PatientPortOut {
     Patient save(Patient patient);
     List<Patient> findAll(String dni, String name);
     Optional<Patient> findById(Long id);
