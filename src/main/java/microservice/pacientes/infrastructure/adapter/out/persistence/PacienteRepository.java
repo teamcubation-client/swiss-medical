@@ -27,10 +27,10 @@ public interface PacienteRepository extends JpaRepository<PacienteEntity, Long> 
     List<PacienteEntity> findByNombreContainingIgnoreCase(String nombre);
 
     @Query(value = "CALL buscar_paciente_por_dni(:dni)", nativeQuery = true)
-    Optional<PacienteEntity> buscarPorDniConSP(@Param("dni") String dni);
+    Optional<PacienteEntity> buscarByDni(@Param("dni") String dni);
 
     @Query(value = "CALL buscar_pacientes_por_nombre(:nombre)", nativeQuery = true)
-    List<PacienteEntity> buscarPorNombreConSP(@Param("nombre") String nombre);
+    List<PacienteEntity> buscarByNombre(@Param("nombre") String nombre);
 
     @Query(value = "CALL buscar_pacientes_por_obra_social_paginado(:p_obra_social, :p_limit, :p_offset)", nativeQuery = true)
     List<PacienteEntity> buscarPorObraSocialPaginado(@Param("p_obra_social") String obraSocial, @Param("p_limit") int limit, @Param("p_offset") int offset);
