@@ -1,5 +1,6 @@
 package microservice.pacientes.infrastructure.adapter.application;
 
+import microservice.pacientes.application.domain.validator.PacienteValidator;
 import microservice.pacientes.application.domain.validator.PacienteValidatorImpl;
 import microservice.pacientes.application.domain.validator.rules.*;
 import org.springframework.context.annotation.Bean;
@@ -11,7 +12,7 @@ import java.util.List;
 public class ApplicationConfig {
 
     @Bean
-    public PacienteValidatorImpl createPacienteValidator() {
+    public PacienteValidator createPacienteValidator() {
         return new PacienteValidatorImpl(
                 List.of(
                         new ApellidoValidatorRule(),
