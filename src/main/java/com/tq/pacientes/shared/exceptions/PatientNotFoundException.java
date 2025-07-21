@@ -1,4 +1,4 @@
-package com.tq.pacientes.exceptions;
+package com.tq.pacientes.shared.exceptions;
 
 public class PatientNotFoundException extends RuntimeException {
     public PatientNotFoundException(Long id) {
