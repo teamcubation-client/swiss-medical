@@ -66,14 +66,14 @@ public interface PacientePortIn {
      * @param dni Documento Nacional de Identidad
      * @return PacienteDTO encontrado
      */
-    Paciente buscarPorDniConSP(String dni);
+    Paciente buscarByDni(String dni);
 
     /**
      * Busca pacientes cuyo nombre contenga la cadena especificada usando stored procedure
      * @param nombre parte o nombre completo a buscar
      * @return lista de PacienteDTO que coinciden con el parametro
      */
-    List<Paciente> buscarPorNombreConSP(String nombre);
+    List<Paciente> buscarByNombre(String nombre);
 
     /**
      * Busca pacientes por obra social con paginacion usando stored procedure

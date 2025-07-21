@@ -1,4 +1,4 @@
-package microservice.pacientes.shared;
+package microservice.pacientes.infrastructure.adapter.in.controller;
 
 public class ApiResponseConst {
     public static final String CODE_OK = "200";

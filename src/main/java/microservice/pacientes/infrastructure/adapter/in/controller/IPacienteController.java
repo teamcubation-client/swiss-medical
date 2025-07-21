@@ -7,7 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import static microservice.pacientes.shared.ApiResponseConst.*;
+import static microservice.pacientes.infrastructure.adapter.in.controller.ApiResponseConst.*;
 
 
 public interface IPacienteController {
@@ -123,7 +123,7 @@ public interface IPacienteController {
         @ApiResponse(responseCode = CODE_INTERNAL_SERVER_ERROR, description = DESC_INTERNAL_ERROR)
     })
     @GetMapping("/sp/buscar/dni/{dni}")
-    ResponseEntity<PacienteDTO> buscarPorDniConSP(@PathVariable String dni);
+    ResponseEntity<PacienteDTO> buscarByDni(@PathVariable String dni);
 
     @Operation(summary = "Buscar pacientes por Nombre (SP)", description = "Busca pacientes por nombre usando stored procedure", tags = {"Stored Procedure"})
     @ApiResponses(value = {
@@ -132,7 +132,7 @@ public interface IPacienteController {
         @ApiResponse(responseCode = CODE_INTERNAL_SERVER_ERROR, description = DESC_INTERNAL_ERROR)
     })
     @GetMapping("/sp/buscar/nombre/{nombre}")
-    ResponseEntity<List<PacienteDTO>> buscarPorNombreConSP(@PathVariable String nombre);
+    ResponseEntity<List<PacienteDTO>> buscarByNombre(@PathVariable String nombre);
 
     @Operation(summary = "Buscar pacientes por Obra Social (SP)", description = "Busca pacientes por obra social con paginacion usando stored procedure", tags = {"Stored Procedure"})
     @ApiResponses(value = {

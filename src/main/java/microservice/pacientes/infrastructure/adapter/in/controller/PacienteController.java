@@ -164,8 +164,8 @@ public class PacienteController implements IPacienteController {
      * @return PacienteDTO encontrado
      */
     @GetMapping("/sp/buscar/dni/{dni}")
-    public ResponseEntity<PacienteDTO> buscarPorDniConSP(@PathVariable String dni) {
-        Paciente paciente = pacientePortIn.buscarPorDniConSP(dni);
+    public ResponseEntity<PacienteDTO> buscarByDni(@PathVariable String dni) {
+        Paciente paciente = pacientePortIn.buscarByDni(dni);
         PacienteDTO dto = pacienteResponseMapper.toDTO(paciente);
         return ResponseEntity.ok(dto);
     }
@@ -176,8 +176,8 @@ public class PacienteController implements IPacienteController {
      * @return lista de PacienteDTO que coinciden con el parametro
      */
     @GetMapping("/sp/buscar/nombre/{nombre}")
-    public ResponseEntity<List<PacienteDTO>> buscarPorNombreConSP(@PathVariable String nombre) {
-        List<Paciente> paciente = pacientePortIn.buscarPorNombreConSP(nombre);
+    public ResponseEntity<List<PacienteDTO>> buscarByNombre(@PathVariable String nombre) {
+        List<Paciente> paciente = pacientePortIn.buscarByNombre(nombre);
         List<PacienteDTO> dto = paciente.stream()
                 .map(pacienteResponseMapper::toDTO)
                 .collect(Collectors.toList());

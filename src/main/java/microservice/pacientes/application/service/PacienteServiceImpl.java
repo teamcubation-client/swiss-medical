@@ -147,13 +147,13 @@ public class PacienteServiceImpl implements PacientePortIn {
     }
 
     @Override
-    public Paciente buscarPorDniConSP(String dni) {
+    public Paciente buscarByDni(String dni) {
         return pacientePortOut.buscarPorDniConSP(dni)
                 .orElseThrow(() -> PacienteNotFoundException.porDni(dni));
     }
 
     @Override
-    public List<Paciente> buscarPorNombreConSP(String nombre) {
+    public List<Paciente> buscarByNombre(String nombre) {
         List<Paciente> paciente = pacientePortOut.buscarPorNombreConSP(nombre);
         if (paciente == null || paciente.isEmpty()) {
             throw PacienteNotFoundException.porNombre(nombre);
