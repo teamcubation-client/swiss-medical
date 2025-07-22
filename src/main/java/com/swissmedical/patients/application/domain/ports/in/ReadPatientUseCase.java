@@ -5,7 +5,7 @@ import com.swissmedical.patients.shared.exceptions.PatientNotFoundException;
 
 import java.util.List;
 
-public interface GetPatientUseCase {
+public interface ReadPatientUseCase {
 
   List<Patient> getAll(String name, int page, int size) throws IllegalArgumentException, PatientNotFoundException;
 

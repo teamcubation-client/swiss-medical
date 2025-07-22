@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public class PatientService implements GetPatientUseCase, CreatePatientUseCase, UpdatePatientUseCase, DeletePatientUseCase {
+public class PatientService implements ReadPatientUseCase, CreatePatientUseCase, UpdatePatientUseCase, DeletePatientUseCase {
 
   private final PatientRepositoryPort patientRepository;
 

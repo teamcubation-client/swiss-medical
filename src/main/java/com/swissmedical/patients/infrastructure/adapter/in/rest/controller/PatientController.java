@@ -10,9 +10,9 @@ import com.swissmedical.patients.infrastructure.adapter.in.rest.mapper.PatientCr
 import com.swissmedical.patients.infrastructure.adapter.in.rest.mapper.PatientResponseMapper;
 import com.swissmedical.patients.infrastructure.adapter.in.rest.mapper.PatientUpdateMapper;
 import com.swissmedical.patients.shared.utils.DefaultValuesController;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -27,7 +27,9 @@ import com.swissmedical.patients.infrastructure.adapter.in.rest.dto.PatientCreat
 
 import jakarta.validation.Valid;
 
-@Component
+@RestController
+@RequestMapping("/api/patients")
+@Tag(name = "Gestión de Pacientes", description = "API para administrar pacientes del sistema")
 public class PatientController implements PatientApi {
 
   private final PatientService patientService;
@@ -35,6 +37,7 @@ public class PatientController implements PatientApi {
   public PatientController(PatientService patientService) {
     this.patientService = patientService;
   }
+
 
   @Override
   @GetMapping()
@@ -55,6 +58,7 @@ public class PatientController implements PatientApi {
     return ResponseEntity.ok(PatientResponseMapper.toDto(patientService.getByDni(dni)));
   }
 
+
   @Override
   @GetMapping("/social-security/{socialSecurity}")
   public ResponseEntity<List<PatientResponseDto>> getBySocialSecurity(
@@ -68,6 +72,7 @@ public class PatientController implements PatientApi {
             .toList());
   }
 
+
   @Override
   @PostMapping()
   public ResponseEntity<PatientResponseDto> create(@Valid @RequestBody PatientCreateDto patientCreateDto) {
@@ -76,6 +81,7 @@ public class PatientController implements PatientApi {
             .status(HttpStatus.CREATED)
             .body(PatientResponseMapper.toDto(patientService.create(patient)));
   }
+
 
   @Override
   @PutMapping("/{id}")
