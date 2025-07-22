@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS pacientes  (
+CREATE TABLE IF NOT EXISTS paciente  (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL,
     apellido VARCHAR(100) NOT NULL,
@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS pacientes  (
     telefono VARCHAR(50)
 );
 
-INSERT INTO pacientes (nombre, apellido, dni, obra_social, email, telefono)
+INSERT INTO paciente (nombre, apellido, dni, obra_social, email, telefono)
 VALUES
 ('Juan', 'Pérez', '12345678', 'Swiss Medical', 'juan.perez@mail.com', '1122334455'),
 ('Juan', 'Gómez', '87654321', 'Swiss Medical', 'juan.gomez@mail.com', '1199887766'),

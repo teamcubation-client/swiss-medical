@@ -1,27 +1,25 @@
-package com.teamcubation.api.pacientes.model;
+package com.teamcubation.api.pacientes.infrastructure.adapter.out.persistence.entity;
 
 import javax.persistence.*;
 
 @Entity
-@Table(name = "pacientes")
-public class Paciente {
-
+@Table(name = "paciente")
+public class PatientEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(name = "nombre", nullable = false, length = 100)
-    private String nombre;
+    private String name;
     @Column(name = "apellido", nullable = false, length = 100)
-    private String apellido;
+    private String lastName;
     @Column(name = "dni", nullable = false, unique = true, length = 20)
     private String dni;
     @Column(name = "obra_social", length = 100)
-    private String obraSocial;
+    private String healthInsuranceProvider;
     @Column(name = "email", length = 150)
     private String email;
     @Column(name = "telefono", length = 50)
-    private String telefono;
-
+    private String phoneNumber;
 
     public Long getId() {
         return id;
@@ -31,20 +29,20 @@ public class Paciente {
         this.id = id;
     }
 
-    public String getNombre() {
-        return nombre;
+    public String getName() {
+        return name;
     }
 
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public String getApellido() {
-        return apellido;
+    public String getLastName() {
+        return lastName;
     }
 
-    public void setApellido(String apellido) {
-        this.apellido = apellido;
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
     }
 
     public String getDni() {
@@ -55,12 +53,12 @@ public class Paciente {
         this.dni = dni;
     }
 
-    public String getObraSocial() {
-        return obraSocial;
+    public String getHealthInsuranceProvider() {
+        return healthInsuranceProvider;
     }
 
-    public void setObraSocial(String obraSocial) {
-        this.obraSocial = obraSocial;
+    public void setHealthInsuranceProvider(String healthInsuranceProvider) {
+        this.healthInsuranceProvider = healthInsuranceProvider;
     }
 
     public String getEmail() {
@@ -71,11 +69,11 @@ public class Paciente {
         this.email = email;
     }
 
-    public String getTelefono() {
-        return telefono;
+    public String getPhoneNumber() {
+        return phoneNumber;
     }
 
-    public void setTelefono(String telefono) {
-        this.telefono = telefono;
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
     }
 }
