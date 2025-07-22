@@ -51,4 +51,14 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(InvalidEmailFormatException.class)
+    public ResponseEntity<String> handleEmailFormat(InvalidEmailFormatException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(InvalidFechaAltaException.class)
+    public ResponseEntity<String> handleFechaAlta(InvalidFechaAltaException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
 } 

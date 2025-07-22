@@ -1,40 +1,59 @@
 package microservice.pacientes.application.service;
 
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import microservice.pacientes.application.domain.model.Paciente;
 import microservice.pacientes.application.domain.port.in.PacientePortInRead;
 import microservice.pacientes.application.domain.port.in.PacientePortInWrite;
 import microservice.pacientes.application.domain.port.out.PacientePortOutRead;
 import microservice.pacientes.application.domain.port.out.PacientePortOutWrite;
+import microservice.pacientes.application.validation.PacienteValidator;
+import microservice.pacientes.infrastructure.validation.DniDuplicadoValidator;
+import microservice.pacientes.infrastructure.validation.EmailFormatValidator;
+import microservice.pacientes.infrastructure.validation.FechaAltaValidator;
 import microservice.pacientes.shared.PacienteDuplicadoException;
 import microservice.pacientes.shared.PacienteNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.PostConstruct;
 import java.util.List;
 
 
 @Service
-@AllArgsConstructor
-
+@RequiredArgsConstructor
 public class PacienteServiceImpl implements PacientePortInWrite, PacientePortInRead {
 
     private final PacientePortOutRead pacientePortOutRead;
     private final PacientePortOutWrite pacientePortOutWrite;
+
+    //Cabeza de la cadena handlers
+    private PacienteValidator validatorChain;
+
+
+    //handlers concretos inyectados
+    private final DniDuplicadoValidator dniVal;
+    private final FechaAltaValidator fechaVal;
+    private final EmailFormatValidator emailVal;
+
     /**
-     * Crea un nuevo paciente en el sistema, con excepcion si el DNI ya existe
-     * @param paciente entidad Paciente a crear
-     * @return paciente creado
-     * @throws PacienteDuplicadoException si ya existe un paciente con el mismo DNI
+     * Arma la cadena: dni -> fecha -> email
+     */
+    @PostConstruct
+    private void initValidatorChain() {
+        dniVal.setNext(fechaVal);
+        fechaVal.setNext(emailVal);
+        this.validatorChain = dniVal;
+    }
+
+
+    /**
+     * Crea un nuevo paciente en el sistema, utilizando patron Chain of Responsibility
      */
     @Override
     @Transactional
     public Paciente crearPaciente(Paciente paciente) {
-        pacientePortOutRead.buscarByDni(paciente.getDni())
-                .ifPresent(p -> {
-                    throw new PacienteDuplicadoException(paciente.getDni());
-                });
-
+        validatorChain.validate(paciente);
         return pacientePortOutWrite.save(paciente);
     }
 

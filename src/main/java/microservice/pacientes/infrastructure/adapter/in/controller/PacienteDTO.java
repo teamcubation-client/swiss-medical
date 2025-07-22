@@ -1,6 +1,7 @@
 package microservice.pacientes.infrastructure.adapter.in.controller;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PastOrPresent;
 
 import lombok.Builder;
@@ -28,7 +29,7 @@ public class PacienteDTO {
     private String telefono;
     @NotBlank(message = "El tipo de plan de obra social es obligatorio")
     private String tipoPlanObraSocial;
-    @PastOrPresent(message = "La fecha de alta no puede ser futura")
+    @NotNull(message = "La fecha de alta es obligatorio")
     private java.time.LocalDate fechaAlta;
     private boolean estado;
 } 
