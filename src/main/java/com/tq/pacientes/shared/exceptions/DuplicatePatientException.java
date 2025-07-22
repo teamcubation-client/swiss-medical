@@ -1,4 +1,4 @@
-package com.tq.pacientes.exceptions;
+package com.tq.pacientes.shared.exceptions;
 
 public class DuplicatePatientException extends RuntimeException {
     public DuplicatePatientException(String dni) {

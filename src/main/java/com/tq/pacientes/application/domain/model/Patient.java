@@ -1,47 +1,29 @@
-package com.tq.pacientes.models;
+package com.tq.pacientes.application.domain.model;
 
-import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.Where;
-
 import java.time.LocalDateTime;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
-@Table(name = "pacientes")
-@Where(clause = "active = true")
+@Builder
 public class Patient {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
-    @Column(nullable = false)
     private String firstName;
-    
-    @Column(nullable = false)
     private String lastName;
-
-    @Column(unique = true, nullable = false)
     private String dni;
-    
     private String healthInsurance;
     private String healthPlan;
     private String address;
     private String phoneNumber;
-
     private String email;
-
-    @Column(nullable = false)
-    private Boolean active = true;
-
-    @Column(nullable = false, updatable = false)
+    private Boolean active;
     private LocalDateTime creationDate;
-    
     private LocalDateTime lastModifiedDate;
+
 }
