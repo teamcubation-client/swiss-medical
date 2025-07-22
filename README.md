@@ -578,8 +578,8 @@ src/
 
 - Este principio establece que se deben separar en interfaces diferentes métodos con funciones específicas
 - En esta ocasión, separé en interfaces cada caso de uso (Use Case) dependeniendo su método
-    - `GetPatientUseCase`: Se encapsulan los métodos relacionados con obtener datos
     - `CreatePatientUseCase`: Se encapsulan los métodos relacionados con crear datos
+    - `ReadPatientUseCase`: Se encapsulan los métodos relacionados con obtener datos
     - `UpdatePatientUseCase`: Se encapsulan los métodos relacionados con actualizar datos
     - `DeletePatientUseCase`: Se encapsulan los métodos relacionados con eliminar datos
 
@@ -588,8 +588,8 @@ src/
 - Para mi elección de Patrón de Diseño, implementé el patrón Proxy para la clase `PatientController`
 - En este caso, se utilizó Programación Orientada a Aspectos (AOP) para crear un proxy que envuelve al controlador
 - Anotaciones utilizadas:
-    - `@Aspect`: Define la clase como un aspecto de AOP.
+    - `@Aspect`: Define la clase como un aspecto de AOP
     - `@Around`: Define un método que se ejecuta alrededor de la ejecución de un método
     - `within`: Especifica que el aspecto se aplica a métodos con la anotación `@RestController`
 - Se implementó un `logger` para ejecutarse cada vez que se realiza una petición al controlador, registrando el nombre
-  del método y los parámetros recibidos.
+  del método y los parámetros recibidos

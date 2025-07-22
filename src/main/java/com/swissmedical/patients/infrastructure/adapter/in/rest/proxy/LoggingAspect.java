@@ -16,22 +16,22 @@ public class LoggingAspect {
   private final Logger logger = LoggerFactory.getLogger(LoggingAspect.class);
 
   @Around("within(@org.springframework.web.bind.annotation.RestController *)")
-  public Object logAroundController(ProceedingJoinPoint pjp) throws Throwable {
-    String clase = pjp.getSignature().getDeclaringTypeName();
-    String metodo = pjp.getSignature().getName();
-    Object[] args = pjp.getArgs();
+  public Object logAroundController(ProceedingJoinPoint joinPoint) throws Throwable {
+    String clase = joinPoint.getSignature().getDeclaringTypeName();
+    String metodo = joinPoint.getSignature().getName();
+    Object[] args = joinPoint.getArgs();
 
     if (!clase.contains("PatientController")) {
-      return pjp.proceed();
+      return joinPoint.proceed();
     }
 
     if (args.length == 0) {
       logger.info("[PROXY] Endpoint llamado: /{} sin argumentos", metodo);
-      return pjp.proceed();
+      return joinPoint.proceed();
     }
 
     logger.info("[PROXY] Endpoint llamado: /{} con argumentos: {}", metodo, Arrays.toString(args));
 
-    return pjp.proceed();
+    return joinPoint.proceed();
   }
 }

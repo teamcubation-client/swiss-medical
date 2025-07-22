@@ -10,7 +10,6 @@ import com.swissmedical.patients.infrastructure.adapter.in.rest.mapper.PatientCr
 import com.swissmedical.patients.infrastructure.adapter.in.rest.mapper.PatientResponseMapper;
 import com.swissmedical.patients.infrastructure.adapter.in.rest.mapper.PatientUpdateMapper;
 import com.swissmedical.patients.shared.utils.DefaultValuesController;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -29,7 +28,6 @@ import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/patients")
-@Tag(name = "Gestión de Pacientes", description = "API para administrar pacientes del sistema")
 public class PatientController implements PatientApi {
 
   private final PatientService patientService;
