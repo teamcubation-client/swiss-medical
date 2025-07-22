@@ -1,7 +1,10 @@
 package com.practica.crud_pacientes.application.domain.model;
 
+import lombok.ToString;
+
 import java.time.LocalDate;
 
+@ToString
 public class Paciente {
     private int id;
     private String nombre;
@@ -108,21 +111,5 @@ public class Paciente {
 
     public void setEstadoCivil(String estadoCivil) {
         this.estadoCivil = estadoCivil;
-    }
-
-    @Override
-    public String toString() {
-        return "{" +
-                "id=" + id +
-                ", nombre='" + nombre + '\'' +
-                ", apellido='" + apellido + '\'' +
-                ", dni='" + dni + '\'' +
-                ", obraSocial='" + obraSocial + '\'' +
-                ", email='" + email + '\'' +
-                ", telefono='" + telefono + '\'' +
-                ", domicilio='" + domicilio + '\'' +
-                ", fechaNacimiento=" + fechaNacimiento +
-                ", estadoCivil='" + estadoCivil + '\'' +
-                '}';
     }
 }

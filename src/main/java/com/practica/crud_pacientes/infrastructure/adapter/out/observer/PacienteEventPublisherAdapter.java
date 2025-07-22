@@ -17,7 +17,7 @@ public class PacienteEventPublisherAdapter implements PacienteEventPublisher {
     }
 
     @Override
-    public void publishPaienteCreado(Paciente paciente) {
+    public void publishPacienteCreado(Paciente paciente) {
         observers.forEach(observer -> observer.onPacienteCreado(paciente));
     }
 
