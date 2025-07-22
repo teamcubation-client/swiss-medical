@@ -5,6 +5,8 @@ import com.teamcubation.api.pacientes.application.domain.port.in.PatientPortIn;
 import com.teamcubation.api.pacientes.infrastructure.adapter.in.rest.dto.PatientRequest;
 import com.teamcubation.api.pacientes.infrastructure.adapter.in.rest.dto.PatientResponse;
 import com.teamcubation.api.pacientes.infrastructure.adapter.in.rest.mapper.PatientRestMapper;
+import com.teamcubation.api.pacientes.infrastructure.adapter.in.rest.response.ApiResponse;
+import com.teamcubation.api.pacientes.infrastructure.adapter.in.rest.response.SuccessResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,38 +26,38 @@ public class PatientController implements IPatientAPI {
 
     @Override
     @PostMapping
-    public ResponseEntity<PatientResponse> create(@RequestBody PatientRequest request) {
-        Patient patient = PatientRestMapper.toDomain(request);
-        Patient created = this.patientPortIn.create(patient);
-        return ResponseEntity.status(HttpStatus.CREATED).body(PatientRestMapper.toResponse(created));
+    public ResponseEntity<ApiResponse<PatientResponse>> create(@RequestBody PatientRequest request) {
+        Patient created = this.patientPortIn.create(PatientRestMapper.toDomain(request));
+        return buildSuccessResponse(PatientRestMapper.toResponse(created), HttpStatus.CREATED);
     }
 
     @Override
     @GetMapping
-    public ResponseEntity<List<PatientResponse>> getAll(@RequestParam(required = false) String dni,
+    public ResponseEntity<ApiResponse<List<PatientResponse>>> getAll(@RequestParam(required = false) String dni,
                                                         @RequestParam(value = "nombre", required = false) String name) {
         List<Patient> patients = this.patientPortIn.getAll(dni, name);
         List<PatientResponse> response = new ArrayList<>();
+
         for (Patient patient : patients) {
             response.add(PatientRestMapper.toResponse(patient));
         }
-        return ResponseEntity.ok(response);
+
+        return buildSuccessResponse(response, HttpStatus.OK);
     }
 
     @Override
     @GetMapping("/{id}")
-    public ResponseEntity<PatientResponse> getById(@PathVariable long id) {
+    public ResponseEntity<ApiResponse<PatientResponse>> getById(@PathVariable long id) {
         Patient patient = this.patientPortIn.getById(id);
-        return ResponseEntity.ok(PatientRestMapper.toResponse(patient));
+        return buildSuccessResponse(PatientRestMapper.toResponse(patient), HttpStatus.OK);
     }
 
     @Override
     @PutMapping("/{id}")
-    public ResponseEntity<PatientResponse> updateById(@PathVariable long id,
+    public ResponseEntity<ApiResponse<PatientResponse>> updateById(@PathVariable long id,
                                                       @RequestBody PatientRequest request) {
-        Patient patient = PatientRestMapper.toDomain(request);
-        Patient response = this.patientPortIn.updateById(id, patient);
-        return ResponseEntity.ok(PatientRestMapper.toResponse(response));
+        Patient patient = this.patientPortIn.updateById(id, PatientRestMapper.toDomain(request));
+        return buildSuccessResponse(PatientRestMapper.toResponse(patient), HttpStatus.OK);
     }
 
     @Override
@@ -67,25 +69,25 @@ public class PatientController implements IPatientAPI {
 
     @Override
     @GetMapping("/dni/{dni}")
-    public ResponseEntity<PatientResponse> getByDni(@PathVariable String dni) {
-        Patient response = this.patientPortIn.getByDni(dni);
-        return ResponseEntity.ok(PatientRestMapper.toResponse(response));
+    public ResponseEntity<ApiResponse<PatientResponse>> getByDni(@PathVariable String dni) {
+        Patient patient = this.patientPortIn.getByDni(dni);
+        return buildSuccessResponse(PatientRestMapper.toResponse(patient), HttpStatus.OK);
     }
 
     @Override
     @GetMapping("/nombre/{nombre}")
-    public ResponseEntity<List<PatientResponse>> getByName(@PathVariable("nombre") String name) {
+    public ResponseEntity<ApiResponse<List<PatientResponse>>> getByName(@PathVariable("nombre") String name) {
         List<Patient> patients = this.patientPortIn.getByName(name);
         List<PatientResponse> response = new ArrayList<>();
         for(Patient patient : patients) {
             response.add(PatientRestMapper.toResponse(patient));
         }
-        return ResponseEntity.ok(response);
+        return buildSuccessResponse(response, HttpStatus.OK);
     }
 
     @Override
     @GetMapping("/obra-social")
-    public ResponseEntity<List<PatientResponse>> getByHealthInsuranceProvider(@RequestParam("obra_social") String healthInsuranceProvider,
+    public ResponseEntity<ApiResponse<List<PatientResponse>>> getByHealthInsuranceProvider(@RequestParam("obra_social") String healthInsuranceProvider,
                                                                               @RequestParam int page,
                                                                               @RequestParam int size) {
         List<Patient> patients = this.patientPortIn.getByHealthInsuranceProvider(healthInsuranceProvider,page,size);
@@ -93,6 +95,17 @@ public class PatientController implements IPatientAPI {
         for(Patient patient : patients){
             response.add(PatientRestMapper.toResponse(patient));
         }
-        return ResponseEntity.ok(response);
+        return buildSuccessResponse(response, HttpStatus.OK);
+    }
+
+    @GetMapping("/export")
+    @Override
+    public ResponseEntity<ApiResponse<String>> exportPatients(@RequestParam("formato") String format) {
+        String patientsExport = this.patientPortIn.exportPatients(format);
+        return buildSuccessResponse(patientsExport, HttpStatus.OK);
+    }
+
+    private <T> ResponseEntity<ApiResponse<T>> buildSuccessResponse(T data, HttpStatus status) {
+        return ResponseEntity.status(status).body(new SuccessResponse<>(data));
     }
 }

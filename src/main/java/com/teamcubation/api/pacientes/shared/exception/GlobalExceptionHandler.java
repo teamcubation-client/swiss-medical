@@ -1,5 +1,7 @@
 package com.teamcubation.api.pacientes.shared.exception;
 
+import com.teamcubation.api.pacientes.infrastructure.adapter.in.rest.response.ApiResponse;
+import com.teamcubation.api.pacientes.infrastructure.adapter.in.rest.response.ErrorResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -11,29 +13,41 @@ public class GlobalExceptionHandler {
     private static final String ERROR_GENERICO = "Ocurrió un error inesperado: ";
 
     @ExceptionHandler(UnsupportedOperationException.class)
-    public ResponseEntity<String> handleUnsupportedOperation(UnsupportedOperationException ex) {
-        return ResponseEntity
-                .status(HttpStatus.NOT_IMPLEMENTED)
-                .body(ex.getMessage());
+    public ResponseEntity<ApiResponse<String>> handleUnsupportedOperation(UnsupportedOperationException ex) {
+        return buildErrorResponse(ex.getMessage(), HttpStatus.NOT_IMPLEMENTED);
     }
 
     @ExceptionHandler(PatientNotFoundException.class)
-    public ResponseEntity<String> handlePacienteNotFound(PatientNotFoundException ex) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+    public ResponseEntity<ApiResponse<String>> handlePacienteNotFound(PatientNotFoundException ex) {
+        return buildErrorResponse(ex.getMessage(), HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(DuplicatedPatientException.class)
-    public ResponseEntity<String> handlePacienteDuplicado(DuplicatedPatientException ex) {
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
+    public ResponseEntity<ApiResponse<String>> handlePacienteDuplicado(DuplicatedPatientException ex) {
+        return buildErrorResponse(ex.getMessage(), HttpStatus.CONFLICT);
     }
 
     @ExceptionHandler(PatientDniAlreadyInUse.class)
-    public ResponseEntity<String> handlePacienteNoActualizado(PatientDniAlreadyInUse ex) {
-        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(ex.getMessage());
+    public ResponseEntity<ApiResponse<String>> handlePacienteNoActualizado(PatientDniAlreadyInUse ex) {
+        return buildErrorResponse(ex.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);
+    }
+
+    @ExceptionHandler(ExporterTypeNotSupportedException.class)
+    public ResponseEntity<ApiResponse<String>> handleExporterTypeNotSupportedException(ExporterTypeNotSupportedException ex) {
+        return buildErrorResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ApiResponse<String>> handleIllegalArgumentException(IllegalArgumentException ex) {
+        return buildErrorResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<String> handleErrorGenerico(Exception ex) {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ERROR_GENERICO + ex.getMessage());
+    public ResponseEntity<ApiResponse<String>> handleErrorGenerico(Exception ex) {
+        return buildErrorResponse(ERROR_GENERICO + ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    private ResponseEntity<ApiResponse<String>> buildErrorResponse(String message, HttpStatus status) {
+        return ResponseEntity.status(status).body(new ErrorResponse<>(message));
     }
 }
