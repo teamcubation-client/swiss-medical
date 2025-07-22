@@ -98,7 +98,7 @@ public class PatientController implements IPatientAPI {
         return buildSuccessResponse(response, HttpStatus.OK);
     }
 
-    @GetMapping("/export")
+    @GetMapping("/exportar")
     @Override
     public ResponseEntity<ApiResponse<String>> exportPatients(@RequestParam("formato") String format) {
         String patientsExport = this.patientPortIn.exportPatients(format);

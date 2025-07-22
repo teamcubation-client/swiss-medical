@@ -1,4 +1,4 @@
-package com.teamcubation.api.pacientes.application.domain.exporter.factory;
+package com.teamcubation.api.pacientes.infrastructure.adapter.out.export.factory;
 
 import com.teamcubation.api.pacientes.shared.exception.ExporterTypeNotSupportedException;
 

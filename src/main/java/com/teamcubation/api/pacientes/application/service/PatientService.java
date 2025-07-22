@@ -1,8 +1,8 @@
 package com.teamcubation.api.pacientes.application.service;
 
-import com.teamcubation.api.pacientes.application.domain.exporter.PatientExporter;
-import com.teamcubation.api.pacientes.application.domain.exporter.factory.ExporterFactory;
-import com.teamcubation.api.pacientes.application.domain.exporter.factory.ExporterFactoryProvider;
+import com.teamcubation.api.pacientes.infrastructure.adapter.out.export.PatientExporter;
+import com.teamcubation.api.pacientes.infrastructure.adapter.out.export.factory.ExporterFactory;
+import com.teamcubation.api.pacientes.infrastructure.adapter.out.export.factory.ExporterFactoryProvider;
 import com.teamcubation.api.pacientes.application.domain.model.Patient;
 import com.teamcubation.api.pacientes.application.domain.port.in.PatientPortIn;
 import com.teamcubation.api.pacientes.application.domain.port.out.PatientPortOut;
