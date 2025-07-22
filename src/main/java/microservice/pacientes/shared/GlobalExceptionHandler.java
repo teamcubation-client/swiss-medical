@@ -40,4 +40,15 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleGlobalException(Exception ex) {
         return new ResponseEntity<>("Ha ocurrido un error inesperado: " + ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
+    /**
+     * Maneja la excepcion cuando se detecta un paciente nulo
+     * @param ex excepcion handlePacienteNull
+     * @return respuesta HTTP 400 con el mensaje de error
+     */
+    @ExceptionHandler(PacienteNullException.class)
+    public ResponseEntity<String> handlePacienteNull(PacienteNullException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
 } 

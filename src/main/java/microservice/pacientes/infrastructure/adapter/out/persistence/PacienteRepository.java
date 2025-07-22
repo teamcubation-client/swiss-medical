@@ -13,17 +13,7 @@ import java.util.Optional;
  */
 @Repository
 public interface PacienteRepository extends JpaRepository<PacienteEntity, Long> {
-    /**
-     * Busca un paciente por su DNI
-     * @param dni Documento Nacional de Identidad
-     * @return Optional con el paciente encontrado, o vacio si no existe
-     */
-    Optional<PacienteEntity> findByDni(String dni);
-    /**
-     * Busca a los pacientes que contenga la cadena especificada del nombre, sin tener en cuenta mayusculas y minusculas
-     * @param nombre parte o nombre completo a buscar
-     * @return lista de pacientes que coinciden con el parametro
-     */
+
     List<PacienteEntity> findByNombreContainingIgnoreCase(String nombre);
 
     @Query(value = "CALL buscar_paciente_por_dni(:dni)", nativeQuery = true)

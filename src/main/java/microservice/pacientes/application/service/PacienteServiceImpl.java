@@ -30,7 +30,7 @@ public class PacienteServiceImpl implements PacientePortInWrite, PacientePortInR
     @Override
     @Transactional
     public Paciente crearPaciente(Paciente paciente) {
-        pacientePortOutRead.findByDni(paciente.getDni())
+        pacientePortOutRead.buscarByDni(paciente.getDni())
                 .ifPresent(p -> {
                     throw new PacienteDuplicadoException(paciente.getDni());
                 });
@@ -73,18 +73,6 @@ public class PacienteServiceImpl implements PacientePortInWrite, PacientePortInR
                 .orElseThrow(() -> PacienteNotFoundException.porId(id));
 
         pacientePortOutWrite.deleteById(id);
-    }
-
-    /**
-     * Busca un paciente por su DNI
-     * @param dni Documento Nacional de Identidad
-     * @return paciente encontrado o null si no existe
-     */
-    @Override
-    @Transactional (readOnly = true)
-    public Paciente buscarPorDni(String dni) {
-        Paciente paciente = pacientePortOutRead.findByDni(dni).orElse(null);
-        return paciente;
     }
 
     /**
@@ -178,11 +166,11 @@ public class PacienteServiceImpl implements PacientePortInWrite, PacientePortInR
     @Override
     @Transactional (readOnly = true)
     public List<Paciente> buscarPorObraSocialPaginado(String obraSocial, int limit, int offset) {
-        List<Paciente> paciente = pacientePortOutRead.buscarPorObraSocialPaginado(obraSocial, limit, offset);
-        if (paciente == null || paciente.isEmpty()) {
+        List<Paciente> pacientes = pacientePortOutRead.buscarPorObraSocialPaginado(obraSocial, limit, offset);
+        if (pacientes == null || pacientes.isEmpty()) {
             throw PacienteNotFoundException.porObraSocial(obraSocial);
         }
-        return paciente;
+        return pacientes;
     }
 
 }

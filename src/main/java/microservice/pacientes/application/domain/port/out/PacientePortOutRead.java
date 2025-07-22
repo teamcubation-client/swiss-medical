@@ -8,8 +8,6 @@ import java.util.Optional;
 
 public interface PacientePortOutRead {
 
-    Optional<Paciente> findByDni(String dni);
-
     List<Paciente> findByNombreContainingIgnoreCase(String nombre);
 
     Optional<Paciente> findById(Long id);

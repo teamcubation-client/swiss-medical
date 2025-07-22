@@ -1,7 +1,7 @@
 package microservice.pacientes.infrastructure.adapter.out.persistence;
 
 import microservice.pacientes.application.domain.model.Paciente;
-import org.springframework.stereotype.Component;
+import microservice.pacientes.shared.PacienteNullException;
 
 /**
  * Mapper para convertir entre entidades Paciente y sus DTO
@@ -11,10 +11,11 @@ public final class PacienteMapper {
 
     //impide una instanciacion
     private PacienteMapper() {}
-    /**
-     * Convierte un Paciente a una Entidad Paciente
-     */
+
     public static PacienteEntity toEntity(Paciente paciente) {
+        if (paciente == null) {
+            throw new PacienteNullException();
+        }
         return PacienteEntity.builder()
                 .id(paciente.getId())
                 .nombre(paciente.getNombre())
@@ -29,10 +30,11 @@ public final class PacienteMapper {
                 .build();
     }
 
-    /**
-     * Convierte una Entidad Paciente a Paciente
-     */
+
     public static Paciente toModel(PacienteEntity pacienteEntity) {
+        if (pacienteEntity == null) {
+            throw new PacienteNullException();
+        }
         return Paciente.builder()
                 .id(pacienteEntity.getId())
                 .nombre(pacienteEntity.getNombre())

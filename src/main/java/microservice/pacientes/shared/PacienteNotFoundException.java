@@ -1,8 +1,6 @@
 package microservice.pacientes.shared;
 
-/**
- * Excepcion cuando no se encuentra un paciente con el ID especificado
- */
+
 public class PacienteNotFoundException extends RuntimeException {
     private PacienteNotFoundException(String message) {
         super(message);

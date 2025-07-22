@@ -1,7 +1,7 @@
 package microservice.pacientes.infrastructure.adapter.in.controller;
 
-import microservice.pacientes.shared.PacienteNotFoundException;
 import microservice.pacientes.application.domain.model.Paciente;
+import microservice.pacientes.shared.PacienteNullException;
 
 /**
  * Mapper para convertir entre entidades Paciente y sus DTO
@@ -13,12 +13,9 @@ public final class PacienteResponseMapper {
     //impide una instanciacion
     private PacienteResponseMapper() {}
 
-    /**
-     * Convierte un Paciente a PacienteDTO
-     */
     public static PacienteDTO toDTO(Paciente paciente) {
         if (paciente == null){
-            throw PacienteNotFoundException.porId(null);
+            throw new PacienteNullException();
         };
         return PacienteDTO.builder()
                 .id(paciente.getId())
@@ -34,10 +31,10 @@ public final class PacienteResponseMapper {
                 .build();
     }
 
-    /**
-     * Convierte un Paciente DTO a Paciente
-     */
     public static Paciente toModel(PacienteDTO pacienteDTO) {
+        if (pacienteDTO == null) {
+            throw new PacienteNullException();
+        }
         return Paciente.builder()
                 .id(pacienteDTO.getId())
                 .nombre(pacienteDTO.getNombre())

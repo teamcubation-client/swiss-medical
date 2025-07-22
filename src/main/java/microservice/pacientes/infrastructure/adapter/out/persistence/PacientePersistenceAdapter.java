@@ -16,12 +16,6 @@ public class PacientePersistenceAdapter implements PacientePortOutRead, Paciente
     private final PacienteRepository pacienteRepository;
 
     @Override
-    public Optional<Paciente> findByDni(String dni) {
-        return pacienteRepository.findByDni(dni)
-                .map(PacienteMapper::toModel);
-    }
-
-    @Override
     public List<Paciente> findByNombreContainingIgnoreCase(String nombre) {
         List<PacienteEntity> pacienteEntityList = pacienteRepository.findByNombreContainingIgnoreCase(nombre);
         return pacienteEntityList.stream()

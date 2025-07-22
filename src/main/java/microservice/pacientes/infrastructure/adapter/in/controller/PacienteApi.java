@@ -49,16 +49,6 @@ public interface PacienteApi {
     ResponseEntity<Void> eliminarPaciente(@PathVariable Long id);
 
 
-    @Operation(summary = "Buscar paciente por DNI", description = "Busca al paciente con por el campo DNI correspondiente", tags = {"Paciente"})
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = CODE_OK, description = DESC_OK),
-        @ApiResponse(responseCode = CODE_NOT_FOUND, description = DESC_NOT_FOUND_DNI),
-        @ApiResponse(responseCode = CODE_INTERNAL_SERVER_ERROR, description = DESC_INTERNAL_ERROR)
-    })
-    @GetMapping("/buscar/dni")
-    ResponseEntity<PacienteDTO> buscarPorDni(@RequestParam String dni);
-
-
     @Operation(summary = "Buscar paciente por Nombre", description = "Busca al paciente con por el campo Nombre parcial o completo", tags = {"Paciente"})
     @ApiResponses(value = {
         @ApiResponse(responseCode = CODE_OK, description = DESC_OK),

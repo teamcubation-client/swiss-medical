@@ -24,13 +24,11 @@ import javax.validation.Valid;
 @RequestMapping("/api/pacientes")
 @AllArgsConstructor
 public class PacienteController implements PacienteApi {
+
     private final PacientePortInWrite pacientePortInWrite;
     private final PacientePortInRead pacientePortInRead;
 
-    /**
-     * Obtiene la lista de todos los pacientes registrados
-     * @return lista de PacienteDTO
-     */
+
     @GetMapping
     public ResponseEntity<List<PacienteDTO>> listarPacientes() {
         List<PacienteDTO> dtos = pacientePortInRead.listarPacientes().stream()
@@ -38,24 +36,13 @@ public class PacienteController implements PacienteApi {
                 .collect(Collectors.toList());
         return ResponseEntity.ok(dtos);
     }
-    
-    /**
-     * Crea un nuevo paciente a partir de un DTO
-     * @param pacienteDTO datos del paciente a crear
-     * @return PacienteDTO creado
-     */
+
     @PostMapping
     public ResponseEntity<PacienteDTO> crearPaciente(@Valid @RequestBody PacienteDTO pacienteDTO) {
         Paciente paciente = PacienteResponseMapper.toModel(pacienteDTO);
         Paciente creado = pacientePortInWrite.crearPaciente(paciente);
         return ResponseEntity.status(HttpStatus.CREATED).body(PacienteResponseMapper.toDTO(creado));
     }
-
-    /**
-     * Obtiene un paciente por su identificador unico
-     * @param id identificador del paciente
-     * @return PacienteDTO encontrado o null si no existe
-     */
 
     @GetMapping("/{id}")
     public ResponseEntity<PacienteDTO> obtenerPaciente(@PathVariable Long id) {
@@ -64,11 +51,6 @@ public class PacienteController implements PacienteApi {
             return ResponseEntity.notFound().build();
         return ResponseEntity.ok(PacienteResponseMapper.toDTO(paciente));
     }
-    
-    /**
-     * Elimina un paciente por su identificador unico
-     * @param id identificador del paciente a eliminar
-     */
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminarPaciente(@PathVariable Long id) {
@@ -76,25 +58,6 @@ public class PacienteController implements PacienteApi {
         return ResponseEntity.noContent().build();
     }
 
-    /**
-     * Busca un paciente por su DNI
-     * @param dni Documento Nacional de Identidad
-     * @return PacienteDTO encontrado o null si no existe
-     */
-
-    @GetMapping("/buscar/dni")
-    public ResponseEntity<PacienteDTO> buscarPorDni(@RequestParam String dni) {
-        Paciente paciente = pacientePortInRead.buscarPorDni(dni);
-        if (paciente == null)
-            return ResponseEntity.notFound().build();
-        return ResponseEntity.ok(PacienteResponseMapper.toDTO(paciente));
-    }
-
-    /**
-     * Busca pacientes cuyo nombre contenga el string especificado
-     * @param nombre parte o nombre completo a buscar
-     * @return lista de PacienteDTO que coinciden con el parametro
-     */
 
     @GetMapping("/buscar/nombre")
     public ResponseEntity<List<PacienteDTO>> buscarPorNombre(@RequestParam String nombre) {
@@ -105,14 +68,6 @@ public class PacienteController implements PacienteApi {
         return ResponseEntity.ok(pacienteDTOs);
     }
 
-
-
-    /**
-     * Actualiza los datos de un paciente existente
-     * @param id identificador del paciente a actualizar
-     * @param pacienteDTO datos nuevos del paciente
-     * @return PacienteDTO actualizado o null si no existe
-     */
 
     @PutMapping("/{id}")
     public ResponseEntity<PacienteDTO> actualizarPaciente(@PathVariable Long id, @RequestBody PacienteDTO pacienteDTO) {
@@ -157,11 +112,6 @@ public class PacienteController implements PacienteApi {
         return ResponseEntity.ok(inactivos);
     }
 
-    /**
-     * Busca un paciente por su DNI usando stored procedure
-     * @param dni Documento Nacional de Identidad
-     * @return PacienteDTO encontrado
-     */
     @GetMapping("/sp/buscar/dni/{dni}")
     public ResponseEntity<PacienteDTO> buscarByDni(@PathVariable String dni) {
         Paciente paciente = pacientePortInRead.buscarByDni(dni);
@@ -169,11 +119,6 @@ public class PacienteController implements PacienteApi {
         return ResponseEntity.ok(dto);
     }
 
-    /**
-     * Busca pacientes cuyo nombre contenga la cadena especificada usando stored procedure
-     * @param nombre parte o nombre completo a buscar
-     * @return lista de PacienteDTO que coinciden con el parametro
-     */
     @GetMapping("/sp/buscar/nombre/{nombre}")
     public ResponseEntity<List<PacienteDTO>> buscarByNombre(@PathVariable String nombre) {
         List<Paciente> paciente = pacientePortInRead.buscarByNombre(nombre);
@@ -183,13 +128,6 @@ public class PacienteController implements PacienteApi {
         return ResponseEntity.ok(dto);
     }
 
-    /**
-     * Busca pacientes por obra social con paginacion usando stored procedure
-     * @param obraSocial nombre de la obra social
-     * @param limit cantidad maxima de resultados
-     * @param offset desplazamiento de resultados
-     * @return lista de PacienteDTO
-     */
     @GetMapping("/sp/buscar/obra-social")
     public ResponseEntity<List<PacienteDTO>> buscarPorObraSocialPaginado(
             @RequestParam String obraSocial,
