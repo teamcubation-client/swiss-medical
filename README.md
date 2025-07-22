@@ -586,10 +586,10 @@ src/
 ## Patrón Proxy
 
 - Para mi elección de Patrón de Diseño, implementé el patrón Proxy para la clase `PatientController`
-- En este caso me costó buscar un caso de uso real para aplicar el patrón Proxy, por lo que decidí usarlo para la clase
-  `PatientController` que implementa la interfaz `PatientApi`
-- Habían mencionado el uso de `Middlewares` y es un concepto que conozco de Node.js, por lo que decidí usarlo
-- En este caso, el `Proxy` actúa como un intermediario entre el cliente y el controlador real, permitiendo agregar, en
-  este caso, un logger con información de las peticiones
-- Se podría también encapsular lógica de validación, pero en este caso no lo consideré necesario, ya que se utiliza la
-  anotación `@Valid` de Spring para validar los DTOs
+- En este caso, se utilizó Programación Orientada a Aspectos (AOP) para crear un proxy que envuelve al controlador
+- Anotaciones utilizadas:
+    - `@Aspect`: Define la clase como un aspecto de AOP.
+    - `@Around`: Define un método que se ejecuta alrededor de la ejecución de un método
+    - `within`: Especifica que el aspecto se aplica a métodos con la anotación `@RestController`
+- Se implementó un `logger` para ejecutarse cada vez que se realiza una petición al controlador, registrando el nombre
+  del método y los parámetros recibidos.
