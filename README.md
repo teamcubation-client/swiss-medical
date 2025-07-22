@@ -593,3 +593,142 @@ src/
     - `within`: Especifica que el aspecto se aplica a métodos con la anotación `@RestController`
 - Se implementó un `logger` para ejecutarse cada vez que se realiza una petición al controlador, registrando el nombre
   del método y los parámetros recibidos
+
+```java
+
+@Aspect
+@Component
+public class LoggingAspect {
+
+  private final Logger logger = LoggerFactory.getLogger(LoggingAspect.class);
+
+  @Around("within(@org.springframework.web.bind.annotation.RestController *)")
+  public Object logAroundController(ProceedingJoinPoint joinPoint) throws Throwable {
+    String clase = joinPoint.getSignature().getDeclaringTypeName();
+    String metodo = joinPoint.getSignature().getName();
+    Object[] args = joinPoint.getArgs();
+
+    if (!clase.contains("PatientController")) {
+      return joinPoint.proceed();
+    }
+
+    if (args.length == 0) {
+      logger.info("[PROXY] Endpoint llamado: /{} sin argumentos", metodo);
+      return joinPoint.proceed();
+    }
+
+    logger.info("[PROXY] Endpoint llamado: /{} con argumentos: {}", metodo, Arrays.toString(args));
+
+    return joinPoint.proceed();
+  }
+}
+```
+
+_Observaciones_
+
+- Se crea una clase con anotacion `@Component` para que Spring la reconozca como un componente dentro del Spring
+  Container
+- Dentro de la anotación `@Around` se define con `within` que se aplique a todos los métodos de las clases
+  que tengan la anotación `@RestController`
+- La función `logAroundController` recibe un `ProceedingJoinPoint` que permite acceder a la información del método
+  invocado (como de qué clase proviene, nombre del método y parámetros)
+
+## Patrón Builder
+
+- El Patrón Builder consiste en que una clase puede definir sus propiedades de forma dinámica mediante un constructor
+- En este caso, se implementó el patrón Builder para la clase `Patient` dentro de la capa de `model`
+
+```java
+public class Patient {
+  private Long id;
+  private String firstName;
+  private String lastName;
+  private String email;
+  private String phoneNumber;
+  private String dni;
+  private String memberNumber;
+  private LocalDate birthDate;
+  private boolean isActive;
+  private String socialSecurity;
+
+  private Patient(PatientBuilder builder) {
+    this.id = builder.id;
+    this.firstName = builder.firstName;
+    this.lastName = builder.lastName;
+    this.email = builder.email;
+    this.phoneNumber = builder.phoneNumber;
+    this.dni = builder.dni;
+    this.memberNumber = builder.memberNumber;
+    this.birthDate = builder.birthDate;
+    this.isActive = builder.isActive;
+    this.socialSecurity = builder.socialSecurity;
+  }
+
+  public static class PatientBuilder {
+    private Long id;
+    private String firstName;
+    private String lastName;
+    private String email;
+    private String phoneNumber;
+    private String dni;
+    private String memberNumber;
+    private LocalDate birthDate;
+    private boolean isActive;
+    private String socialSecurity;
+
+    public PatientBuilder id(Long id) {
+      this.id = id;
+      return this;
+    }
+
+    public PatientBuilder firstName(String firstName) {
+      this.firstName = firstName;
+      return this;
+    }
+
+    public PatientBuilder lastName(String lastName) {
+      this.lastName = lastName;
+      return this;
+    }
+
+    public PatientBuilder email(String email) {
+      this.email = email;
+      return this;
+    }
+
+    public PatientBuilder phoneNumber(String phoneNumber) {
+      this.phoneNumber = phoneNumber;
+      return this;
+    }
+
+    public PatientBuilder dni(String dni) {
+      this.dni = dni;
+      return this;
+    }
+
+    public PatientBuilder memberNumber(String memberNumber) {
+      this.memberNumber = memberNumber;
+      return this;
+    }
+
+    public PatientBuilder birthDate(LocalDate birthDate) {
+      this.birthDate = birthDate;
+      return this;
+    }
+
+    public PatientBuilder isActive(boolean isActive) {
+      this.isActive = isActive;
+      return this;
+    }
+
+    public PatientBuilder socialSecurity(String socialSecurity) {
+      this.socialSecurity = socialSecurity;
+      return this;
+    }
+
+    public Patient build() {
+      return new Patient(this);
+    }
+  }
+}
+```

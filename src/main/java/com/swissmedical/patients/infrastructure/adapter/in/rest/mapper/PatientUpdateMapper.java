@@ -8,7 +8,7 @@ import java.time.LocalDate;
 public class PatientUpdateMapper {
 
   public static Patient toDomain(PatientUpdateDto patientUpdateDto) {
-    return Patient.builder()
+    return new Patient.PatientBuilder()
             .firstName(patientUpdateDto.getFirstName())
             .lastName(patientUpdateDto.getLastName())
             .email(patientUpdateDto.getEmail())
