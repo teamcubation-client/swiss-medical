@@ -2,7 +2,9 @@
 
 ## 🎯 Objetivo general
 
-Implementar un microservicio RESTful en Java 11 usando Spring Boot que gestione pacientes. El proyecto debe aplicar buenas prácticas de Programación Orientada a Objetos (POO), arquitectura en capas, manejo de excepciones personalizadas, y separación entre modelo y vista mediante DTOs.
+Implementar un microservicio RESTful en Java 11 usando Spring Boot que gestione pacientes. El proyecto debe aplicar
+buenas prácticas de Programación Orientada a Objetos (POO), arquitectura en capas, manejo de excepciones personalizadas,
+y separación entre modelo y vista mediante DTOs.
 
 ## 🧩 Fase 1: CRUD de Pacientes
 
@@ -24,7 +26,8 @@ Permitir búsqueda filtrada por:
 - DNI exacto
 - Nombre (parcial, no sensible a mayúsculas/minúsculas)
 
-La información de los pacientes se almacenará utilizando un repositorio (puede ser una lista en memoria, una base de datos H2 o cualquier otra implementación que se considere adecuada).
+La información de los pacientes se almacenará utilizando un repositorio (puede ser una lista en memoria, una base de
+datos H2 o cualquier otra implementación que se considere adecuada).
 
 ### ✅ Módulo 1-B: Manejo de Excepciones Personalizadas
 
@@ -48,7 +51,8 @@ Dividir el proyecto en al menos tres capas:
 
 ### ✅ Módulo 2-B: Uso de DTOs y Mappers
 
-- Crear una clase PacienteDTO que exponga solo los datos necesarios del paciente (por ejemplo: nombre, apellido, DNI, obra social).
+- Crear una clase PacienteDTO que exponga solo los datos necesarios del paciente (por ejemplo: nombre, apellido, DNI,
+  obra social).
 - Implementar una clase PacienteMapper para convertir entre Paciente y PacienteDTO.
 
 ## 🔁 Fase 3: Persistencia real (opcional o futura)
@@ -69,7 +73,8 @@ Dividir el proyecto en al menos tres capas:
 
 ### ✅ Parte A: Documentación de la API con Swagger (SpringDoc OpenAPI)
 
-- 📚 Objetivo: Documentar de manera automática los endpoints del microservicio usando Swagger, permitiendo probarlos desde una interfaz web (/swagger-ui.html o /swagger-ui/index.html).
+- 📚 Objetivo: Documentar de manera automática los endpoints del microservicio usando Swagger, permitiendo probarlos
+  desde una interfaz web (/swagger-ui.html o /swagger-ui/index.html).
 - Instalar la dependencia springdoc-openapi-ui.
 - Probar que aparezca la documentación.
 - (Opcional) Agregar anotaciones @Operation, @Parameter o @ApiResponse para enriquecer la docu.
@@ -77,7 +82,8 @@ Dividir el proyecto en al menos tres capas:
 
 ### ✅ Parte B: Centralización de Excepciones con @ControllerAdvice
 
-- 📚 Objetivo: Implementar una clase global que maneje las excepciones personalizadas del microservicio, devolviendo mensajes claros y estados HTTP adecuados.
+- 📚 Objetivo: Implementar una clase global que maneje las excepciones personalizadas del microservicio, devolviendo
+  mensajes claros y estados HTTP adecuados.
 - Crear una clase GlobalExceptionHandler.
 - Usar @ExceptionHandler para capturar PacienteNoEncontradoException y PacienteDuplicadoException.
 - Retornar objetos ResponseEntity con código de error y mensaje.
@@ -87,11 +93,14 @@ Dividir el proyecto en al menos tres capas:
 
 ### 🎯 Objetivo
 
-- Contenerizar el microservicio usando Docker. Sustituir la base de datos H2 en memoria por una base de datos MySQL montada también como contenedor. Usar Docker Compose para orquestar ambos contenedores (app + db) y un archivo .env para manejar variables de entorno.
-
+- Contenerizar el microservicio usando Docker. Sustituir la base de datos H2 en memoria por una base de datos MySQL
+  montada también como contenedor. Usar Docker Compose para orquestar ambos contenedores (app + db) y un archivo .env
+  para manejar variables de entorno.
 
 ## Fase 6: Implementación e Integración de Stored Procedures
+
 ### 🎯 Objetivo
+
 - Extender el microservicio para incluir lógica almacenada directamente en la base de datos. En esta etapa, deberán:
 - Crear y poblar la base de datos MySQL con registros de pacientes.
 - Implementar procedimientos almacenados (stored procedures) para consultas específicas.
@@ -101,12 +110,14 @@ Dividir el proyecto en al menos tres capas:
 ### ✅ Módulo 6-A: Crear script init.sql
 
 1. Crear un archivo llamado init.sql con el siguiente contenido:
-   - Carga de datos de ejemplo: al menos 10 registros realistas en la tabla paciente.
+    - Carga de datos de ejemplo: al menos 10 registros realistas en la tabla paciente.
 
-   - Definición de stored procedures:
-     - `buscar_paciente_por_dni(IN p_dni VARCHAR(20))`: devuelve un único paciente por DNI.
-     - `buscar_pacientes_por_nombre(IN p_nombre VARCHAR(50))`: devuelve pacientes cuyo nombre contenga el valor parcial recibido (insensible a mayúsculas).
-     - `buscar_pacientes_por_obra_social_paginado(IN p_obra_social VARCHAR(50), IN p_limit INT, IN p_offset INT)`: devuelve pacientes de una obra social con paginación estilo limit/offset.
+    - Definición de stored procedures:
+        - `buscar_paciente_por_dni(IN p_dni VARCHAR(20))`: devuelve un único paciente por DNI.
+        - `buscar_pacientes_por_nombre(IN p_nombre VARCHAR(50))`: devuelve pacientes cuyo nombre contenga el valor
+          parcial recibido (insensible a mayúsculas).
+        - `buscar_pacientes_por_obra_social_paginado(IN p_obra_social VARCHAR(50), IN p_limit INT, IN p_offset INT)`:
+          devuelve pacientes de una obra social con paginación estilo limit/offset.
 
 ```sql
 init.sql
@@ -164,25 +175,30 @@ DELIMITER ;
 
 ```yaml
 volumes:
-- ./01_init.sql:/docker-entrypoint-initdb.d/01_init.sql
+  - ./01_init.sql:/docker-entrypoint-initdb.d/01_init.sql
 ```
 
 3. Definir el archivo .env con las variables necesarias para la base de datos.
 
 ### ✅ Módulo 6-B: Invocar los Stored Procedures desde Java
-1. En la interfaz PacienteRepository, agregar métodos que ejecuten los stored procedures utilizando @Query(value = "...", nativeQuery = true) o @Procedure.
+
+1. En la interfaz PacienteRepository, agregar métodos que ejecuten los stored procedures utilizando @Query(
+   value = "...", nativeQuery = true) o @Procedure.
 
 ```java
+
 @Query(value = "CALL buscar_paciente_por_dni(:dni)", nativeQuery = true)
 Optional<Paciente> buscarPorDniConSP(@Param("dni") String dni);
 ```
 
 2. Desde la capa de servicios, invocar los métodos del repositorio y mapear los resultados a PacienteDTO.
-3. Manejar posibles errores (por ejemplo, si no se encuentra un paciente) usando excepciones personalizadas como PacienteNoEncontradoException.
+3. Manejar posibles errores (por ejemplo, si no se encuentra un paciente) usando excepciones personalizadas como
+   PacienteNoEncontradoException.
 
 ### ✅ Módulo 6-C: Exponer Endpoints REST
 
-- Agregar endpoints en el controlador que permitan consultar los stored procedures desde la API REST. Ejemplo de endpoints:
+- Agregar endpoints en el controlador que permitan consultar los stored procedures desde la API REST. Ejemplo de
+  endpoints:
 
 | Endpoint                   | Método | Descripción                                    |
 |----------------------------|--------|------------------------------------------------|
@@ -190,9 +206,8 @@ Optional<Paciente> buscarPorDniConSP(@Param("dni") String dni);
 | /pacientes/nombre/{nombre} | GET    | Busca pacientes por nombre parcial (via SP)    |
 | /pacientes/obra-social     | GET    | Busca pacientes por obra social con paginación |
 
-
 - El endpoint /obra-social debe recibir los parámetros:
-  - `obraSocial`, `page`, `size` como `@RequestParam`
+    - `obraSocial`, `page`, `size` como `@RequestParam`
 
 ### 📌 Requisitos técnicos
 
@@ -201,13 +216,15 @@ Optional<Paciente> buscarPorDniConSP(@Param("dni") String dni);
 - El script SQL debe ejecutarse automáticamente en la creación del contenedor.
 - Resolver las búsquedas solicitadas usando exclusivamente los stored procedures implementados.
 
-
 ## 🧩 Fase 7: Migración a Arquitectura Hexagonal (Ports & Adapters)
 
 ### 🎯 Objetivo
 
-- Reestructurar el microservicio para adoptar una arquitectura hexagonal, también conocida como Arquitectura de Puertos y Adaptadores, donde el dominio central queda aislado de las tecnologías externas (frameworks, base de datos, web, etc.).
-- 
+- Reestructurar el microservicio para adoptar una arquitectura hexagonal, también conocida como Arquitectura de Puertos
+  y Adaptadores, donde el dominio central queda aislado de las tecnologías externas (frameworks, base de datos, web,
+  etc.).
+-
+
 ### ✅ Módulo 7-A: Propuesta de Estructura de Carpetas
 
 ```bash
@@ -239,38 +256,41 @@ src/
     - Contiene los modelos (Paciente) y los puertos (port/in y port/out).
     - Los puertos definen interfaces, no implementaciones.
 - La capa `application` implementa la lógica de negocio (los casos de uso) orquestando los puertos.
-- La capa `infrastructure` contiene los adaptadores que se conectan a tecnologías externas como Spring MVC, JPA, Swagger, etc.
-  - `adapter/in/rest` conecta el mundo web (controllers).
-  - `adapter/out/persistence` conecta con la base de datos (repositorios, entidades JPA, mapeadores).
+- La capa `infrastructure` contiene los adaptadores que se conectan a tecnologías externas como Spring MVC, JPA,
+  Swagger, etc.
+    - `adapter/in/rest` conecta el mundo web (controllers).
+    - `adapter/out/persistence` conecta con la base de datos (repositorios, entidades JPA, mapeadores).
 - shared agrupa componentes transversales como excepciones.
 
 ### ✅ Módulo 7-C: Migración guiada a Arquitectura Hexagonal
 
-- Migrá el proyecto desde MVC a una arquitectura hexagonal basada en puertos y adaptadores, reorganizando responsabilidades según las siguientes acciones:
+- Migrá el proyecto desde MVC a una arquitectura hexagonal basada en puertos y adaptadores, reorganizando
+  responsabilidades según las siguientes acciones:
 
 #### 📌 Pasos a seguir
+
 1. Modelo de dominio (Paciente)
     - Ubicación: application.domain.model
-    - Representa el paciente dentro del negocio. 
+    - Representa el paciente dentro del negocio.
     - Sin anotaciones de frameworks.
 2. Definir puertos (interfaces)
-   - port.in: PacienteUseCase define las operaciones disponibles.
-   - port.out: PacienteRepositoryPort define cómo se accede a los datos.
+    - port.in: PacienteUseCase define las operaciones disponibles.
+    - port.out: PacienteRepositoryPort define cómo se accede a los datos.
 3. Casos de uso (PacienteService)
-   - Ubicación: application.service
-   - Implementa PacienteUseCase, usa PacienteRepositoryPort.
+    - Ubicación: application.service
+    - Implementa PacienteUseCase, usa PacienteRepositoryPort.
 4. Controlador REST
-   - Ubicación: infrastructure.adapter.in.rest
-   - Se conecta solo con PacienteUseCase. No accede a entidades ni repos directamente.
+    - Ubicación: infrastructure.adapter.in.rest
+    - Se conecta solo con PacienteUseCase. No accede a entidades ni repos directamente.
 5. Adapter de persistencia
-   - Ubicación: infrastructure.adapter.out.persistence
-   - Implementa PacienteRepositoryPort usando JpaRepository y stored procedures. 
-   - Incluye clase PacienteEntity con anotaciones JPA.
-6. DTOs REST (PacienteRequest, PacienteResponse) 
-   - Ubicación: infrastructure.adapter.in.rest.dto
-   - Modelos para entrada y salida de la API.
-   - Solo contienen los datos necesarios para el cliente. 
-   - Permiten cambiar la interfaz sin afectar al dominio ni a la base de datos.
+    - Ubicación: infrastructure.adapter.out.persistence
+    - Implementa PacienteRepositoryPort usando JpaRepository y stored procedures.
+    - Incluye clase PacienteEntity con anotaciones JPA.
+6. DTOs REST (PacienteRequest, PacienteResponse)
+    - Ubicación: infrastructure.adapter.in.rest.dto
+    - Modelos para entrada y salida de la API.
+    - Solo contienen los datos necesarios para el cliente.
+    - Permiten cambiar la interfaz sin afectar al dominio ni a la base de datos.
 7. Mappers
     - Ubicación según el adapter correspondiente (rest.mapper, persistence.mapper)
     - Transforman entre modelos:
@@ -284,7 +304,65 @@ src/
 - Los puertos son contratos; los adapters los implementan.
 - Los DTOs y entidades son detalles técnicos, no parte del modelo central.
 
+## 🧩 Fase 8: Principios SOLID + Patrones de Diseño
+
+### 🎯 Objetivo
+
+- Refactorizar el microservicio implementando explícitamente los principios SOLID y patrones de diseño. Cada miembro del
+  equipo debe elegir un principio SOLID y patrón específico, investigar su aplicación, implementarlo y presentar su
+  solución al resto del equipo explicando las mejoras introducidas.
+- 📋 Tabla de Asignación de Principios y Patrones
+
+| Miembro del Equipo | Principio SOLID                 | Patrón de diseño |
+|--------------------|---------------------------------|------------------|
+| Dani               | Liskov Substitution Principle   | Factory Method   |
+| Emi                | Segregación de Interfaces       | Proxy            |
+| Fer                | Dependency Injection (DI)       | Template Method  |
+| Guada              | Single Responsibility Principle | Observer         |
+| Marcos             |                                 |                  |
+| Nico               | Open/Closed Principle (OCP)     | Strategy         |
+
+## ✅ Módulo 8-A: Implementación de Principios SOLID
+
+### 📌 Tareas por Principio SOLID
+
+- Cada miembro que elija un principio SOLID debe:
+    - Investigar el principio asignado y comprender su propósito
+    - Identificar en el código actual del microservicio dónde se viola el principio
+    - Implementar una refactorización que demuestre la aplicación correcta del principio
+    - Crear un ejemplo de código "antes" y "después" que muestre claramente la diferencia
+    - Preparar una explicación para presentar al equipo sobre el principio implementado
+
+## ✅ Módulo 8-B: Implementación de Patrones de Diseño
+
+### 📌 Tareas por Patrón de Diseño
+
+- Cada miembro que elija un patrón de diseño debe:
+- Investigar el patrón asignado, su estructura y casos de uso típicos
+- Identificar una situación específica en el microservicio donde el patrón sea aplicable
+- Implementar el patrón de manera que resuelva un problema real del proyecto
+- Demostrar cómo el patrón mejora la flexibilidad, mantenibilidad o extensibilidad del código
+- Preparar una explicación para presentar al equipo sobre el patrón implementado
+
+## 🧠 Beneficios Esperados
+
+- Al completar esta fase, el equipo habrá:
+- Aplicado principios SOLID de manera práctica y comprensible
+- Implementado patrones de diseño que resuelvan problemas reales
+- Mejorado la calidad del código mediante refactoring sistemático
+- Desarrollado habilidades de investigación y aplicación de conceptos teóricos
+- Fortalecido las habilidades de comunicación técnica y trabajo en equipo
+-
+
+## 📌 Consideraciones Técnicas
+
+- Mantener compatibilidad con la arquitectura hexagonal existente
+- Actualizar la documentación de Swagger si es necesario
+- Conservar la funcionalidad de los stored procedures
+- Mantener la contenerización con Docker
+
 ---
+
 # 📝 Check List
 
 - [ x ] Implementar operaciones CRUD a pacientes
@@ -328,27 +406,35 @@ README.md
 ```
 
 ---
+
 # Comentarios del archivo docker-compose.yml
 
 - Para que dos contenedores estén comunicados, es necsario que estén en la misma red
-- Es necesario definir la variable de entorno de `host` para que la aplicación de Spring identifique correctamente la base de datos MySQL
-- La sección de `healthcheck` sirve para verificar que el servicio de MySQL esté listo antes de que la aplicación Spring Boot intente conectarse a él
+- Es necesario definir la variable de entorno de `host` para que la aplicación de Spring identifique correctamente la
+  base de datos MySQL
+- La sección de `healthcheck` sirve para verificar que el servicio de MySQL esté listo antes de que la aplicación Spring
+  Boot intente conectarse a él
 - Esto es importante para evitar errores de conexión al iniciar la aplicación
-- Al `depends_on` se le agrega el `condition: service_healthy` para que la aplicación espere a que el servicio de MySQL esté completamente operativo antes de iniciar
+- Al `depends_on` se le agrega el `condition: service_healthy` para que la aplicación espere a que el servicio de MySQL
+  esté completamente operativo antes de iniciar
 - A lo último se define las redes que se va a utilizar en el contenedor
 
 ## Detalles sobre el apartado `healthcheck`
 
-- `test`: Comando que se ejecuta para verificar la salud del contenedor. En este caso, se usa `mysqladmin ping` para comprobar si el servidor MySQL está respondiendo.
-- `timeout`: Tiempo máximo que se espera para que el comando se ejecute. Si el comando no responde en este tiempo, se considera que la verificación ha fallado.
+- `test`: Comando que se ejecuta para verificar la salud del contenedor. En este caso, se usa `mysqladmin ping` para
+  comprobar si el servidor MySQL está respondiendo.
+- `timeout`: Tiempo máximo que se espera para que el comando se ejecute. Si el comando no responde en este tiempo, se
+  considera que la verificación ha fallado.
 - `retries`: Número de intentos que se realizan antes de considerar que el contenedor no está saludable.
 - `interval`: Tiempo entre cada intento de verificación de salud.
-- `start_period`: Tiempo que se espera antes de comenzar a realizar verificaciones de salud. Esto es útil para dar tiempo al contenedor para iniciar completamente antes de que se realicen las primeras verificaciones.
+- `start_period`: Tiempo que se espera antes de comenzar a realizar verificaciones de salud. Esto es útil para dar
+  tiempo al contenedor para iniciar completamente antes de que se realicen las primeras verificaciones.
 
 ## Driver `bridges`
 
 - El driver `bridge` es el controlador de red predeterminado en Docker
-- Permite que los contenedores se comuniquen entre sí y con el host, creando una red aislada para los contenedores que se ejecutan en el mismo host
+- Permite que los contenedores se comuniquen entre sí y con el host, creando una red aislada para los contenedores que
+  se ejecutan en el mismo host
 
 ```yaml
 services:
@@ -396,25 +482,38 @@ networks:
 ```
 
 ---
+
 # Implementación de Store Procedures
 
-- Se creó los archivos `init.sql` y `stored_procedures.sql` para definir los procedimientos almacenados y poblar la base de datos con datos de ejemplo.
-- Se aplicó la nomeclatura con un número al inicio de cada archivo para asegurar que se ejecuten en el orden correcto al iniciar el contenedor de MySQL.
-- Se configuró el archivo `docker-compose.yml` para montar estos archivos en el directorio `/docker-entrypoint-initdb.d/` del contenedor MySQL, lo que permite que se ejecuten automáticamente al iniciar el contenedor.
-- Dentro del repositorio se utilizó la anotación `@Query` con `nativeQuery = true` para invocar los procedimientos almacenados desde Java.
+- Se creó los archivos `init.sql` y `stored_procedures.sql` para definir los procedimientos almacenados y poblar la base
+  de datos con datos de ejemplo.
+- Se aplicó la nomeclatura con un número al inicio de cada archivo para asegurar que se ejecuten en el orden correcto al
+  iniciar el contenedor de MySQL.
+- Se configuró el archivo `docker-compose.yml` para montar estos archivos en el directorio
+  `/docker-entrypoint-initdb.d/` del contenedor MySQL, lo que permite que se ejecuten automáticamente al iniciar el
+  contenedor.
+- Dentro del repositorio se utilizó la anotación `@Query` con `nativeQuery = true` para invocar los procedimientos
+  almacenados desde Java.
 
 ```java
+
 @Query(value = "CALL buscar_paciente_por_dni(:dni)", nativeQuery = true)
 Optional<Paciente> buscarPorDniConSP(@Param("dni") String dni);
 ```
-- No olvidar realizar el `build` de la aplicación y el `docker-compose up` para que se creen los contenedores y se ejecuten los scripts de inicialización.
+
+- No olvidar realizar el `build` de la aplicación y el `docker-compose up` para que se creen los contenedores y se
+  ejecuten los scripts de inicialización.
 
 ---
+
 # Refactorización a Arquitectura Hexagonal
 
-- Se reorganizó el proyecto para adoptar una arquitectura hexagonal, separando claramente las capas de dominio y de infrastructura.
-- Se definieron los puertos de entrada y salida para el dominio, permitiendo que la lógica de negocio no dependa de detalles técnicos como JPA o REST.
-- Se implementaron adaptadores para conectar el dominio con la infraestructura, manteniendo el núcleo del negocio independiente de las tecnologías externas.
+- Se reorganizó el proyecto para adoptar una arquitectura hexagonal, separando claramente las capas de dominio y de
+  infrastructura.
+- Se definieron los puertos de entrada y salida para el dominio, permitiendo que la lógica de negocio no dependa de
+  detalles técnicos como JPA o REST.
+- Se implementaron adaptadores para conectar el dominio con la infraestructura, manteniendo el núcleo del negocio
+  independiente de las tecnologías externas.
 
 ## Nueva Estructura del Proyecto
 
@@ -469,4 +568,174 @@ src/
                         ├── ErrorMessages.java
                         └── ResponseCode.java
                     
+```
+
+---
+
+# Implementación de SOLID y Patrones de Diseño
+
+## Segregación de interfaces (Intefaces segregation)
+
+- Este principio establece que se deben separar en interfaces diferentes métodos con funciones específicas
+- En esta ocasión, separé en interfaces cada caso de uso (Use Case) dependeniendo su método
+    - `CreatePatientUseCase`: Se encapsulan los métodos relacionados con crear datos
+    - `ReadPatientUseCase`: Se encapsulan los métodos relacionados con obtener datos
+    - `UpdatePatientUseCase`: Se encapsulan los métodos relacionados con actualizar datos
+    - `DeletePatientUseCase`: Se encapsulan los métodos relacionados con eliminar datos
+
+## Patrón Proxy
+
+- Para mi elección de Patrón de Diseño, implementé el patrón Proxy para la clase `PatientController`
+- En este caso, se utilizó Programación Orientada a Aspectos (AOP) para crear un proxy que envuelve al controlador
+- Anotaciones utilizadas:
+    - `@Aspect`: Define la clase como un aspecto de AOP
+    - `@Around`: Define un método que se ejecuta alrededor de la ejecución de un método
+    - `within`: Especifica que el aspecto se aplica a métodos con la anotación `@RestController`
+- Se implementó un `logger` para ejecutarse cada vez que se realiza una petición al controlador, registrando el nombre
+  del método y los parámetros recibidos
+
+```java
+
+@Aspect
+@Component
+public class LoggingAspect {
+
+  private final Logger logger = LoggerFactory.getLogger(LoggingAspect.class);
+
+  @Around("within(@org.springframework.web.bind.annotation.RestController *)")
+  public Object logAroundController(ProceedingJoinPoint joinPoint) throws Throwable {
+    String clase = joinPoint.getSignature().getDeclaringTypeName();
+    String metodo = joinPoint.getSignature().getName();
+    Object[] args = joinPoint.getArgs();
+
+    if (!clase.contains("PatientController")) {
+      return joinPoint.proceed();
+    }
+
+    if (args.length == 0) {
+      logger.info("[PROXY] Endpoint llamado: /{} sin argumentos", metodo);
+      return joinPoint.proceed();
+    }
+
+    logger.info("[PROXY] Endpoint llamado: /{} con argumentos: {}", metodo, Arrays.toString(args));
+
+    return joinPoint.proceed();
+  }
+}
+```
+
+_Observaciones_
+
+- Se crea una clase con anotacion `@Component` para que Spring la reconozca como un componente dentro del Spring
+  Container
+- Dentro de la anotación `@Around` se define con `within` que se aplique a todos los métodos de las clases
+  que tengan la anotación `@RestController`
+- La función `logAroundController` recibe un `ProceedingJoinPoint` que permite acceder a la información del método
+  invocado (como de qué clase proviene, nombre del método y parámetros)
+
+## Patrón Builder
+
+- El Patrón Builder consiste en que una clase puede definir sus propiedades de forma dinámica mediante un constructor
+- En este caso, se implementó el patrón Builder para la clase `Patient` dentro de la capa de `model`
+
+```java
+public class Patient {
+  private Long id;
+  private String firstName;
+  private String lastName;
+  private String email;
+  private String phoneNumber;
+  private String dni;
+  private String memberNumber;
+  private LocalDate birthDate;
+  private boolean isActive;
+  private String socialSecurity;
+
+  private Patient(PatientBuilder builder) {
+    this.id = builder.id;
+    this.firstName = builder.firstName;
+    this.lastName = builder.lastName;
+    this.email = builder.email;
+    this.phoneNumber = builder.phoneNumber;
+    this.dni = builder.dni;
+    this.memberNumber = builder.memberNumber;
+    this.birthDate = builder.birthDate;
+    this.isActive = builder.isActive;
+    this.socialSecurity = builder.socialSecurity;
+  }
+
+  public static PatientBuilder builder() {
+    return new PatientBuilder();
+  }
+
+  public static class PatientBuilder {
+    private Long id;
+    private String firstName;
+    private String lastName;
+    private String email;
+    private String phoneNumber;
+    private String dni;
+    private String memberNumber;
+    private LocalDate birthDate;
+    private boolean isActive;
+    private String socialSecurity;
+
+    private PatientBuilder() {
+    }
+
+    public PatientBuilder id(Long id) {
+      this.id = id;
+      return this;
+    }
+
+    public PatientBuilder firstName(String firstName) {
+      this.firstName = firstName;
+      return this;
+    }
+
+    public PatientBuilder lastName(String lastName) {
+      this.lastName = lastName;
+      return this;
+    }
+
+    public PatientBuilder email(String email) {
+      this.email = email;
+      return this;
+    }
+
+    public PatientBuilder phoneNumber(String phoneNumber) {
+      this.phoneNumber = phoneNumber;
+      return this;
+    }
+
+    public PatientBuilder dni(String dni) {
+      this.dni = dni;
+      return this;
+    }
+
+    public PatientBuilder memberNumber(String memberNumber) {
+      this.memberNumber = memberNumber;
+      return this;
+    }
+
+    public PatientBuilder birthDate(LocalDate birthDate) {
+      this.birthDate = birthDate;
+      return this;
+    }
+
+    public PatientBuilder isActive(boolean isActive) {
+      this.isActive = isActive;
+      return this;
+    }
+
+    public PatientBuilder socialSecurity(String socialSecurity) {
+      this.socialSecurity = socialSecurity;
+      return this;
+    }
+
+    public Patient build() {
+      return new Patient(this);
+    }
+  }
+}
 ```
