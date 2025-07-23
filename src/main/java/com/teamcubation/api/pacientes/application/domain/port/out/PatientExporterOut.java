@@ -1,9 +1,9 @@
-package com.teamcubation.api.pacientes.infrastructure.adapter.in.exporter;
+package com.teamcubation.api.pacientes.application.domain.port.out;
 
 import com.teamcubation.api.pacientes.application.domain.model.Patient;
 
 import java.util.List;
 
-public interface PatientExporter {
+public interface PatientExporterOut {
     String export(List<Patient> patients);
 }

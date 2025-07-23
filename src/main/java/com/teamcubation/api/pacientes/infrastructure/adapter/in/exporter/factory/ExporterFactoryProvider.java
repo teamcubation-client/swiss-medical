@@ -2,15 +2,22 @@ package com.teamcubation.api.pacientes.infrastructure.adapter.in.exporter.factor
 
 import com.teamcubation.api.pacientes.shared.exception.ExporterTypeNotSupportedException;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class ExporterFactoryProvider {
+    private static final Map<String, ExporterFactory> FACTORIES = new HashMap<>();
+
+    static {
+        FACTORIES.put("csv", new CsvExporterFactory());
+        FACTORIES.put("json", new JsonExporterFactory());
+    }
 
     public static ExporterFactory getFactory(String type) {
-        if ("csv".equalsIgnoreCase(type)) {
-            return new CsvExporterFactory();
-        } else if ("json".equalsIgnoreCase(type)) {
-            return new JsonExporterFactory();
-        } else {
+        ExporterFactory factory = FACTORIES.get(type.toLowerCase());
+        if (factory == null) {
             throw new ExporterTypeNotSupportedException(type);
         }
+        return factory;
     }
 }

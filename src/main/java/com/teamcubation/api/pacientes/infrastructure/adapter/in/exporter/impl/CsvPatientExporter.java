@@ -1,25 +1,28 @@
 package com.teamcubation.api.pacientes.infrastructure.adapter.in.exporter.impl;
 
-import com.teamcubation.api.pacientes.infrastructure.adapter.in.exporter.PatientExporter;
+import com.teamcubation.api.pacientes.application.domain.port.out.PatientExporterOut;
 import com.teamcubation.api.pacientes.application.domain.model.Patient;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
-public class CsvPatientExporter implements PatientExporter {
+public class CsvPatientExporter implements PatientExporterOut {
 
     @Override
     public String export(List<Patient> patients) {
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("id,name,lastName,dni,healthInsuranceProvider,email,phoneNumber\n");
-        for (Patient p : patients) {
-            stringBuilder.append(p.getId()).append(",")
-                    .append(p.getName()).append(",")
-                    .append(p.getLastName()).append(",")
-                    .append(p.getDni()).append(",")
-                    .append(p.getHealthInsuranceProvider()).append(",")
-                    .append(p.getEmail()).append(",")
-                    .append(p.getPhoneNumber()).append("\n");
-        }
-        return stringBuilder.toString();
+        String header = "id,nombre,apellido,dni,obra_social,email,telefono\n";
+
+        String body = patients.stream()
+                .map(patient -> String.join(",",
+                        String.valueOf(patient.getId()),
+                        patient.getName(),
+                        patient.getLastName(),
+                        patient.getDni(),
+                        patient.getHealthInsuranceProvider(),
+                        patient.getEmail(),
+                        patient.getPhoneNumber()))
+                .collect(Collectors.joining("\n"));
+
+        return header + body + "\n";
     }
 }

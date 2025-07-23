@@ -28,7 +28,7 @@ public class PatientController implements IPatientAPI {
     @PostMapping
     public ResponseEntity<ApiResponse<PatientResponse>> create(@RequestBody PatientRequest request) {
         Patient created = this.patientPortIn.create(PatientRestMapper.toDomain(request));
-        return buildSuccessResponse(PatientRestMapper.toResponse(created), HttpStatus.CREATED);
+        return ResponseEntity.status(HttpStatus.CREATED).body(new SuccessResponse<>(PatientRestMapper.toResponse(created)));
     }
 
     @Override
@@ -42,14 +42,14 @@ public class PatientController implements IPatientAPI {
             response.add(PatientRestMapper.toResponse(patient));
         }
 
-        return buildSuccessResponse(response, HttpStatus.OK);
+        return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponse<>(response));
     }
 
     @Override
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<PatientResponse>> getById(@PathVariable long id) {
         Patient patient = this.patientPortIn.getById(id);
-        return buildSuccessResponse(PatientRestMapper.toResponse(patient), HttpStatus.OK);
+        return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponse<>(PatientRestMapper.toResponse(patient)));
     }
 
     @Override
@@ -57,7 +57,7 @@ public class PatientController implements IPatientAPI {
     public ResponseEntity<ApiResponse<PatientResponse>> updateById(@PathVariable long id,
                                                       @RequestBody PatientRequest request) {
         Patient patient = this.patientPortIn.updateById(id, PatientRestMapper.toDomain(request));
-        return buildSuccessResponse(PatientRestMapper.toResponse(patient), HttpStatus.OK);
+        return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponse<>(PatientRestMapper.toResponse(patient)));
     }
 
     @Override
@@ -71,7 +71,7 @@ public class PatientController implements IPatientAPI {
     @GetMapping("/dni/{dni}")
     public ResponseEntity<ApiResponse<PatientResponse>> getByDni(@PathVariable String dni) {
         Patient patient = this.patientPortIn.getByDni(dni);
-        return buildSuccessResponse(PatientRestMapper.toResponse(patient), HttpStatus.OK);
+        return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponse<>(PatientRestMapper.toResponse(patient)));
     }
 
     @Override
@@ -82,7 +82,7 @@ public class PatientController implements IPatientAPI {
         for(Patient patient : patients) {
             response.add(PatientRestMapper.toResponse(patient));
         }
-        return buildSuccessResponse(response, HttpStatus.OK);
+        return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponse<>(response));
     }
 
     @Override
@@ -95,17 +95,14 @@ public class PatientController implements IPatientAPI {
         for(Patient patient : patients){
             response.add(PatientRestMapper.toResponse(patient));
         }
-        return buildSuccessResponse(response, HttpStatus.OK);
+        return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponse<>(response));
     }
 
     @GetMapping("/exportar")
     @Override
-    public ResponseEntity<ApiResponse<String>> exportPatients(@RequestParam("formato") String format) {
+    public ResponseEntity<ApiResponse<String>> export(@RequestParam("formato") String format) {
         String patientsExport = this.patientPortIn.exportPatients(format);
-        return buildSuccessResponse(patientsExport, HttpStatus.OK);
+        return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponse<>(patientsExport));
     }
 
-    private <T> ResponseEntity<ApiResponse<T>> buildSuccessResponse(T data, HttpStatus status) {
-        return ResponseEntity.status(status).body(new SuccessResponse<>(data));
-    }
 }

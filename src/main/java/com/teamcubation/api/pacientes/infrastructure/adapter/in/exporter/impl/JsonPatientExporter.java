@@ -1,32 +1,25 @@
 package com.teamcubation.api.pacientes.infrastructure.adapter.in.exporter.impl;
 
-import com.teamcubation.api.pacientes.infrastructure.adapter.in.exporter.PatientExporter;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.teamcubation.api.pacientes.application.domain.port.out.PatientExporterOut;
 import com.teamcubation.api.pacientes.application.domain.model.Patient;
+import com.teamcubation.api.pacientes.shared.exception.JsonExportException;
 
 import java.util.List;
 
-public class JsonPatientExporter implements PatientExporter {
+public class JsonPatientExporter implements PatientExporterOut {
+
+    private static final String JSON_EXPORT_TARGET_NAME = "pacientes";
+
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
     public String export(List<Patient> patients) {
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("[");
-        for (int i = 0; i < patients.size(); i++) {
-            Patient p = patients.get(i);
-            stringBuilder.append("{")
-                    .append("\"id\":").append(p.getId()).append(",")
-                    .append("\"name\":\"").append(p.getName()).append("\",")
-                    .append("\"lastName\":\"").append(p.getLastName()).append("\",")
-                    .append("\"dni\":\"").append(p.getDni()).append("\",")
-                    .append("\"healthInsuranceProvider\":\"").append(p.getHealthInsuranceProvider()).append("\",")
-                    .append("\"email\":\"").append(p.getEmail()).append("\",")
-                    .append("\"phoneNumber\":\"").append(p.getPhoneNumber()).append("\"")
-                    .append("}");
-            if (i < patients.size() - 1) {
-                stringBuilder.append(",");
-            }
+        try {
+            return objectMapper.writeValueAsString(patients);
+        } catch (JsonProcessingException e) {
+            throw new JsonExportException(JSON_EXPORT_TARGET_NAME, e);
         }
-        stringBuilder.append("]");
-        return stringBuilder.toString();
     }
 }

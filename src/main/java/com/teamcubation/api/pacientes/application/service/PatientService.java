@@ -1,6 +1,6 @@
 package com.teamcubation.api.pacientes.application.service;
 
-import com.teamcubation.api.pacientes.infrastructure.adapter.in.exporter.PatientExporter;
+import com.teamcubation.api.pacientes.application.domain.port.out.PatientExporterOut;
 import com.teamcubation.api.pacientes.infrastructure.adapter.in.exporter.factory.ExporterFactory;
 import com.teamcubation.api.pacientes.infrastructure.adapter.in.exporter.factory.ExporterFactoryProvider;
 import com.teamcubation.api.pacientes.application.domain.model.Patient;
@@ -94,7 +94,7 @@ public class PatientService implements PatientPortIn {
     public String exportPatients(String format) {
         List<Patient> patients = patientPortOut.findAll(null, null);
         ExporterFactory factory = ExporterFactoryProvider.getFactory(format);
-        PatientExporter exporter = factory.createExporter();
+        PatientExporterOut exporter = factory.createPatientExporter();
         return exporter.export(patients);
     }
 

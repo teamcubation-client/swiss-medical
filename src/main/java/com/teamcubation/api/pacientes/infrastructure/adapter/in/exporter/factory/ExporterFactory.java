@@ -1,7 +1,7 @@
 package com.teamcubation.api.pacientes.infrastructure.adapter.in.exporter.factory;
 
-import com.teamcubation.api.pacientes.infrastructure.adapter.in.exporter.PatientExporter;
+import com.teamcubation.api.pacientes.application.domain.port.out.PatientExporterOut;
 
 public interface ExporterFactory {
-    PatientExporter createExporter();
+    PatientExporterOut createPatientExporter();
 }

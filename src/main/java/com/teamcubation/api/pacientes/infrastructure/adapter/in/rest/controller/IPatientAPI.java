@@ -65,5 +65,5 @@ public interface IPatientAPI {
     );
 
     @Operation(summary = "Permite exportar lista de pacientes en el formato seleccionado")
-    ResponseEntity<ApiResponse<String>> exportPatients(@Parameter(description = "Formato elegido", example = "csv") String format);
+    ResponseEntity<ApiResponse<String>> export(@Parameter(description = "Formato elegido", example = "csv") String format);
 }

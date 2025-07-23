@@ -37,6 +37,11 @@ public class GlobalExceptionHandler {
         return buildErrorResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(JsonExportException.class)
+    public ResponseEntity<ApiResponse<String>> handleJsonExportException(JsonExportException ex) {
+        return buildErrorResponse(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ApiResponse<String>> handleIllegalArgumentException(IllegalArgumentException ex) {
         return buildErrorResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
