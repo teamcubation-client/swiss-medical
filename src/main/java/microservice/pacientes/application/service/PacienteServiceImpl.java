@@ -9,7 +9,6 @@ import microservice.pacientes.application.domain.port.out.PacientePortOutRead;
 import microservice.pacientes.application.domain.port.out.PacientePortOutWrite;
 import microservice.pacientes.application.validation.PacienteValidator;
 import microservice.pacientes.infrastructure.validation.*;
-import microservice.pacientes.shared.PacienteDuplicadoException;
 import microservice.pacientes.shared.PacienteNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,19 +41,32 @@ public class PacienteServiceImpl implements PacientePortInWrite, PacientePortInR
      */
     @PostConstruct
     private void initValidatorChain() {
-        dniValidator.setNext(fechaValidator);
-        fechaValidator.setNext(emailValidator);
-        this.createChain = dniValidator;
+
+        DniDuplicadoValidator dniDuplicadoCreate = new DniDuplicadoValidator(pacientePortOutRead);
+        FechaAltaValidator fechaAltaCreate = new FechaAltaValidator();
+        EmailFormatValidator emailFormatoCreate = new EmailFormatValidator();
+
+        dniDuplicadoCreate.setNext(fechaAltaCreate);
+        fechaAltaCreate.setNext(emailFormatoCreate);
+        this.createChain = dniDuplicadoCreate;
 
 
-        existePacienteValidator.setNext(estadoInactivoValidator);
-        this.deleteChain = existePacienteValidator;
+        ExistePacienteValidator existePacienteDelete = new ExistePacienteValidator(pacientePortOutRead);
+        EstadoInactivoValidator inactivoDelete = new EstadoInactivoValidator();
+
+        existePacienteDelete.setNext(inactivoDelete);
+        this.deleteChain = existePacienteDelete;
 
 
-        existePacienteValidator.setNext(dniValidator);
-        dniValidator.setNext(emailValidator);
-        emailValidator.setNext(fechaValidator);
-        this.updateChain = existePacienteValidator;
+        ExistePacienteValidator existePacienteUpdate = new ExistePacienteValidator(pacientePortOutRead);
+        DniDuplicadoValidator dniDuplicadoUpdate = new DniDuplicadoValidator(pacientePortOutRead);
+        FechaAltaValidator fechaAltaUpdate = new FechaAltaValidator();
+        EmailFormatValidator emailFormatoUpdate = new EmailFormatValidator();
+
+        existePacienteUpdate.setNext(dniDuplicadoUpdate);
+        dniDuplicadoUpdate.setNext(emailFormatoUpdate);
+        emailFormatoUpdate.setNext(fechaAltaUpdate);
+        this.updateChain = existePacienteUpdate;
     }
 
 
