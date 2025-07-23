@@ -1,4 +1,4 @@
-package com.teamcubation.api.pacientes.infrastructure.adapter.out.export;
+package com.teamcubation.api.pacientes.infrastructure.adapter.in.exporter;
 
 import com.teamcubation.api.pacientes.application.domain.model.Patient;
 

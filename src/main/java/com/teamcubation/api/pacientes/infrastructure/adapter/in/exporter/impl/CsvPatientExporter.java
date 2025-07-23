@@ -1,6 +1,6 @@
-package com.teamcubation.api.pacientes.infrastructure.adapter.out.export.impl;
+package com.teamcubation.api.pacientes.infrastructure.adapter.in.exporter.impl;
 
-import com.teamcubation.api.pacientes.infrastructure.adapter.out.export.PatientExporter;
+import com.teamcubation.api.pacientes.infrastructure.adapter.in.exporter.PatientExporter;
 import com.teamcubation.api.pacientes.application.domain.model.Patient;
 
 import java.util.List;
