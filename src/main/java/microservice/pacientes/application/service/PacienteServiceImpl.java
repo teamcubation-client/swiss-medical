@@ -29,16 +29,7 @@ public class PacienteServiceImpl implements PacientePortInWrite, PacientePortInR
     private PacienteValidator deleteChain;
     private PacienteValidator updateChain;
 
-    //handlers concretos inyectados
-    private final DniDuplicadoValidator dniValidator;
-    private final FechaAltaValidator fechaValidator;
-    private final EmailFormatValidator emailValidator;
-    private final EstadoInactivoValidator estadoInactivoValidator;
-    private final ExistePacienteValidator existePacienteValidator;
-
-    /**
-     * Arma la cadena: dni -> fecha -> email
-     */
+    //arma la cadena
     @PostConstruct
     private void initValidatorChain() {
 
