@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import microservice.pacientes.application.domain.model.Paciente;
 import microservice.pacientes.application.domain.port.out.PacientePortOutRead;
 import microservice.pacientes.application.domain.port.out.PacientePortOutWrite;
+import microservice.pacientes.shared.PacienteNotFoundException;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -58,9 +59,36 @@ public class PacientePersistenceAdapter implements PacientePortOutRead, Paciente
 
     @Override
     public Paciente update(Paciente paciente) {
-        PacienteEntity entity = PacienteMapper.toEntity(paciente);
-        PacienteEntity updated = pacienteRepository.save(entity);
-        return PacienteMapper.toModel(updated);
+        PacienteEntity entity = pacienteRepository.findById(paciente.getId())
+                .orElseThrow(() -> PacienteNotFoundException.porId(paciente.getId()));
+
+        if (paciente.getNombre() != null) {
+            entity.setNombre(paciente.getNombre());
+        }
+        if (paciente.getApellido() != null) {
+            entity.setApellido(paciente.getApellido());
+        }
+        if (paciente.getDni() != null) {
+            entity.setDni(paciente.getDni());
+        }
+        if (paciente.getObraSocial() != null) {
+            entity.setObraSocial(paciente.getObraSocial());
+        }
+        if (paciente.getEmail() != null) {
+            entity.setEmail(paciente.getEmail());
+        }
+        if (paciente.getTelefono() != null) {
+            entity.setTelefono(paciente.getTelefono());
+        }
+        if (paciente.getTipoPlanObraSocial() != null) {
+            entity.setTipoPlanObraSocial(paciente.getTipoPlanObraSocial());
+        }
+        if (paciente.getFechaAlta() != null) {
+            entity.setFechaAlta(paciente.getFechaAlta());
+        }
+        entity.setEstado(paciente.isEstado());
+
+        return PacienteMapper.toModel(entity);
     }
 
     @Override

@@ -28,7 +28,7 @@ public class PacienteServiceImpl implements PacientePortInWrite, PacientePortInR
     //Cabeza de la cadena handlers
     private PacienteValidator createChain;
     private PacienteValidator deleteChain;
-
+    private PacienteValidator updateChain;
 
     //handlers concretos inyectados
     private final DniDuplicadoValidator dniVal;
@@ -36,6 +36,7 @@ public class PacienteServiceImpl implements PacientePortInWrite, PacientePortInR
     private final EmailFormatValidator emailVal;
     private final EstadoInactivoValidator estadoInactivoVal;
     private final ExistePacienteValidator existePacienteVal;
+
     /**
      * Arma la cadena: dni -> fecha -> email
      */
@@ -48,6 +49,12 @@ public class PacienteServiceImpl implements PacientePortInWrite, PacientePortInR
 
         existePacienteVal.setNext(estadoInactivoVal);
         this.deleteChain = existePacienteVal;
+
+
+        existePacienteVal.setNext(dniVal);
+        dniVal.setNext(emailVal);
+        emailVal.setNext(fechaVal);
+        this.updateChain = existePacienteVal;
     }
 
 
@@ -120,35 +127,9 @@ public class PacienteServiceImpl implements PacientePortInWrite, PacientePortInR
     @Override
     @Transactional
     public Paciente actualizarPaciente(Long id, Paciente paciente) {
-        Paciente existente = pacientePortOutRead.findById(id)
-                .orElseThrow(() -> PacienteNotFoundException.porId(id));
-
-        if (paciente.getNombre() != null) {
-            existente.setNombre(paciente.getNombre());
-        }
-        if (paciente.getApellido() != null) {
-            existente.setApellido(paciente.getApellido());
-        }
-        if (paciente.getDni() != null) {
-            existente.setDni(paciente.getDni());
-        }
-        if (paciente.getObraSocial() != null) {
-            existente.setObraSocial(paciente.getObraSocial());
-        }
-        if (paciente.getEmail() != null) {
-            existente.setEmail(paciente.getEmail());
-        }
-        if (paciente.getTelefono() != null) {
-            existente.setTelefono(paciente.getTelefono());
-        }
-        if (paciente.getTipoPlanObraSocial() != null) {
-            existente.setTipoPlanObraSocial(paciente.getTipoPlanObraSocial());
-        }
-        if (paciente.getFechaAlta() != null) {
-            existente.setFechaAlta(paciente.getFechaAlta());
-        }
-        existente.setEstado(paciente.isEstado());
-        return pacientePortOutWrite.save(existente);
+        paciente.setId(id);
+        updateChain.validate(paciente);
+        return pacientePortOutWrite.update(paciente);
     }
 
     @Override
