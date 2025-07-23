@@ -8,9 +8,7 @@ import microservice.pacientes.application.domain.port.in.PacientePortInWrite;
 import microservice.pacientes.application.domain.port.out.PacientePortOutRead;
 import microservice.pacientes.application.domain.port.out.PacientePortOutWrite;
 import microservice.pacientes.application.validation.PacienteValidator;
-import microservice.pacientes.infrastructure.validation.DniDuplicadoValidator;
-import microservice.pacientes.infrastructure.validation.EmailFormatValidator;
-import microservice.pacientes.infrastructure.validation.FechaAltaValidator;
+import microservice.pacientes.infrastructure.validation.*;
 import microservice.pacientes.shared.PacienteDuplicadoException;
 import microservice.pacientes.shared.PacienteNotFoundException;
 import org.springframework.stereotype.Service;
@@ -28,14 +26,16 @@ public class PacienteServiceImpl implements PacientePortInWrite, PacientePortInR
     private final PacientePortOutWrite pacientePortOutWrite;
 
     //Cabeza de la cadena handlers
-    private PacienteValidator validatorChain;
+    private PacienteValidator createChain;
+    private PacienteValidator deleteChain;
 
 
     //handlers concretos inyectados
     private final DniDuplicadoValidator dniVal;
     private final FechaAltaValidator fechaVal;
     private final EmailFormatValidator emailVal;
-
+    private final EstadoInactivoValidator estadoInactivoVal;
+    private final ExistePacienteValidator existePacienteVal;
     /**
      * Arma la cadena: dni -> fecha -> email
      */
@@ -43,7 +43,11 @@ public class PacienteServiceImpl implements PacientePortInWrite, PacientePortInR
     private void initValidatorChain() {
         dniVal.setNext(fechaVal);
         fechaVal.setNext(emailVal);
-        this.validatorChain = dniVal;
+        this.createChain = dniVal;
+
+
+        existePacienteVal.setNext(estadoInactivoVal);
+        this.deleteChain = existePacienteVal;
     }
 
 
@@ -53,7 +57,7 @@ public class PacienteServiceImpl implements PacientePortInWrite, PacientePortInR
     @Override
     @Transactional
     public Paciente crearPaciente(Paciente paciente) {
-        validatorChain.validate(paciente);
+        createChain.validate(paciente);
         return pacientePortOutWrite.save(paciente);
     }
 
@@ -90,7 +94,7 @@ public class PacienteServiceImpl implements PacientePortInWrite, PacientePortInR
     public void eliminarPaciente(Long id) {
         Paciente paciente = pacientePortOutRead.findById(id)
                 .orElseThrow(() -> PacienteNotFoundException.porId(id));
-
+        deleteChain.validate(paciente);
         pacientePortOutWrite.deleteById(id);
     }
 

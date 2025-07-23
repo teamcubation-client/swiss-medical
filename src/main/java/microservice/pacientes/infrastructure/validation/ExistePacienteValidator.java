@@ -4,29 +4,29 @@ import lombok.AllArgsConstructor;
 import microservice.pacientes.application.domain.model.Paciente;
 import microservice.pacientes.application.domain.port.out.PacientePortOutRead;
 import microservice.pacientes.application.validation.PacienteValidator;
-import microservice.pacientes.shared.PacienteDuplicadoException;
+import microservice.pacientes.shared.PacienteNotFoundException;
 import org.springframework.stereotype.Component;
 
-import java.util.Optional;
-
 @Component
-public class DniDuplicadoValidator implements PacienteValidator {
-    private PacienteValidator next;
-    private final PacientePortOutRead pacientePortOutRead;
 
-    public DniDuplicadoValidator(PacientePortOutRead pacientePortOutRead) {
+public class ExistePacienteValidator implements PacienteValidator {
+
+    private final PacientePortOutRead pacientePortOutRead;
+    private PacienteValidator next;
+
+    public ExistePacienteValidator(PacientePortOutRead pacientePortOutRead) {
         this.pacientePortOutRead = pacientePortOutRead;
     }
     @Override
-    public void validate(Paciente paciente){
-        Optional<Paciente> existente = pacientePortOutRead.buscarByDni(paciente.getDni());
-        if (existente.isPresent()) {
-            throw new PacienteDuplicadoException(paciente.getDni());
+    public void validate(Paciente paciente) {
+        Long id = paciente.getId();
+        if (id == null || pacientePortOutRead.findById(id).isEmpty()) {
+            throw PacienteNotFoundException.porId(id);
         }
+
         if (next != null) {
             next.validate(paciente);
         }
-
     }
 
     @Override

@@ -2,23 +2,18 @@ package microservice.pacientes.infrastructure.validation;
 
 import microservice.pacientes.application.domain.model.Paciente;
 import microservice.pacientes.application.validation.PacienteValidator;
-import microservice.pacientes.shared.InvalidFechaAltaException;
+import microservice.pacientes.shared.PacienteActivoException;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDate;
-
 @Component
-public class FechaAltaValidator implements PacienteValidator {
+public class EstadoInactivoValidator implements PacienteValidator {
 
     private PacienteValidator next;
 
-    public FechaAltaValidator() { }
-
     @Override
-    public void validate(Paciente paciente) {
-        LocalDate alta = paciente.getFechaAlta();
-        if (alta != null && alta.isAfter(LocalDate.now())) {
-            throw new InvalidFechaAltaException(alta);
+    public void validate(Paciente paciente){
+        if (paciente.isEstado()) {
+            throw new PacienteActivoException(paciente.getId());
         }
         if (next != null) {
             next.validate(paciente);
