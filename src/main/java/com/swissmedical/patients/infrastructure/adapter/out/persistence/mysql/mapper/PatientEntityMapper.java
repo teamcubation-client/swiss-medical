@@ -6,7 +6,7 @@ import com.swissmedical.patients.infrastructure.adapter.out.persistence.mysql.en
 public class PatientEntityMapper {
 
   public static Patient toDomain(PatientEntity patientEntity) {
-    return new Patient.PatientBuilder()
+    return Patient.builder()
             .id(patientEntity.getId())
             .firstName(patientEntity.getFirstName())
             .lastName(patientEntity.getLastName())

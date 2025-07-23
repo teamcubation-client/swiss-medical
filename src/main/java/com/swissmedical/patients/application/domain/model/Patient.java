@@ -1,13 +1,11 @@
 package com.swissmedical.patients.application.domain.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDate;
 
-@Data
+@Getter
+@Setter
 public class Patient {
   private Long id;
   private String firstName;
@@ -33,6 +31,10 @@ public class Patient {
     this.socialSecurity = builder.socialSecurity;
   }
 
+  public static PatientBuilder builder() {
+    return new PatientBuilder();
+  }
+
   public static class PatientBuilder {
     private Long id;
     private String firstName;
@@ -44,6 +46,9 @@ public class Patient {
     private LocalDate birthDate;
     private boolean isActive;
     private String socialSecurity;
+
+    private PatientBuilder() {
+    }
 
     public PatientBuilder id(Long id) {
       this.id = id;
