@@ -1,56 +1,71 @@
--- agregué esto porque si no me tiraba error al crear el container.
-CREATE TABLE IF NOT EXISTS paciente (
-    dni VARCHAR(20) NOT NULL PRIMARY KEY,
-    nombre VARCHAR(255) NOT NULL,
-    apellido VARCHAR(255) NOT NULL,
-    obra_social VARCHAR(255),
-    email VARCHAR(255),
-    telefono VARCHAR(50)
-);
+-- Configurar conexión y base de datos
+SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci;
+SET CHARACTER SET utf8mb4;
+SET collation_connection = utf8mb4_unicode_ci;
 
+-- Dropear la tabla y procedimientos si existen
+DROP PROCEDURE IF EXISTS buscar_paciente_por_dni;
+DROP PROCEDURE IF EXISTS buscar_pacientes_por_nombre;
+DROP PROCEDURE IF EXISTS buscar_pacientes_por_obra_social_paginado;
+DROP TABLE IF EXISTS pacientes;
 
-INSERT INTO paciente (dni, nombre, apellido, obra_social, email, telefono) VALUES
-('12345678', 'Carlos', 'Pérez', 'OSDE', 'carlos.perez@example.com', '111-1111'),
-('23456789', 'Ana', 'Gómez', 'Swiss Medical', 'ana.gomez@example.com', '222-2222'),
-('34567890', 'Luis', 'Martínez', 'OSDE', 'luis.martinez@example.com', '333-3333'),
-('45678901', 'María', 'López', 'Galeno', 'maria.lopez@example.com', '444-4444'),
-('56789012', 'Jorge', 'Sánchez', 'OSDE', 'jorge.sanchez@example.com', '555-5555'),
-('67890123', 'Lucía', 'Fernández', 'Swiss Medical', 'lucia.fernandez@example.com', '666-6666'),
-('78901234', 'Pedro', 'Ramírez', 'Medicus', 'pedro.ramirez@example.com', '777-7777'),
-('89012345', 'Laura', 'Suárez', 'Galeno', 'laura.suarez@example.com', '888-8888'),
-('90123456', 'Sofía', 'Gutiérrez', 'OSDE', 'sofia.gutierrez@example.com', '999-9999'),
-('01234567', 'Diego', 'Herrera', 'Medicus', 'diego.herrera@example.com', '101-0101');
+-- Crear tabla
+CREATE TABLE IF NOT EXISTS pacientes (
+    dni VARCHAR(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL PRIMARY KEY,
+    nombre VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+    apellido VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+    obra_social VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+    email VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+    telefono VARCHAR(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- Insertar datos
+INSERT INTO pacientes (dni, nombre, apellido, obra_social, email, telefono) VALUES
+                                                                               ('12345678', 'Carlos', 'Pérez', 'OSDE', 'carlos.perez@example.com', '111111111'),
+                                                                               ('23456789', 'Ana', 'Gómez', 'Swiss Medical', 'ana.gomez@example.com', '222222222'),
+                                                                               ('34567890', 'Luis', 'Martínez', 'OSDE', 'luis.martinez@example.com', '333333333'),
+                                                                               ('45678901', 'María', 'López', 'Galeno', 'maria.lopez@example.com', '444444444'),
+                                                                               ('56789012', 'Jorge', 'Sánchez', 'OSDE', 'jorge.sanchez@example.com', '555555555'),
+                                                                               ('67890123', 'Lucía', 'Fernández', 'Swiss Medical', 'lucia.fernandez@example.com', '666666666'),
+                                                                               ('78901234', 'Pedro', 'Ramírez', 'Medicus', 'pedro.ramirez@example.com', '777777777'),
+                                                                               ('89012345', 'Laura', 'Suárez', 'Galeno', 'laura.suarez@example.com', '888888888'),
+                                                                               ('90123456', 'Sofía', 'Gutiérrez', 'OSDE', 'sofia.gutierrez@example.com', '999999999'),
+                                                                               ('01234567', 'Diego', 'Herrera', 'Medicus', 'diego.herrera@example.com', '101010101');
 
 -- Procedimiento 1: buscar paciente por DNI
 DELIMITER //
 
-CREATE PROCEDURE buscar_paciente_por_dni(IN p_dni VARCHAR(20))
+CREATE PROCEDURE buscar_paciente_por_dni(
+    IN p_dni VARCHAR(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci
+)
 BEGIN
-    SELECT dni, nombre, apellido, obra_social, email, telefono
-    FROM paciente
-    WHERE dni = p_dni;
+SELECT dni, nombre, apellido, obra_social, email, telefono
+FROM pacientes
+WHERE dni COLLATE utf8mb4_unicode_ci = p_dni COLLATE utf8mb4_unicode_ci;
 END;
 //
 
 -- Procedimiento 2: buscar pacientes por nombre parcial (case-insensitive)
-CREATE PROCEDURE buscar_pacientes_por_nombre(IN p_nombre VARCHAR(50))
+CREATE PROCEDURE buscar_pacientes_por_nombre(
+    IN p_nombre VARCHAR(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci
+)
 BEGIN
-    SELECT dni, nombre, apellido, obra_social, email, telefono
-    FROM paciente
-    WHERE LOWER(nombre) LIKE CONCAT('%', LOWER(p_nombre), '%');
+SELECT dni, nombre, apellido, obra_social, email, telefono
+FROM pacientes
+WHERE LOWER(nombre COLLATE utf8mb4_unicode_ci) LIKE CONCAT('%', LOWER(p_nombre COLLATE utf8mb4_unicode_ci), '%');
 END;
 //
 
 -- Procedimiento 3: buscar pacientes por obra social con paginación
 CREATE PROCEDURE buscar_pacientes_por_obra_social_paginado(
-    IN p_obra_social VARCHAR(50),
+    IN p_obra_social VARCHAR(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
     IN p_limit INT,
     IN p_offset INT
 )
 BEGIN
-    SELECT dni, nombre, apellido, obra_social, email, telefono
-    FROM paciente
-    WHERE obra_social = p_obra_social
+SELECT dni, nombre, apellido, obra_social, email, telefono
+FROM pacientes
+WHERE obra_social COLLATE utf8mb4_unicode_ci = p_obra_social COLLATE utf8mb4_unicode_ci
     LIMIT p_limit OFFSET p_offset;
 END;
 //

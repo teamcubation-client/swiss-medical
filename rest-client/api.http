@@ -7,16 +7,28 @@ POST http://localhost:8080/pacientes
 Content-Type: application/json
 
 {
-    "dni": "111111",
+    "dni": "86754321",
     "nombre": "Nicolas",
     "apellido": "Berti",
     "obraSocial": "OSDE",
     "email": "nicolas.berti@teamcubation.com",
-    "telefono": "2920642002"
+    "telefono": "123456798"
+}
+
+### GET paciente by dni: 86754321
+GET http://localhost:8080/pacientes/86754321
+
+### POST pacientes incorrecto. deberia dar error.
+POST http://localhost:8080/pacientes
+Content-Type: application/json
+
+{
+  "apellido": "1111",
+  "nombre": "Nicolas"
 }
 
 ### PUT pacientes
-PUT http://localhost:8080/pacientes/111111
+PUT http://localhost:8080/pacientes/86754321
 Content-Type: application/json
 
 {
@@ -24,6 +36,15 @@ Content-Type: application/json
     "apellido": "Girolamo",
     "email": "nicolas.berti69@gmail.com"
 }
+
+### GET paciente by 111111
+GET http://localhost:8080/pacientes/111111
+
+### GET paciente by NAME
+GET http://localhost:8080/pacientes/nombre/Martin
+
+### GET paciente by obra social
+GET http://localhost:8080/pacientes/obra_social?obraSocial=OSDE&page=1&size=10
 
 ### GET paciente by DNI with SP
 GET http://localhost:8080/pacientes/dni/90123456
@@ -41,4 +62,4 @@ GET http://localhost:8080/pacientes/1
 GET http://localhost:8080/pacientes/nombre/Laura
 
 ### GET paciente by obra social with SP
-GET http://localhost:8080/pacientes/obra_social?obra_social=OSDE&page=1&size=2
+GET http://localhost:8080/pacientes/obra_social?obraSocial=OSDE&page=1&size=2
