@@ -1,5 +1,6 @@
-package com.practica.crud_pacientes.infrastructure.adapter.in.rest.Controller;
+package com.practica.crud_pacientes.infrastructure.adapter.in.rest.controller;
 
+import com.practica.crud_pacientes.application.domain.port.in.Mediator;
 import jakarta.validation.Valid;
 import com.practica.crud_pacientes.application.domain.model.Paciente;
 import com.practica.crud_pacientes.application.domain.port.in.PacienteUseCase;
@@ -7,24 +8,25 @@ import com.practica.crud_pacientes.infrastructure.adapter.in.rest.dto.PacienteRe
 import com.practica.crud_pacientes.infrastructure.adapter.in.rest.dto.PacienteResponse;
 import com.practica.crud_pacientes.infrastructure.adapter.in.rest.mapper.PacienteRestMapper;
 import com.practica.crud_pacientes.infrastructure.adapter.in.rest.openAPI.PacienteAPI;
+import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@AllArgsConstructor
 @RestController
 @RequestMapping("/pacientes")
 public class PacienteController implements PacienteAPI {
 
     private final PacienteUseCase pacienteUseCase;
+    private final Mediator mediator;
 
-    public PacienteController(PacienteUseCase pacienteUseCase){
-        this.pacienteUseCase = pacienteUseCase;
-    }
 
     @GetMapping("")
     public ResponseEntity<List<PacienteResponse>> getPacientes(){
+        mediator.notifyTraffic("/pacientes");
         List<Paciente> pacientesDomain = pacienteUseCase.getPacientes();
         List<PacienteResponse> pacientesResponse = pacientesDomain.stream()
                 .map(PacienteRestMapper.mapper::domainToResponse)
