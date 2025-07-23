@@ -31,30 +31,30 @@ public class PacienteServiceImpl implements PacientePortInWrite, PacientePortInR
     private PacienteValidator updateChain;
 
     //handlers concretos inyectados
-    private final DniDuplicadoValidator dniVal;
-    private final FechaAltaValidator fechaVal;
-    private final EmailFormatValidator emailVal;
-    private final EstadoInactivoValidator estadoInactivoVal;
-    private final ExistePacienteValidator existePacienteVal;
+    private final DniDuplicadoValidator dniValidator;
+    private final FechaAltaValidator fechaValidator;
+    private final EmailFormatValidator emailValidator;
+    private final EstadoInactivoValidator estadoInactivoValidator;
+    private final ExistePacienteValidator existePacienteValidator;
 
     /**
      * Arma la cadena: dni -> fecha -> email
      */
     @PostConstruct
     private void initValidatorChain() {
-        dniVal.setNext(fechaVal);
-        fechaVal.setNext(emailVal);
-        this.createChain = dniVal;
+        dniValidator.setNext(fechaValidator);
+        fechaValidator.setNext(emailValidator);
+        this.createChain = dniValidator;
 
 
-        existePacienteVal.setNext(estadoInactivoVal);
-        this.deleteChain = existePacienteVal;
+        existePacienteValidator.setNext(estadoInactivoValidator);
+        this.deleteChain = existePacienteValidator;
 
 
-        existePacienteVal.setNext(dniVal);
-        dniVal.setNext(emailVal);
-        emailVal.setNext(fechaVal);
-        this.updateChain = existePacienteVal;
+        existePacienteValidator.setNext(dniValidator);
+        dniValidator.setNext(emailValidator);
+        emailValidator.setNext(fechaValidator);
+        this.updateChain = existePacienteValidator;
     }
 
 

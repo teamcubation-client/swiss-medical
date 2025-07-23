@@ -17,6 +17,7 @@ public class DniDuplicadoValidator implements PacienteValidator {
     public DniDuplicadoValidator(PacientePortOutRead pacientePortOutRead) {
         this.pacientePortOutRead = pacientePortOutRead;
     }
+
     @Override
     public void validate(Paciente paciente){
         Optional<Paciente> existente = pacientePortOutRead.buscarByDni(paciente.getDni());
