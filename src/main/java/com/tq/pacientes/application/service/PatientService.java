@@ -7,6 +7,8 @@ import com.tq.pacientes.shared.exceptions.PatientNotFoundException;
 import com.tq.pacientes.application.domain.model.Patient;
 import com.tq.pacientes.application.domain.port.in.PatientUseCase;
 import com.tq.pacientes.application.domain.port.out.PatientRepositoryPort;
+import com.tq.pacientes.application.domain.model.patientprocessing.PatientSaveFactory;
+import com.tq.pacientes.application.domain.model.patientprocessing.PatientSaveTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -17,9 +19,11 @@ import java.util.Optional;
 public class PatientService implements PatientUseCase {
 
     private final PatientRepositoryPort patientRepositoryPort;
+    private final PatientSaveFactory patientSaveFactory;
 
-    public PatientService(PatientRepositoryPort patientRepositoryPort) {
+    public PatientService(PatientRepositoryPort patientRepositoryPort, PatientSaveFactory patientSaveFactory) {
         this.patientRepositoryPort = patientRepositoryPort;
+        this.patientSaveFactory = patientSaveFactory;
     }
 
     @Override
@@ -29,7 +33,9 @@ public class PatientService implements PatientUseCase {
         }
         patient.setCreationDate(LocalDateTime.now());
         patient.setLastModifiedDate(LocalDateTime.now());
-        return patientRepositoryPort.save(patient);
+        PatientSaveTemplate saveTemplate = patientSaveFactory.getPatientSaveStrategy(patient, patientRepositoryPort);
+        saveTemplate.save(patient);
+        return patient;
     }
 
     @Override
@@ -66,7 +72,7 @@ public class PatientService implements PatientUseCase {
         Patient patient = getById(id)
                 .orElseThrow(() -> new PatientNotFoundException(id));
         if (patientDetails.getDni() != null && !patient.getDni().equals(patientDetails.getDni())) {
-            if (patientRepositoryPort.findByDni(patientDetails.getDni()) != null) {
+            if (patientRepositoryPort.findByDni(patientDetails.getDni()).isPresent()) {
                 throw new DuplicatePatientException(patientDetails.getDni());
             }
             patient.setDni(patientDetails.getDni());
@@ -116,4 +122,4 @@ public class PatientService implements PatientUseCase {
         patient.setLastModifiedDate(LocalDateTime.now());
         patientRepositoryPort.update(patient);
     }
-} 
+}
