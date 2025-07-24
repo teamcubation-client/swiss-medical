@@ -17,4 +17,5 @@ public interface PatientPortIn {
     );
     Patient updateById(long id, Patient patient);
     void deleteById(long id);
+    String exportPatients(String format);
 }

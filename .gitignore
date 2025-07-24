@@ -8,6 +8,8 @@ target/
 *.log
 build/
 /src/main/resources/application-local.properties
+estructura-rutas.txt
+estructura-tree.txt
 
 ### STS ###
 .apt_generated

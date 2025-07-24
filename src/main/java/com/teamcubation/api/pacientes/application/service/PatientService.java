@@ -1,5 +1,8 @@
 package com.teamcubation.api.pacientes.application.service;
 
+import com.teamcubation.api.pacientes.application.domain.port.out.PatientExporterOut;
+import com.teamcubation.api.pacientes.infrastructure.adapter.in.exporter.factory.ExporterFactory;
+import com.teamcubation.api.pacientes.infrastructure.adapter.in.exporter.factory.ExporterFactoryProvider;
 import com.teamcubation.api.pacientes.application.domain.model.Patient;
 import com.teamcubation.api.pacientes.application.domain.port.in.PatientPortIn;
 import com.teamcubation.api.pacientes.application.domain.port.out.PatientPortOut;
@@ -85,6 +88,14 @@ public class PatientService implements PatientPortIn {
         this.patientPortOut.findById(id)
                 .orElseThrow(() -> new PatientNotFoundException(id));
         this.patientPortOut.deleteById(id);
+    }
+
+    @Override
+    public String exportPatients(String format) {
+        List<Patient> patients = patientPortOut.findAll(null, null);
+        ExporterFactory factory = ExporterFactoryProvider.getFactory(format);
+        PatientExporterOut exporter = factory.createPatientExporter();
+        return exporter.export(patients);
     }
 
     /**
