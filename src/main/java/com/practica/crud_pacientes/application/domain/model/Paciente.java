@@ -1,7 +1,10 @@
 package com.practica.crud_pacientes.application.domain.model;
 
+import lombok.ToString;
+
 import java.time.LocalDate;
 
+@ToString
 public class Paciente {
     private int id;
     private String nombre;

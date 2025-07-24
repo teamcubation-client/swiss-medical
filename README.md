@@ -108,3 +108,67 @@ Se valora el uso de @RestController, @Service, @Repository, DTOs y validaciones 
 
 El código debe ser claro, legible y estar organizado por paquetes.
 
+---
+
+# Implementación del Principio de Responsabilidad Única, patrón de diseño Observer y Mediator
+
+## 🧱 Principio de Responsabilidad Única (SRP) y patrón Observer
+
+Para aplicar el principio de **Responsabilidad Única (SRP)** se introdujo un requerimiento técnico: **registrar logs cada vez que se da de alta o baja a un paciente**.
+
+Este requerimiento llevó a implementar el patrón de diseño **Observer**, agregando:
+
+- Una interfaz `PacienteObserver` que define las acciones a realizar cuando se crea o elimina un paciente.
+- Un observer concreto llamado `PacienteLoggerObserver` que se encarga **exclusivamente** de registrar logs.
+- Un publisher `PacienteEventPublisherAdapter` que se encarga de notificar a todos los observers registrados.
+
+Inicialmente, los observers estaban siendo notificados directamente desde `PacienteService`, lo cual **violaba el principio SRP**. Esto se debía a que `PacienteService` ya tenía la responsabilidad de manejar la lógica de negocio, y además estaba acoplado a la gestión de notificaciones a los observers.
+
+### ✅ Solución: separación con EventPublisher
+
+Para resolver esta violación, se implementó una interfaz `PacienteEventPublisher` y su correspondiente adaptador. Ahora, `PacienteService` únicamente notifica al publisher, quien se encarga de difundir el evento a todos los observers suscriptos.
+
+Con esta estructura:
+
+- `PacienteService` se encarga solamente de la lógica de negocio.
+- `PacienteEventPublisherAdapter` se encarga de gestionar la lista de observers.
+- `PacienteLoggerObserver` se encarga de generar los logs.
+
+De esta manera, **cada clase cumple una única responsabilidad**, respetando SRP y aplicando correctamente el patrón Observer.
+
+---
+
+## 🤝 Patrón Mediator
+
+Luego se agregó un segundo requerimiento: **detectar cuando hay demasiado tráfico en un canal (endpoint) y lanzar una alerta**.
+
+Para implementar esta funcionalidad se utilizó el patrón de diseño **Mediator**, que permite centralizar la lógica de coordinación entre componentes y evita que estén directamente acoplados.
+
+### 🔧 Implementación del Mediator
+
+Se crearon los siguientes componentes:
+
+- **`Mediator`** (interfaz): define un método `notifyTraffic(String event)` que se llama al detectar tráfico.
+- **`TrafficMediator`**: implementación del mediator. Coordina el tráfico entre el `TrafficMonitor` (contador) y el `AlertService` (quien emite la alerta).
+- **`TrafficMonitor`**: mantiene un contador de solicitudes. Cuando se supera un umbral configurado, indica que debe generarse una alerta.
+- **`AlertService`**: publica el evento de alerta (que luego es recibido por los observers).
+- **`SistemaLoggerObserver`**: escucha las alertas emitidas y las registra en logs.
+- El endpoint `/pacientes` en el `PacienteController` es el único canal monitorizado en este caso.
+
+### ⚙️ Flujo de ejecución
+
+1. El controlador de pacientes (`PacienteController`) invoca `mediator.notifyTraffic("/pacientes")` cada vez que se accede al endpoint `GET /pacientes`.
+2. El `TrafficMediator` consulta al `TrafficMonitor` si el tráfico superó el umbral.
+3. Si se superó, se invoca al `AlertService`, quien publica un evento de alerta.
+4. Este evento es recibido por todos los observers registrados, como el `SistemaLoggerObserver`.
+
+---
+
+## 📌 Conclusión
+
+Este proyecto muestra cómo aplicar de forma combinada el **Principio de Responsabilidad Única**, junto con los patrones de diseño **Observer** y **Mediator**, para lograr una arquitectura limpia, desacoplada y fácil de mantener.
+
+- ✅ Cada clase tiene una única responsabilidad clara.
+- ✅ Los componentes están desacoplados entre sí.
+- ✅ El sistema puede extenderse sin necesidad de modificar las clases existentes.
+
