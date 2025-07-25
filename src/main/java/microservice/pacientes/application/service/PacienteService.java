@@ -1,6 +1,5 @@
 package microservice.pacientes.application.service;
 
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import microservice.pacientes.application.domain.model.Paciente;
 import microservice.pacientes.application.domain.port.in.PacientePortInRead;
@@ -19,7 +18,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class PacienteServiceImpl implements PacientePortInWrite, PacientePortInRead {
+public class PacienteService implements PacientePortInWrite, PacientePortInRead {
 
     private final PacientePortOutRead pacientePortOutRead;
     private final PacientePortOutWrite pacientePortOutWrite;
@@ -31,7 +30,7 @@ public class PacienteServiceImpl implements PacientePortInWrite, PacientePortInR
 
     //arma la cadena
     @PostConstruct
-    private void initValidatorChain() {
+    void initValidatorChain() {
 
         DniDuplicadoValidator dniDuplicadoCreate = new DniDuplicadoValidator(pacientePortOutRead);
         FechaAltaValidator fechaAltaCreate = new FechaAltaValidator();
