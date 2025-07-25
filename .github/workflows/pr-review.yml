@@ -26,7 +26,7 @@ jobs:
         restore-keys: ${{ runner.os }}-m2
         
     - name: Run tests
-      run: mvn clean test -Ptest
+      run: mvn clean test -Ptest -Dspring.profiles.active=test
       
     - name: Generate test report
       uses: dorny/test-reporter@v1
@@ -59,12 +59,12 @@ jobs:
         restore-keys: ${{ runner.os }}-m2
         
     - name: Run tests with coverage
-      run: mvn clean test jacoco:report -Ptest
+      run: mvn clean test jacoco:report -Ptest -Dspring.profiles.active=test
       
     - name: Check coverage threshold and generate report
       run: |
         # Generate coverage report and check threshold in one command
-        mvn clean verify -Ptest
+        mvn clean verify -Ptest -Dspring.profiles.active=test
         
         echo "✅ All tests passed and coverage meets the 80% threshold"
         
