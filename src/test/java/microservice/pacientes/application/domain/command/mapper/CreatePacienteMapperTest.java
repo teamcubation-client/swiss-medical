@@ -5,11 +5,14 @@ import microservice.pacientes.application.domain.factory.PacienteFactory;
 import microservice.pacientes.application.domain.model.Paciente;
 import microservice.pacientes.shared.exception.PacienteArgumentoInvalido;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -25,10 +28,10 @@ public class CreatePacienteMapperTest {
     @InjectMocks
     private CreatePacienteMapper createPacienteMapper;
 
-    @Test
-    @DisplayName("Debería mapear correctamente el paciente")
-    void mapValidPaciente() {
-        CreatePacienteCommand command = new CreatePacienteCommand("12345678", "John", "Doe", "OSDE", "email@example", "123456789");
+    @ParameterizedTest
+    @MethodSource("pacientesProvider")
+    @DisplayName("Debería mapear correctamente el paciente con distintos datos")
+    void mapValidPaciente(CreatePacienteCommand command, Paciente expectedPaciente) {
         when(pacienteFactory.create(
                 command.getDni(),
                 command.getNombre(),
@@ -36,23 +39,35 @@ public class CreatePacienteMapperTest {
                 command.getObraSocial(),
                 command.getEmail(),
                 command.getTelefono())
-        ).thenReturn(
-                new Paciente("12345678", "John", "Doe", "OSDE", "email@example", "123456789"));
+        ).thenReturn(expectedPaciente);
 
         Paciente paciente = createPacienteMapper.toEntity(command);
 
-        assertEquals("12345678", paciente.getDni());
-        assertEquals("John", paciente.getNombre());
-        assertEquals("Doe", paciente.getApellido());
-        assertEquals("OSDE", paciente.getObraSocial());
-        assertEquals("email@example", paciente.getEmail());
-        assertEquals("123456789", paciente.getTelefono());
+        assertEquals(expectedPaciente.getDni(), paciente.getDni());
+        assertEquals(expectedPaciente.getNombre(), paciente.getNombre());
+        assertEquals(expectedPaciente.getApellido(), paciente.getApellido());
+        assertEquals(expectedPaciente.getObraSocial(), paciente.getObraSocial());
+        assertEquals(expectedPaciente.getEmail(), paciente.getEmail());
+        assertEquals(expectedPaciente.getTelefono(), paciente.getTelefono());
     }
 
-    @Test
+    static Stream<Arguments> pacientesProvider() {
+        return Stream.of(
+                Arguments.of(
+                        new CreatePacienteCommand("12345678", "John", "Doe", "OSDE", "email@example", "123456789"),
+                        new Paciente("12345678", "John", "Doe", "OSDE", "email@example", "123456789")
+                ),
+                Arguments.of(
+                        new CreatePacienteCommand("87654321", "Jane", "Smith", "Medife", "jane@ex.com", "987654321"),
+                        new Paciente("87654321", "Jane", "Smith", "Medife", "jane@ex.com", "987654321")
+                )
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("invalidPacientesProvider")
     @DisplayName("Debería lanzar una excepción si el paciente es inválido")
-    void mapInvalidPaciente() {
-        CreatePacienteCommand command = new CreatePacienteCommand("1", "Jo hn", "Doe#", "OSDE", "emailexample", "123456334789");
+    void mapInvalidPaciente(CreatePacienteCommand command) {
         when(pacienteFactory.create(
                 command.getDni(),
                 command.getNombre(),
@@ -62,6 +77,16 @@ public class CreatePacienteMapperTest {
                 command.getTelefono())
         ).thenThrow(PacienteArgumentoInvalido.class);
 
-        assertThrows(PacienteArgumentoInvalido.class, () -> createPacienteMapper.toEntity(command));
+        assertThrows(PacienteArgumentoInvalido.class,
+                () -> createPacienteMapper.toEntity(command));
+    }
+
+    static Stream<CreatePacienteCommand> invalidPacientesProvider() {
+        return Stream.of(
+                new CreatePacienteCommand("1", "Jo hn", "Doe#", "OSDE", "emailexample", "123456334789"),
+                new CreatePacienteCommand("", "Juan", "Pérez", "OSDE", "email@example.com", "123456"),
+                new CreatePacienteCommand("1234", "María", "López$", "Medife", "mail@", "987654321"),
+                new CreatePacienteCommand("5678", "José", "Gómez", "OSDE", "emailexample", "phone123")
+        );
     }
 }

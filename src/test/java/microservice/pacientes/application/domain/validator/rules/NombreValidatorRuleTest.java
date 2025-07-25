@@ -21,13 +21,20 @@ public class NombreValidatorRuleTest {
         nombreValidatorRule = new NombreValidatorRule();
     }
 
-    @Test
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "Juan",
+            "María",
+            "José",
+            "Ñandú",
+            "ANA",
+            "ana"
+    })
     @DisplayName("Debería validar un nombre válido")
-    void validateValidNombre() {
-        Paciente paciente = Paciente.builder().nombre("Juan").build();
+    void validateValidNombre(String validNombre) {
+        Paciente paciente = Paciente.builder().nombre(validNombre).build();
         assertDoesNotThrow(() -> nombreValidatorRule.validate(paciente));
     }
-
 
     @ParameterizedTest
     @ValueSource(strings = {
@@ -36,7 +43,17 @@ public class NombreValidatorRuleTest {
             "J1an",
             "$#!@-.",
             "   ",
-            " "
+            " ",
+            "",
+            "Ju an",
+            "J1an",
+            "$#!@-.",
+            "   ",
+            " ",
+            "Juan\n",
+            "Juan1",
+            "1Juan",
+            "111"
     })
     @DisplayName("Debería lanzar excepción para nombres inválidos")
     void validateInvalidNombre(String invalidNombre) {
@@ -45,12 +62,6 @@ public class NombreValidatorRuleTest {
         assertEquals("El nombre del paciente es inválido", exception.getMessage());
     }
 
-    @Test
-    @DisplayName("Debería validar un nombre con acentos")
-    void validateValidNombreWithAccents() {
-        Paciente paciente = Paciente.builder().nombre("José").build();
-        assertDoesNotThrow(() -> nombreValidatorRule.validate(paciente));
-    }
 
     @Test
     @DisplayName("Debería lanzar excepción para nombre nulo")

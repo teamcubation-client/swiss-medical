@@ -6,8 +6,13 @@ import microservice.pacientes.shared.exception.PacienteArgumentoInvalido;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -23,15 +28,10 @@ public class PacienteFactoryImplTest {
     @InjectMocks
     private PacienteFactoryImpl pacienteFactory;
 
-    @Test
-    void createValidPaciente() {
-        String dni = "12345678";
-        String nombre = "Juan";
-        String apellido = "Perez";
-        String obraSocial = "OSDE";
-        String email = "juan.perez@gmail.com";
-        String telefono = "123456789";
-
+    @ParameterizedTest
+    @MethodSource("validPacientesProvider")
+    @DisplayName("Debería crear un paciente válido")
+    void createValidPaciente(String dni, String nombre, String apellido, String obraSocial, String email, String telefono) {
         Paciente paciente = pacienteFactory.create(dni, nombre, apellido, obraSocial, email, telefono);
 
         assertEquals(dni, paciente.getDni());
@@ -43,117 +43,44 @@ public class PacienteFactoryImplTest {
         verify(pacienteValidator).validate(paciente);
     }
 
-    @Test
-    void createPacienteWithInvalidDNI() {
-        String dni = "1111";
-        String nombre = "Juan";
-        String apellido = "Perez";
-        String obraSocial = "OSDE";
-        String email = "juan.perez@gmail.com";
-        String telefono = "123456789";
-        PacienteArgumentoInvalido exception = new PacienteArgumentoInvalido("Argumento invalido");
-
-        doThrow(exception).when(pacienteValidator).validate(any(Paciente.class));
-
-        PacienteArgumentoInvalido pacienteArgumentoInvalido = assertThrows(PacienteArgumentoInvalido.class, () -> {
-            pacienteFactory.create(dni, nombre, apellido, obraSocial, email, telefono);
-        });
-        assertEquals("Argumento invalido", pacienteArgumentoInvalido.getMessage());
-        verify(pacienteValidator).validate(any(Paciente.class));
+    static Stream<Arguments> validPacientesProvider() {
+        return Stream.of(
+                Arguments.of("12345678", "Juan", "Perez", "OSDE", "juan.perez@gmail.com", "123456789")
+        );
     }
 
-    @Test
-    void createPacienteWithInvalidNombre() {
-        String dni = "12345678";
-        String nombre = "";
-        String apellido = "Perez";
-        String obraSocial = "OSDE";
-        String email = "juan.perez@gmail.com";
-        String telefono = "123456789";
-
-        doThrow(new PacienteArgumentoInvalido(""))
+    @ParameterizedTest
+    @MethodSource("invalidPacienteArgumentsProvider")
+    void createPacienteInvalidCases(
+            String dni,
+            String nombre,
+            String apellido,
+            String obraSocial,
+            String email,
+            String telefono
+    ) {
+        doThrow(new PacienteArgumentoInvalido("Argumento invalido"))
                 .when(pacienteValidator)
                 .validate(any(Paciente.class));
 
-        assertThrows(PacienteArgumentoInvalido.class, () -> {
-            pacienteFactory.create(dni, nombre, apellido, obraSocial, email, telefono);
-        });
+        PacienteArgumentoInvalido exception = assertThrows(
+                PacienteArgumentoInvalido.class,
+                () -> pacienteFactory.create(dni, nombre, apellido, obraSocial, email, telefono)
+        );
+
+        assertEquals("Argumento invalido", exception.getMessage());
+
         verify(pacienteValidator).validate(any(Paciente.class));
     }
 
-    @Test
-    void createPacienteWithInvalidApellido() {
-        String dni = "12345678";
-        String nombre = "Juan";
-        String apellido = "";
-        String obraSocial = "OSDE";
-        String email = "juan.perez@gmail.com";
-        String telefono = "123456789";
-
-        doThrow(new PacienteArgumentoInvalido(""))
-                .when(pacienteValidator)
-                .validate(any(Paciente.class));
-
-        assertThrows(PacienteArgumentoInvalido.class, () -> {
-            pacienteFactory.create(dni, nombre, apellido, obraSocial, email, telefono);
-        });
-        verify(pacienteValidator).validate(any(Paciente.class));
-    }
-
-    @Test
-    void createPacienteWithInvalidEmail() {
-        String dni = "12345678";
-        String nombre = "Juan";
-        String apellido = "Perez";
-        String obraSocial = "OSDE";
-        String email = "juan.perez";
-        String telefono = "123456789";
-
-        doThrow(new PacienteArgumentoInvalido(""))
-                .when(pacienteValidator)
-                .validate(any(Paciente.class));
-
-        assertThrows(PacienteArgumentoInvalido.class, () -> {
-            pacienteFactory.create(dni, nombre, apellido, obraSocial, email, telefono);
-        });
-        verify(pacienteValidator).validate(any(Paciente.class));
-    }
-
-    @Test
-    void createPacienteWithInvalidTelefono() {
-        String dni = "12345678";
-        String nombre = "";
-        String apellido = "Perez";
-        String obraSocial = "OSDE";
-        String email = "juan.perez";
-        String telefono = "123456789";
-
-        doThrow(new PacienteArgumentoInvalido(""))
-                .when(pacienteValidator)
-                .validate(any(Paciente.class));
-
-        assertThrows(PacienteArgumentoInvalido.class, () -> {
-            pacienteFactory.create(dni, nombre, apellido, obraSocial, email, telefono);
-        });
-        verify(pacienteValidator).validate(any(Paciente.class));
-    }
-
-    @Test
-    void createPacienteInvalid() {
-        String dni = "1";
-        String nombre = "";
-        String apellido = "";
-        String obraSocial = "OSDE";
-        String email = "juan.perez";
-        String telefono = "123";
-
-        doThrow(new PacienteArgumentoInvalido(""))
-                .when(pacienteValidator)
-                .validate(any(Paciente.class));
-
-        assertThrows(PacienteArgumentoInvalido.class, () -> {
-            pacienteFactory.create(dni, nombre, apellido, obraSocial, email, telefono);
-        });
-        verify(pacienteValidator).validate(any(Paciente.class));
+    static Stream<org.junit.jupiter.params.provider.Arguments> invalidPacienteArgumentsProvider() {
+        return Stream.of(
+                org.junit.jupiter.params.provider.Arguments.of("1111", "Juan", "Perez", "OSDE", "juan.perez@gmail.com", "123456789"),  // dni inválido
+                org.junit.jupiter.params.provider.Arguments.of("12345678", "", "Perez", "OSDE", "juan.perez@gmail.com", "123456789"),       // nombre inválido
+                org.junit.jupiter.params.provider.Arguments.of("12345678", "Juan", "", "OSDE", "juan.perez@gmail.com", "123456789"),        // apellido inválido
+                org.junit.jupiter.params.provider.Arguments.of("12345678", "Juan", "Perez", "OSDE", "juan.perez", "123456789"),             // email inválido
+                org.junit.jupiter.params.provider.Arguments.of("12345678", "Juan", "Perez", "OSDE", "juan.perez@gmail.com", ""),             // teléfono inválido (vacío)
+                org.junit.jupiter.params.provider.Arguments.of("1", "", "", "OSDE", "juan.perez", "123")                                   // múltiples inválidos
+        );
     }
 }

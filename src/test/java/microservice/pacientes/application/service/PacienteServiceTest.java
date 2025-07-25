@@ -12,12 +12,15 @@ import microservice.pacientes.shared.exception.PacienteNoEncontradoException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -69,16 +72,26 @@ public class PacienteServiceTest {
         verify(createPacienteMapper).toEntity(createPacienteCommand);
     }
 
-    @Test
+    @ParameterizedTest
+    @MethodSource("invalidCreatePacienteCommands")
     @DisplayName("Debería lanzar una excepción al intentar crear un paciente con datos inválidos")
-    void createInvalidPaciente() {
-        CreatePacienteCommand createPacienteCommand = new CreatePacienteCommand("1", "Juan", "Perez", "Obra social", "email@test.com", "123456789");
-        Paciente paciente = new Paciente("1", "Juan", "Perez", "Obra social", "email@test.com", "123456789");
+    void createInvalidPaciente(CreatePacienteCommand createPacienteCommand) {
         doThrow(new PacienteArgumentoInvalido(""))
                 .when(createPacienteMapper).toEntity(createPacienteCommand);
 
         assertThrows(PacienteArgumentoInvalido.class, () -> pacienteService.create(createPacienteCommand));
         verify(createPacienteMapper).toEntity(createPacienteCommand);
+    }
+
+    static Stream<CreatePacienteCommand> invalidCreatePacienteCommands() {
+        return Stream.of(
+                new CreatePacienteCommand("1", "Juan", "Perez", "Obra social", "email@test.com", "123456789"),
+                new CreatePacienteCommand("12345678", "", "Perez", "OSDE", "email@example.com", "123456789"),
+                new CreatePacienteCommand("12345678", "Juan", "", "OSDE", "email@example.com", "123456789"),
+                new CreatePacienteCommand("12345678", "Juan", "Perez", "OSDE", "invalidemail", "123456789"),
+                new CreatePacienteCommand("12345678", "Juan", "Perez", "OSDE", "email@example.com", ""),
+                new CreatePacienteCommand("", "", "", "", "", "")
+        );
     }
 
     @Test
@@ -279,17 +292,31 @@ public class PacienteServiceTest {
         verify(pacientePortOut).getByDni(dni);
     }
 
-    @Test
+    @ParameterizedTest
+    @MethodSource("invalidUpdatePacienteCommands")
     @DisplayName("Debería lanzar una excepción al intentar actualizar un paciente con argumentos inválidos")
-    void updateInvalidPaciente() {
-        String dni = "12345678";
-        UpdatePacienteCommand command = new UpdatePacienteCommand(null, "Perez", "OSDE", "juan.perez@gmail.com", "123456789");
-        Paciente pacienteExistente = new Paciente(dni, "Juan", "Antiguo", "Medife", "viejo@email.com", "000000000");
-        when(pacientePortOut.getByDni(dni)).thenReturn(Optional.of(pacienteExistente));
-        doThrow(new PacienteArgumentoInvalido("Argumento invalido")).when(pacienteUpdater).update(command, pacienteExistente);
+    void updateInvalidPaciente(UpdatePacienteCommand command) {
+        String DNI = "12345678";
+        Paciente pacienteExistente = new Paciente(DNI, "Juan", "Antiguo", "Medife", "viejo@email.com", "000000000");
+        when(pacientePortOut.getByDni(DNI)).thenReturn(Optional.of(pacienteExistente));
+        doThrow(new PacienteArgumentoInvalido("Argumento invalido"))
+                .when(pacienteUpdater).update(command, pacienteExistente);
 
-        assertThrows(PacienteArgumentoInvalido.class, () -> pacienteService.update(dni, command));
-        verify(pacientePortOut).getByDni(dni);
+        assertThrows(PacienteArgumentoInvalido.class,
+                () -> pacienteService.update(DNI, command));
+        verify(pacientePortOut).getByDni(DNI);
+    }
+
+    static Stream<UpdatePacienteCommand> invalidUpdatePacienteCommands() {
+        return Stream.of(
+                new UpdatePacienteCommand(null, "Perez", "OSDE", "juan.perez@gmail.com", "123456789"),
+                new UpdatePacienteCommand("Juan", null, "OSDE", "juan.perez@gmail.com", "123456789"),
+                new UpdatePacienteCommand("Juan", "Perez", null, "juan.perez@gmail.com", "123456789"),
+                new UpdatePacienteCommand("Juan", "Perez", "OSDE", "invalidemail", "123456789"),
+                new UpdatePacienteCommand("Juan", "Perez", "OSDE", "juan.perez@gmail.com", ""),
+                new UpdatePacienteCommand(null, null, null, null, null)
+                // agregá más combinaciones inválidas si querés
+        );
     }
 
 }
