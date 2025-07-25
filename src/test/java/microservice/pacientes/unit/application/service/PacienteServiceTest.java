@@ -258,8 +258,7 @@ public class PacienteServiceTest {
         UpdatePacienteCommand command = new UpdatePacienteCommand("Agustin", "Perez", "OSDE", "agustin.perez@gmail.com", "123456789");
         Paciente pacienteExistente = new Paciente(dni, "Juan", "Antiguo", "Medife", "viejo@email.com", "000000000");
         when(pacientePortOut.getByDni(dni)).thenReturn(Optional.of(pacienteExistente));
-        //pacienteUpdater.update(command, pacienteExistente);
-        /*doAnswer(invocation -> { // es mejor usar un spy en este caso?
+        doAnswer(invocation -> { // es mejor usar un spy en este caso?
             UpdatePacienteCommand cmd = invocation.getArgument(0);
             Paciente pac = invocation.getArgument(1);
             pac.setNombre(cmd.getNombre());
@@ -268,7 +267,7 @@ public class PacienteServiceTest {
             pac.setEmail(cmd.getEmail());
             pac.setTelefono(cmd.getTelefono());
             return null;
-        }).when(pacienteUpdater).update(command, pacienteExistente);*/
+        }).when(pacienteUpdater).update(command, pacienteExistente);
         when(pacientePortOut.save(pacienteExistente)).thenReturn(pacienteExistente);
 
         Paciente actualizado = pacienteService.update(dni, command);
