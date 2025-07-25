@@ -19,7 +19,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class PatientServiceTest {
@@ -60,6 +60,17 @@ public class PatientServiceTest {
   }
 
   @Test
+  public void testGetAllWithInvalidPageAndSize() {
+    assertThrows(IllegalArgumentException.class, () -> {
+      patientService.getAll("", -1, 10);
+    });
+
+    assertThrows(IllegalArgumentException.class, () -> {
+      patientService.getAll("", 1, -10);
+    });
+  }
+
+  @Test
   public void testGetAllWithName() {
     String name = "John";
     when(repository.findByFirstName(name)).thenReturn(List.of(
@@ -70,6 +81,16 @@ public class PatientServiceTest {
 
     assertEquals(1, patients.size());
     assertEquals("John", patients.get(0).getFirstName());
+  }
+
+  @Test
+  public void testGetAllWithNameNotFound() {
+    String name = "NonExistent";
+    when(repository.findByFirstName(name)).thenReturn(List.of());
+
+    assertThrows(PatientNotFoundException.class, () -> {
+      patientService.getAll(name, 1, 10);
+    });
   }
 
   @Test
@@ -165,6 +186,15 @@ public class PatientServiceTest {
     assertThrows(PatientNotFoundException.class, () -> {
       patientService.update(1L, patient);
     });
+  }
+
+  @Test
+  public void testDeletePatient() {
+    when(repository.existsById(TestContants.ID)).thenReturn(true);
+
+    patientService.delete(TestContants.ID);
+
+    verify(repository, times(1)).delete(TestContants.ID);
   }
 
   @Test
