@@ -10,18 +10,17 @@ import microservice.pacientes.application.domain.port.in.DeletePacienteUseCase;
 import microservice.pacientes.application.domain.port.in.FindPacienteUseCase;
 import microservice.pacientes.application.domain.port.in.UpdatePacienteUseCase;
 import microservice.pacientes.application.domain.port.out.PacientePortOut;
-import microservice.pacientes.application.domain.validator.PacienteValidator;
+import microservice.pacientes.application.domain.port.out.PacienteUpdater;
 import microservice.pacientes.shared.annotations.UseCase;
 import microservice.pacientes.shared.exception.PacienteDuplicadoException;
 import microservice.pacientes.shared.exception.PacienteNoEncontradoException;
-
 import java.util.List;
 
 @AllArgsConstructor
 @UseCase
 public class PacienteService implements FindPacienteUseCase, CreatePacienteUseCase, UpdatePacienteUseCase, DeletePacienteUseCase {
     private final PacientePortOut pacientePortOut;
-    private final PacienteValidator pacienteValidator;
+    private final PacienteUpdater pacienteUpdater;
     private final CreatePacienteMapper createPacienteMapper;
 
     @Override
@@ -74,12 +73,8 @@ public class PacienteService implements FindPacienteUseCase, CreatePacienteUseCa
     public Paciente update(String dni, UpdatePacienteCommand updatePacienteCommand) throws PacienteNoEncontradoException {
         Paciente paciente = pacientePortOut.getByDni(dni)
                 .orElseThrow(PacienteNoEncontradoException::new);
-        if (updatePacienteCommand.getNombre() != null) paciente.setNombre(updatePacienteCommand.getNombre());
-        if (updatePacienteCommand.getApellido() != null) paciente.setApellido(updatePacienteCommand.getApellido());
-        if (updatePacienteCommand.getObraSocial() != null) paciente.setObraSocial(updatePacienteCommand.getObraSocial());
-        if (updatePacienteCommand.getEmail() != null) paciente.setEmail(updatePacienteCommand.getEmail());
-        if (updatePacienteCommand.getTelefono() != null) paciente.setTelefono(updatePacienteCommand.getTelefono());
-        pacienteValidator.validate(paciente);
+        pacienteUpdater.update(updatePacienteCommand, paciente);
+
         return pacientePortOut.save(paciente);
     }
 }
