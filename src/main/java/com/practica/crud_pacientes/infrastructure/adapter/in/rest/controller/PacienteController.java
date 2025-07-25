@@ -10,6 +10,7 @@ import com.practica.crud_pacientes.infrastructure.adapter.in.rest.mapper.Pacient
 import com.practica.crud_pacientes.infrastructure.adapter.in.rest.openAPI.PacienteAPI;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,6 +23,7 @@ public class PacienteController implements PacienteAPI {
 
     private final PacienteUseCase pacienteUseCase;
     private final Mediator mediator;
+    private final PacienteRestMapper mapper;
 
 
     @GetMapping("")
@@ -29,7 +31,7 @@ public class PacienteController implements PacienteAPI {
         mediator.notifyTraffic("/pacientes");
         List<Paciente> pacientesDomain = pacienteUseCase.getPacientes();
         List<PacienteResponse> pacientesResponse = pacientesDomain.stream()
-                .map(PacienteRestMapper.mapper::domainToResponse)
+                .map(mapper::domainToResponse)
                 .toList();
         return ResponseEntity.ok(pacientesResponse);
     }
@@ -37,22 +39,23 @@ public class PacienteController implements PacienteAPI {
     @GetMapping("/buscar-por-id/{id}")
     public ResponseEntity<PacienteResponse> getPaciente(@PathVariable int id) {
         Paciente paciente = pacienteUseCase.getPacienteById(id);
-        return ResponseEntity.ok(PacienteRestMapper.mapper.domainToResponse(paciente));
+        return ResponseEntity.ok(mapper.domainToResponse(paciente));
     }
 
     @PostMapping("/nuevo-paciente")
     public ResponseEntity<PacienteResponse> addPaciente(@RequestBody @Valid PacienteRequest pacienteNuevo) {
-        Paciente pacienteDomain = PacienteRestMapper.mapper.requestToDomain(pacienteNuevo);
+        Paciente pacienteDomain = mapper.requestToDomain(pacienteNuevo);
         Paciente nuevoPaciente = pacienteUseCase.addPaciente(pacienteDomain);
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(PacienteRestMapper.mapper.domainToResponse(nuevoPaciente));
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(mapper.domainToResponse(nuevoPaciente));
     }
 
     @PutMapping("/actualizar/{id}")
     public ResponseEntity<PacienteResponse> updatePaciente(@PathVariable int id, @RequestBody PacienteRequest paciente) {
-        Paciente pacienteDomain = PacienteRestMapper.mapper.requestToDomain(paciente);
+        Paciente pacienteDomain = mapper.requestToDomain(paciente);
         Paciente pacienteActualizado = pacienteUseCase.updatePaciente(id, pacienteDomain);
-        return ResponseEntity.ok(PacienteRestMapper.mapper.domainToResponse(pacienteActualizado));
+        return ResponseEntity.ok(mapper.domainToResponse(pacienteActualizado));
     }
 
     @DeleteMapping("/eliminar/{id}")
@@ -64,14 +67,14 @@ public class PacienteController implements PacienteAPI {
     @GetMapping("/dni/{dni}")
     public ResponseEntity<PacienteResponse> getPacienteByDni(@PathVariable @Valid String dni) {
         Paciente paciente = pacienteUseCase.getByDni(dni);
-        return ResponseEntity.ok(PacienteRestMapper.mapper.domainToResponse(paciente));
+        return ResponseEntity.ok(mapper.domainToResponse(paciente));
     }
 
     @GetMapping("/nombre/{nombre}")
     public ResponseEntity<List<PacienteResponse>> getPacientesByName(@PathVariable @Valid String nombre) {
         List<Paciente> pacientes = pacienteUseCase.getPacientesbyName(nombre);
         List<PacienteResponse> pacientesResponse = pacientes.stream()
-                .map(PacienteRestMapper.mapper::domainToResponse)
+                .map(mapper::domainToResponse)
                 .toList();
         return ResponseEntity.ok(pacientesResponse);
     }
@@ -82,7 +85,7 @@ public class PacienteController implements PacienteAPI {
                                                                       @RequestParam(defaultValue = "0") int off) {
         List<Paciente> pacientes = pacienteUseCase.getPacietesbyObraSocial(obraSocial, limite, off);
         List<PacienteResponse> pacientesResponse = pacientes.stream()
-                .map(PacienteRestMapper.mapper::domainToResponse)
+                .map(mapper::domainToResponse)
                 .toList();
         return ResponseEntity.ok(pacientesResponse);
     }
