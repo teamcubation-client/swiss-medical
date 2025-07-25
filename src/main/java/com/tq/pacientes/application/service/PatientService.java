@@ -66,7 +66,7 @@ public class PatientService implements PatientUseCase {
         Patient patient = getById(id)
                 .orElseThrow(() -> new PatientNotFoundException(id));
         if (patientDetails.getDni() != null && !patient.getDni().equals(patientDetails.getDni())) {
-            if (patientRepositoryPort.findByDni(patientDetails.getDni()) != null) {
+            if (patientRepositoryPort.findByDni(patientDetails.getDni()).isPresent()) {
                 throw new DuplicatePatientException(patientDetails.getDni());
             }
             patient.setDni(patientDetails.getDni());
