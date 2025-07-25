@@ -1,0 +1,295 @@
+package microservice.pacientes.application.service;
+
+import microservice.pacientes.application.domain.command.CreatePacienteCommand;
+import microservice.pacientes.application.domain.command.UpdatePacienteCommand;
+import microservice.pacientes.application.domain.command.mapper.CreatePacienteMapper;
+import microservice.pacientes.application.domain.model.Paciente;
+import microservice.pacientes.application.domain.port.out.PacientePortOut;
+import microservice.pacientes.application.domain.port.out.PacienteUpdater;
+import microservice.pacientes.shared.exception.PacienteArgumentoInvalido;
+import microservice.pacientes.shared.exception.PacienteDuplicadoException;
+import microservice.pacientes.shared.exception.PacienteNoEncontradoException;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.*;
+
+@ExtendWith(org.mockito.junit.jupiter.MockitoExtension.class)
+@DisplayName("PacienteServiceTest Tests")
+public class PacienteServiceTest {
+
+    @Mock
+    private PacientePortOut pacientePortOut;
+
+    @Mock
+    private PacienteUpdater pacienteUpdater;
+
+    @Mock
+    private CreatePacienteMapper createPacienteMapper;
+
+    @InjectMocks
+    private PacienteService pacienteService;
+
+    @Test
+    @DisplayName("Debería crear correctamente un paciente")
+    void createValidPaciente() {
+        CreatePacienteCommand createPacienteCommand = new CreatePacienteCommand("12345678", "Juan", "Perez", "Obra social", "email@test.com", "123456789");
+        Paciente paciente = new Paciente("12345678", "Juan", "Perez", "Obra social", "email@test.com", "123456789");
+        when(createPacienteMapper.toEntity(createPacienteCommand)).thenReturn(paciente);
+        when(pacientePortOut.existsByDni("12345678")).thenReturn(false);
+        when(pacientePortOut.save(paciente)).thenReturn(paciente);
+
+        Paciente pacienteReturn = pacienteService.create(createPacienteCommand);
+
+        verify(pacientePortOut).existsByDni("12345678");
+        verify(createPacienteMapper).toEntity(createPacienteCommand);
+        verify(pacientePortOut).save(paciente);
+        assertEquals(paciente, pacienteReturn);
+    }
+
+    @Test
+    @DisplayName("Debería lanzar una excepción al intentar crear un paciente duplicado")
+    void createExistsPaciente() {
+        CreatePacienteCommand createPacienteCommand = new CreatePacienteCommand("12345678", "Juan", "Perez", "Obra social", "email@test.com", "123456789");
+        Paciente paciente = new Paciente("12345678", "Juan", "Perez", "Obra social", "email@test.com", "123456789");
+        when(createPacienteMapper.toEntity(createPacienteCommand)).thenReturn(paciente);
+        when(pacientePortOut.existsByDni("12345678")).thenReturn(true);
+
+        assertThrows(PacienteDuplicadoException.class, () -> pacienteService.create(createPacienteCommand));
+        verify(pacientePortOut).existsByDni("12345678");
+        verify(createPacienteMapper).toEntity(createPacienteCommand);
+    }
+
+    @Test
+    @DisplayName("Debería lanzar una excepción al intentar crear un paciente con datos inválidos")
+    void createInvalidPaciente() {
+        CreatePacienteCommand createPacienteCommand = new CreatePacienteCommand("1", "Juan", "Perez", "Obra social", "email@test.com", "123456789");
+        Paciente paciente = new Paciente("1", "Juan", "Perez", "Obra social", "email@test.com", "123456789");
+        doThrow(new PacienteArgumentoInvalido(""))
+                .when(createPacienteMapper).toEntity(createPacienteCommand);
+
+        assertThrows(PacienteArgumentoInvalido.class, () -> pacienteService.create(createPacienteCommand));
+        verify(createPacienteMapper).toEntity(createPacienteCommand);
+    }
+
+    @Test
+    @DisplayName("Debería eliminar correctamente un paciente")
+    void deleteExistsPaciente() {
+        Paciente paciente = new Paciente("12345678", "Juan", "Perez", "Obra social", "email@test.com", "123456789");
+        when(pacientePortOut.getByDni("12345678")).thenReturn(Optional.of(paciente));
+
+        pacienteService.delete("12345678");
+
+        verify(pacientePortOut).getByDni("12345678");
+        verify(pacientePortOut).delete(paciente);
+    }
+
+    @Test
+    @DisplayName("Debería lanzar una excepción al intentar eliminar un paciente inexistente")
+    void deleteNoExistsPaciente() {
+        when(pacientePortOut.getByDni("12345678")).thenReturn(Optional.empty());
+
+        assertThrows(PacienteNoEncontradoException.class, () -> pacienteService.delete("12345678"));
+        verify(pacientePortOut).getByDni("12345678");
+    }
+
+    @Test
+    @DisplayName("Debería obtener correctamente un paciente")
+    void getAll() {
+        List<Paciente> pacientes = new ArrayList<>();
+        pacientes.add(new Paciente("12345678", "Juan", "Perez", "Obra social", "email@test.com", "123456789"));
+        pacientes.add(new Paciente("12345679", "Juan", "Perez", "Obra social", "email@test.com", "123456789"));
+        when(pacientePortOut.getAll()).thenReturn(pacientes);
+
+        List<Paciente> pacientesReturn = pacienteService.getAll();
+
+        verify(pacientePortOut).getAll();
+        assertEquals(pacientes, pacientesReturn);
+    }
+
+    @Test
+    @DisplayName("Debería obtener correctamente una lista vacía de pacientes")
+    void getAllEmpty() {
+        List<Paciente> pacientes = new ArrayList<>();
+        when(pacientePortOut.getAll()).thenReturn(pacientes);
+
+        List<Paciente> pacientesReturn = pacienteService.getAll();
+
+        verify(pacientePortOut).getAll();
+        assertEquals(pacientes, pacientesReturn);
+    }
+
+    @Test
+    @DisplayName("Debería obtener correctamente un paciente")
+    void getByNombreContainingIgnoreCase() {
+        List<Paciente> pacientes = new ArrayList<>();
+        pacientes.add(new Paciente("12345679", "Juan", "Perez", "Obra social", "email@test.com", "123456789"));
+        pacientes.add(new Paciente("12345679", "Juana", "Perez", "Obra social", "email@test.com", "123456789"));
+        when(pacientePortOut.getByNombreContainingIgnoreCase("Juan")).thenReturn(pacientes);
+
+        List<Paciente> pacientesReturn = pacienteService.getByNombreContainingIgnoreCase("Juan");
+
+        verify(pacientePortOut).getByNombreContainingIgnoreCase("Juan");
+        assertEquals(pacientes, pacientesReturn);
+    }
+
+    @Test
+    @DisplayName("Debería obtener correctamente una lista vacía de pacientes")
+    void getByNombreContainingIgnoreCaseEmpty() {
+        List<Paciente> pacientes = new ArrayList<>();
+        when(pacientePortOut.getByNombreContainingIgnoreCase("Juan")).thenReturn(pacientes);
+
+        List<Paciente> pacientesReturn = pacienteService.getByNombreContainingIgnoreCase("Juan");
+
+        verify(pacientePortOut).getByNombreContainingIgnoreCase("Juan");
+        assertEquals(pacientes, pacientesReturn);
+    }
+
+    @Test
+    @DisplayName("Debería obtener una lista vacía si no coincide el nombre con los pacientes")
+    void getByNombreContainingIgnoreCaseNoCoincide() {
+        List<Paciente> pacientes = new ArrayList<>();
+        pacientes.add(new Paciente("12345678", "Juan", "Perez", "Obra social", "email@test.com", "123456789"));
+        when(pacientePortOut.getByNombreContainingIgnoreCase("Agustin")).thenReturn(List.of());
+
+        List<Paciente> pacientesReturn = pacienteService.getByNombreContainingIgnoreCase("Agustin");
+
+        verify(pacientePortOut).getByNombreContainingIgnoreCase("Agustin");
+        assertEquals(0, pacientesReturn.size());
+    }
+
+    @Test
+    @DisplayName("Debería obtener correctamente un paciente")
+    void getByDni() {
+        Paciente paciente = new Paciente("12345678", "Juan", "Perez", "Obra social", "email@test.com", "123456789");
+        when(pacientePortOut.getByDni("12345678")).thenReturn(Optional.of(paciente));
+
+        Paciente pacienteReturn = pacienteService.getByDni("12345678");
+
+        verify(pacientePortOut).getByDni("12345678");
+        assertEquals(paciente, pacienteReturn);
+    }
+
+    @Test
+    @DisplayName("Debería lanzar una excepción al intentar obtener un paciente inexistente")
+    void getByNoExistsDni() {
+        when(pacientePortOut.getByDni("12345678")).thenReturn(Optional.empty());
+
+        assertThrows(PacienteNoEncontradoException.class, () -> pacienteService.getByDni("12345678"));
+        verify(pacientePortOut).getByDni("12345678");
+    }
+
+    @Test
+    @DisplayName("Debería obtener correctamente un paciente")
+    void getByNombre() {
+        Paciente paciente = new Paciente("12345678", "Juan", "Perez", "Obra social", "email@test.com", "123456789");
+        when(pacientePortOut.getByNombre("Juan")).thenReturn(Optional.of(paciente));
+
+        Paciente pacienteReturn = pacienteService.getByNombre("Juan");
+
+        verify(pacientePortOut).getByNombre("Juan");
+        assertEquals(paciente, pacienteReturn);
+    }
+
+    @Test
+    @DisplayName("Debería lanzar una excepción al intentar obtener un paciente inexistente")
+    void getByNoExistsNombre() {
+        when(pacientePortOut.getByNombre("Juan")).thenReturn(Optional.empty());
+
+        assertThrows(PacienteNoEncontradoException.class, () -> pacienteService.getByNombre("Juan"));
+        verify(pacientePortOut).getByNombre("Juan");
+    }
+
+    @Test
+    @DisplayName("Debería obtener correctamente los pacientes segun la obra social")
+    void getByObraSocial() {
+        List<Paciente> pacientes = new ArrayList<>();
+        pacientes.add(new Paciente("12345678", "Juan", "Perez", "OSDE", "email@test.com", "123456789"));
+        pacientes.add(new Paciente("12345680", "Agustina", "Perez", "OSDE", "email@test.com", "123456789"));
+        when(pacientePortOut.getByObraSocial("OSDE", 10, 0)).thenReturn(pacientes);
+
+        List<Paciente> pacientesReturn = pacienteService.getByObraSocial("OSDE", 10, 0);
+
+        verify(pacientePortOut).getByObraSocial("OSDE", 10, 0);
+        assertEquals(pacientes, pacientesReturn);
+    }
+
+    @Test
+    @DisplayName("Debería obtener una lista vacía cuando no haya pacientes con dicha obra social")
+    void getByNoExistsObraSocial() {
+        List<Paciente> pacientes = new ArrayList<>();
+        pacientes.add(new Paciente("12345679", "Agustin", "Perez", "SWISS MEDICAL", "email@test.com", "123456789"));
+        when(pacientePortOut.getByObraSocial("OSDE", 10, 0)).thenReturn(List.of());
+
+        List<Paciente> pacientesReturn = pacienteService.getByObraSocial("OSDE", 10, 0);
+
+        verify(pacientePortOut).getByObraSocial("OSDE", 10, 0);
+        assertEquals(0, pacientesReturn.size());
+    }
+
+    @Test
+    @DisplayName("Debería actualizar correctamente un paciente")
+    void updateValidPaciente() {
+        String dni = "12345678";
+        UpdatePacienteCommand command = new UpdatePacienteCommand("Juan", "Perez", "OSDE", "juan.perez@gmail.com", "123456789");
+        Paciente pacienteExistente = new Paciente(dni, "Juan", "Antiguo", "Medife", "viejo@email.com", "000000000");
+        when(pacientePortOut.getByDni(dni)).thenReturn(Optional.of(pacienteExistente));
+        doAnswer(invocation -> {
+            UpdatePacienteCommand cmd = invocation.getArgument(0);
+            Paciente pac = invocation.getArgument(1);
+            pac.setNombre(cmd.getNombre());
+            pac.setApellido(cmd.getApellido());
+            pac.setObraSocial(cmd.getObraSocial());
+            pac.setEmail(cmd.getEmail());
+            pac.setTelefono(cmd.getTelefono());
+            return null;
+        }).when(pacienteUpdater).update(command, pacienteExistente);
+        when(pacientePortOut.save(pacienteExistente)).thenReturn(pacienteExistente);
+
+        Paciente actualizado = pacienteService.update(dni, command);
+
+        assertEquals("Juan", actualizado.getNombre());
+        assertEquals("Perez", actualizado.getApellido());
+        assertEquals("OSDE", actualizado.getObraSocial());
+        assertEquals("juan.perez@gmail.com", actualizado.getEmail());
+        assertEquals("123456789", actualizado.getTelefono());
+        verify(pacientePortOut).getByDni(dni);
+        verify(pacienteUpdater).update(command, pacienteExistente);
+        verify(pacientePortOut).save(pacienteExistente);
+
+    }
+
+    @Test
+    @DisplayName("Debería lanzar una excepción al intentar actualizar un paciente inexistente")
+    void updateNoExistsPaciente() {
+        String dni = "12345678";
+        UpdatePacienteCommand command = new UpdatePacienteCommand("Juan", "Perez", "OSDE", "juan.perez@gmail.com", "123456789");
+        when(pacientePortOut.getByDni(dni)).thenReturn(Optional.empty());
+
+        assertThrows(PacienteNoEncontradoException.class, () -> pacienteService.update(dni, command));
+        verify(pacientePortOut).getByDni(dni);
+    }
+
+    @Test
+    @DisplayName("Debería lanzar una excepción al intentar actualizar un paciente con argumentos inválidos")
+    void updateInvalidPaciente() {
+        String dni = "12345678";
+        UpdatePacienteCommand command = new UpdatePacienteCommand(null, "Perez", "OSDE", "juan.perez@gmail.com", "123456789");
+        Paciente pacienteExistente = new Paciente(dni, "Juan", "Antiguo", "Medife", "viejo@email.com", "000000000");
+        when(pacientePortOut.getByDni(dni)).thenReturn(Optional.of(pacienteExistente));
+        doThrow(new PacienteArgumentoInvalido("Argumento invalido")).when(pacienteUpdater).update(command, pacienteExistente);
+
+        assertThrows(PacienteArgumentoInvalido.class, () -> pacienteService.update(dni, command));
+        verify(pacientePortOut).getByDni(dni);
+    }
+
+}
