@@ -361,6 +361,173 @@ src/
 - Conservar la funcionalidad de los stored procedures
 - Mantener la contenerización con Docker
 
+## 🧪 Fase 9: Testing del Microservicio
+
+### 🎯 Objetivo General
+
+- Alcanzar al menos un 80% de cobertura de código mediante pruebas automatizadas que validen el comportamiento del
+  dominio, los casos de uso, los adaptadores y los endpoints del microservicio.
+
+## ✅ Módulo 9-A: Tests Unitarios con Arquitectura Hexagonal
+
+### 📌 Objetivo:
+
+- Probar en forma aislada cada unidad de lógica del sistema, mockeando las dependencias externas mediante los puertos (
+  interfaces).
+- La clave es testear desde el interior hacia el exterior:
+
+| Capa                    | Clase principal          | Qué probar                                     | Cómo testear                             |
+|-------------------------|--------------------------|------------------------------------------------|------------------------------------------|
+| application/service     | PatientService           | Casos de uso: crear, buscar, eliminar          | Mock PatientRepositoryPort               |
+| adapter/in/rest         | PatientController        | Mapeo HTTP ↔ Dominio + manejo de errores       | Mock PatientUseCase                      |
+| adapter/out/persistence | PatientRepositoryAdapter | Persistencia y mapeo entre entidades y dominio | Mock JpaRepository y PatientEntityMapper |
+
+#### 📘 Ejemplo 1: PatientServiceTest.java
+
+```java
+
+@ExtendWith(MockitoExtension.class)
+class PatientServiceTest {
+
+  @Mock
+  private PatientRepositoryPort repository;
+
+  @InjectMocks
+  private PatientService service;
+
+  @Test
+  void shouldCreatePatientWhenDniIsNotTaken() {
+    Patient patient = new Patient("123", "Ana", "Lopez", "OSDE", "ana@mail.com", "123456");
+
+    when(repository.existsByDni("123")).thenReturn(false);
+    when(repository.save(any())).thenReturn(patient);
+
+    Patient result = service.createPatient(patient);
+
+    assertEquals("Ana", result.getFirstName());
+    verify(repository).save(patient);
+  }
+
+  @Test
+  void shouldThrowDuplicatedExceptionIfDniExists() {
+    Patient patient = new Patient("123", "Ana", "Lopez", "OSDE", "ana@mail.com", "123456");
+
+    when(repository.existsByDni("123")).thenReturn(true);
+
+    assertThrows(PatientDuplicatedException.class, () -> {
+      service.createPatient(patient);
+    });
+  }
+
+}
+```
+
+#### 📘 Ejemplo 2: PatientControllerTest.java
+
+```java
+
+@WebMvcTest(PatientController.class)
+class PatientControllerTest {
+
+  @Autowired
+  private MockMvc mockMvc;
+
+  @MockBean
+  private PatientUseCase useCase;
+
+  @Test
+  void shouldReturnPatientByDni() throws Exception {
+    Patient patient = new Patient("123", "Ana", "Lopez", "OSDE", "ana@mail.com", "123456");
+
+    when(useCase.findByDni("123")).thenReturn(patient);
+
+    mockMvc.perform(get("/patients/dni/123"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.firstName").value("Ana"));
+  }
+
+}
+```
+
+#### 📘 Ejemplo 3: PatientRepositoryAdapterTest.java
+
+```java
+
+@ExtendWith(MockitoExtension.class)
+class PatientRepositoryAdapterTest {
+
+  @Mock
+  private PatientJpaRepository jpaRepository;
+
+  @Mock
+  private PatientEntityMapper entityMapper;
+
+  @InjectMocks
+  private PatientRepositoryAdapter adapter;
+
+  @Test
+  void shouldSavePatientSuccessfully() {
+    Patient patient = new Patient("123", "Ana", "Lopez", "OSDE", "ana@mail.com", "123456");
+    PatientEntity entity = new PatientEntity();
+
+    when(entityMapper.toEntity(patient)).thenReturn(entity);
+    when(jpaRepository.save(entity)).thenReturn(entity);
+    when(entityMapper.toDomain(entity)).thenReturn(patient);
+
+    Patient result = adapter.save(patient);
+
+    assertEquals("123", result.getDni());
+  }
+
+}
+```
+
+## ✅ Módulo 9-B: Tests de Integración
+
+### 📌 Objetivo:
+
+- Probar que los componentes se integran correctamente en conjunto, especialmente desde el controlador hasta la
+  persistencia.
+- Recomendaciones:
+- Usar @SpringBootTest o @WebMvcTest con MockMvc.
+- Crear un perfil de test (application-test.yml) para evitar la conexión a MySQL real.
+- Se puede mockear el acceso a base de datos o usar H2 en memoria para simular procedimientos almacenados si es
+  necesario.
+
+- 📌 Si quieren pruebas realistas con base de datos, pueden usar Testcontainers, aunque no es obligatorio para este
+  ejercicio.
+
+### 📁 Estructura sugerida de tests
+
+```
+src/test/java/com/swissmedical/pacients/
+        ├──application/
+        │ └──service/
+        │   └──PatientServiceTest.java
+        ├──infrastructure/
+            │ └──adapter/
+            │ ├──in/rest/controller/
+            │ │ └──PatientControllerTest.java
+            │ └──out/persistence/mysql/repository/
+            │ └──PatientRepositoryAdapterTest.java
+        └──shared/
+        └──exceptions/
+        └──GlobalExceptionHandlerTest.java (opcional)
+```
+
+## 📌 Herramientas y configuración
+
+- Usar JUnit 5, Mockito, MockMvc.
+- Medir cobertura con Jacoco (jacoco-maven-plugin o equivalente).
+- Verificar que la cobertura supere el 80% en las capas de dominio, aplicación y adaptadores.
+
+## 🧠 Beneficios esperados
+
+- Validación clara del comportamiento esperado y no esperado.
+- Posibilidad de refactorizar sin miedo.
+- Cobertura sólida en lógica de negocio.
+- Separación de responsabilidades probadas.
+
 ---
 
 # 📝 Check List
