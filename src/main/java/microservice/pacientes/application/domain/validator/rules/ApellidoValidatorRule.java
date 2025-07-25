@@ -14,6 +14,6 @@ public class ApellidoValidatorRule implements PacienteValidatorRule {
     }
 
     private boolean isInvalid(String apellido) {
-        return !apellido.matches("^[\\p{L}\\s]+$");
+        return !apellido.matches("^[A-Za-zÁÉÍÓÚáéíóúÑñ]+$");
     }
 }

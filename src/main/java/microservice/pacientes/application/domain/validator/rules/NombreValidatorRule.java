@@ -14,6 +14,6 @@ public class NombreValidatorRule implements PacienteValidatorRule {
     }
 
     private boolean isInvalid(String nombre) {
-        return !nombre.matches("^[\\p{L}\\s]+$");
+        return !nombre.matches("^[A-Za-zÁÉÍÓÚáéíóúÑñ]+$");
     }
 }
