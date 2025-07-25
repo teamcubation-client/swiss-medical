@@ -1,6 +1,7 @@
-package microservice.pacientes.application.domain.validator.rules;
+package microservice.pacientes.unit.application.domain.validator.rules;
 
 import microservice.pacientes.application.domain.model.Paciente;
+import microservice.pacientes.application.domain.validator.rules.EmailValidatorRule;
 import microservice.pacientes.shared.exception.PacienteArgumentoInvalido;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

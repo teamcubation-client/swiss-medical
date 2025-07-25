@@ -1,6 +1,7 @@
-package microservice.pacientes.application.domain.validator;
+package microservice.pacientes.unit.application.domain.validator;
 
 import microservice.pacientes.application.domain.model.Paciente;
+import microservice.pacientes.application.domain.validator.PacienteValidatorImpl;
 import microservice.pacientes.application.domain.validator.rules.PacienteValidatorRule;
 import microservice.pacientes.shared.exception.PacienteArgumentoInvalido;
 import org.junit.jupiter.api.BeforeEach;

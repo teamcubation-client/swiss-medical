@@ -1,4 +1,4 @@
-package microservice.pacientes.infrastructure.out.persistence.mysql.updater;
+package microservice.pacientes.unit.infrastructure.out.persistence.mysql.updater;
 
 import microservice.pacientes.application.domain.command.UpdatePacienteCommand;
 import microservice.pacientes.application.domain.model.Paciente;
@@ -23,8 +23,7 @@ import static org.mockito.Mockito.*;
 class PacienteUpdaterImplTest {
 
     @Spy
-    private MapStructPacienteUpdater mapStructPacienteUpdater =
-            Mappers.getMapper(MapStructPacienteUpdater.class);
+    private MapStructPacienteUpdater mapStructPacienteUpdater = Mappers.getMapper(MapStructPacienteUpdater.class);
 
     @Mock
     private PacienteValidator pacienteValidator;
@@ -36,6 +35,7 @@ class PacienteUpdaterImplTest {
     void updateValidPaciente() {
         UpdatePacienteCommand command = new UpdatePacienteCommand("Agustin", "Gonzalez", "Swiss Medical", "agus@gmail.com", "123123123");
         Paciente paciente = new Paciente("12345678", "Juan", "Perez", "OSDE", "juan.perez@gmail.com", "123456789");
+
         pacienteUpdater.update(command, paciente);
 
         verify(mapStructPacienteUpdater).update(command, paciente);
@@ -51,7 +51,6 @@ class PacienteUpdaterImplTest {
     void updateInvalidPaciente() {
         UpdatePacienteCommand command = new UpdatePacienteCommand("J1an", "Pere3z", "OSDE", "juan.perezgmailcom", "123123123456789");
         Paciente paciente = new Paciente("12345678", "Juan", "Perez", "OSDE", "juan.perez@gmail.com", "123456789");
-
         doThrow(new PacienteArgumentoInvalido("Argumento inválido")).when(pacienteValidator).validate(paciente);
         
         assertThrows(RuntimeException.class, () -> pacienteUpdater.update(command, paciente));

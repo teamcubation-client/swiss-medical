@@ -1,5 +1,6 @@
-package microservice.pacientes.application.domain.factory;
+package microservice.pacientes.unit.application.domain.factory;
 
+import microservice.pacientes.application.domain.factory.PacienteFactoryImpl;
 import microservice.pacientes.application.domain.model.Paciente;
 import microservice.pacientes.application.domain.validator.PacienteValidator;
 import microservice.pacientes.shared.exception.PacienteArgumentoInvalido;

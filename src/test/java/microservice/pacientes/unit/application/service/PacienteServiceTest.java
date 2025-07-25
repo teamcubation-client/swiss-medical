@@ -1,4 +1,4 @@
-package microservice.pacientes.application.service;
+package microservice.pacientes.unit.application.service;
 
 import microservice.pacientes.application.domain.command.CreatePacienteCommand;
 import microservice.pacientes.application.domain.command.UpdatePacienteCommand;
@@ -6,6 +6,7 @@ import microservice.pacientes.application.domain.command.mapper.CreatePacienteMa
 import microservice.pacientes.application.domain.model.Paciente;
 import microservice.pacientes.application.domain.port.out.PacientePortOut;
 import microservice.pacientes.application.domain.port.out.PacienteUpdater;
+import microservice.pacientes.application.service.PacienteService;
 import microservice.pacientes.shared.exception.PacienteArgumentoInvalido;
 import microservice.pacientes.shared.exception.PacienteDuplicadoException;
 import microservice.pacientes.shared.exception.PacienteNoEncontradoException;
@@ -16,14 +17,14 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(org.mockito.junit.jupiter.MockitoExtension.class)
@@ -33,8 +34,8 @@ public class PacienteServiceTest {
     @Mock
     private PacientePortOut pacientePortOut;
 
-    @Mock
-    private PacienteUpdater pacienteUpdater;
+    @Spy
+    private PacienteUpdater pacienteUpdater; // esto puede ser un spy?
 
     @Mock
     private CreatePacienteMapper createPacienteMapper;
@@ -103,7 +104,7 @@ public class PacienteServiceTest {
         pacienteService.delete("12345678");
 
         verify(pacientePortOut).getByDni("12345678");
-        verify(pacientePortOut).delete(paciente);
+        verify(pacientePortOut, times(1)).delete(paciente);
     }
 
     @Test
@@ -252,11 +253,13 @@ public class PacienteServiceTest {
     @Test
     @DisplayName("Debería actualizar correctamente un paciente")
     void updateValidPaciente() {
+        // hace falta probar que realmente se actualiza el paciente o eso  lo prueba el unit test de pacienteupdater?
         String dni = "12345678";
-        UpdatePacienteCommand command = new UpdatePacienteCommand("Juan", "Perez", "OSDE", "juan.perez@gmail.com", "123456789");
+        UpdatePacienteCommand command = new UpdatePacienteCommand("Agustin", "Perez", "OSDE", "agustin.perez@gmail.com", "123456789");
         Paciente pacienteExistente = new Paciente(dni, "Juan", "Antiguo", "Medife", "viejo@email.com", "000000000");
         when(pacientePortOut.getByDni(dni)).thenReturn(Optional.of(pacienteExistente));
-        doAnswer(invocation -> {
+        //pacienteUpdater.update(command, pacienteExistente);
+        /*doAnswer(invocation -> { // es mejor usar un spy en este caso?
             UpdatePacienteCommand cmd = invocation.getArgument(0);
             Paciente pac = invocation.getArgument(1);
             pac.setNombre(cmd.getNombre());
@@ -265,20 +268,19 @@ public class PacienteServiceTest {
             pac.setEmail(cmd.getEmail());
             pac.setTelefono(cmd.getTelefono());
             return null;
-        }).when(pacienteUpdater).update(command, pacienteExistente);
+        }).when(pacienteUpdater).update(command, pacienteExistente);*/
         when(pacientePortOut.save(pacienteExistente)).thenReturn(pacienteExistente);
 
         Paciente actualizado = pacienteService.update(dni, command);
 
-        assertEquals("Juan", actualizado.getNombre());
+        assertEquals("Agustin", actualizado.getNombre());
         assertEquals("Perez", actualizado.getApellido());
         assertEquals("OSDE", actualizado.getObraSocial());
-        assertEquals("juan.perez@gmail.com", actualizado.getEmail());
+        assertEquals("agustin.perez@gmail.com", actualizado.getEmail());
         assertEquals("123456789", actualizado.getTelefono());
         verify(pacientePortOut).getByDni(dni);
         verify(pacienteUpdater).update(command, pacienteExistente);
         verify(pacientePortOut).save(pacienteExistente);
-
     }
 
     @Test

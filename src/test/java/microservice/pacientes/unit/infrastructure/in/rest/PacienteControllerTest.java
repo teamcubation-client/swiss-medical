@@ -1,4 +1,4 @@
-package microservice.pacientes.infrastructure.in.rest;
+package microservice.pacientes.unit.infrastructure.in.rest;
 
 public class PacienteControllerTest {
 

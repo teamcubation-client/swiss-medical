@@ -1,6 +1,7 @@
-package microservice.pacientes.application.domain.command.mapper;
+package microservice.pacientes.unit.application.domain.command.mapper;
 
 import microservice.pacientes.application.domain.command.CreatePacienteCommand;
+import microservice.pacientes.application.domain.command.mapper.CreatePacienteMapper;
 import microservice.pacientes.application.domain.factory.PacienteFactory;
 import microservice.pacientes.application.domain.model.Paciente;
 import microservice.pacientes.shared.exception.PacienteArgumentoInvalido;

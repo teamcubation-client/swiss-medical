@@ -74,7 +74,6 @@ public class PacienteService implements FindPacienteUseCase, CreatePacienteUseCa
         Paciente paciente = pacientePortOut.getByDni(dni)
                 .orElseThrow(PacienteNoEncontradoException::new);
         pacienteUpdater.update(updatePacienteCommand, paciente);
-
         return pacientePortOut.save(paciente);
     }
 }
