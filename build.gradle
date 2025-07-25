@@ -2,6 +2,7 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.5.3'
 	id 'io.spring.dependency-management' version '1.1.7'
+	id 'jacoco'
 }
 
 group = 'microservice'
@@ -27,6 +28,7 @@ ext {
 	set('springdocVersion', '2.8.9')
 	set('lombokVersion', '1.18.30')
 	set('mysqlConnectorVersion', '8.0.33')
+	set('h2Version', '2.2.224')
 }
 
 dependencies {
@@ -34,13 +36,52 @@ dependencies {
 	implementation "org.springframework.boot:spring-boot-starter-data-jpa"
 	implementation "org.springframework.boot:spring-boot-starter-web"
 	implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:${springdocVersion}"
+
 	compileOnly "org.projectlombok:lombok:${lombokVersion}"
 	annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+
 	runtimeOnly "com.mysql:mysql-connector-j:${mysqlConnectorVersion}"
+
 	testImplementation "org.springframework.boot:spring-boot-starter-test"
 	testRuntimeOnly "org.junit.platform:junit-platform-launcher"
+	testImplementation "com.h2database:h2:${h2Version}"
 }
 
 tasks.named('test') {
 	useJUnitPlatform()
+
+	include '**/*Test.class', '**/*Tests.class'
+
+	testLogging {
+		showStandardStreams = true
+	}
+
+	finalizedBy jacocoTestReport
 }
+
+jacoco {
+	toolVersion = "0.8.10"
+}
+
+jacocoTestReport {
+	dependsOn test
+	reports {
+		xml.required = true
+		html.required = true
+	}
+}
+
+jacocoTestCoverageVerification {
+	violationRules {
+		rule {
+			element = 'BUNDLE'
+			limit {
+				counter = 'INSTRUCTION'
+				value = 'COVEREDRATIO'
+				minimum = 0.80
+			}
+		}
+	}
+}
+
+check.dependsOn jacocoTestCoverageVerification
