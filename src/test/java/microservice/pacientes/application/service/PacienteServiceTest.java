@@ -315,7 +315,6 @@ public class PacienteServiceTest {
                 new UpdatePacienteCommand("Juan", "Perez", "OSDE", "invalidemail", "123456789"),
                 new UpdatePacienteCommand("Juan", "Perez", "OSDE", "juan.perez@gmail.com", ""),
                 new UpdatePacienteCommand(null, null, null, null, null)
-                // agregá más combinaciones inválidas si querés
         );
     }
 
