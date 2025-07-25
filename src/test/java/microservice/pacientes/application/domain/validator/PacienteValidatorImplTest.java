@@ -1,87 +1,3 @@
-//package microservice.pacientes.application.domain.validator;
-//
-//import microservice.pacientes.application.domain.model.Paciente;
-//import microservice.pacientes.application.domain.validator.rules.PacienteValidatorRule;
-//import microservice.pacientes.shared.exception.PacienteArgumentoInvalido;
-//import org.junit.jupiter.api.BeforeEach;
-//import org.junit.jupiter.api.Test;
-//import org.junit.jupiter.api.extension.ExtendWith;
-//import org.mockito.InjectMocks;
-//import org.mockito.Mock;
-//
-//import java.util.List;
-//
-//import static org.junit.jupiter.api.Assertions.assertThrows;
-//import static org.mockito.Mockito.*;
-//
-//@ExtendWith(org.mockito.junit.jupiter.MockitoExtension.class)
-//public class PacienteValidatorImplTest {
-//
-//    @Mock
-//    private PacienteValidatorRule rule1;
-//
-//    @Mock
-//    private PacienteValidatorRule rule2;
-//
-//    @Mock
-//    private PacienteValidatorRule rule3;
-//
-//    @Mock
-//    private PacienteValidatorRule rule4;
-//
-//    @Mock
-//    private PacienteValidatorRule rule5;
-//
-//    private PacienteValidatorImpl pacienteValidator;
-//
-//    private List<PacienteValidatorRule> reglas;
-//
-//    @BeforeEach
-//    void setUp() {
-//        reglas = List.of(rule1, rule2, rule3, rule4, rule5);
-//        pacienteValidator = new PacienteValidatorImpl(reglas);
-//    }
-//
-//    @Test
-//    void validateValidPaciente() {
-//        Paciente paciente = Paciente.builder()
-//                                .dni("12345678")
-//                                .nombre("Juan")
-//                                .apellido("Perez")
-//                                .obraSocial("OSDE")
-//                                .email("juan.perez@gmail.com")
-//                                .telefono("123456789")
-//                                .build();
-//
-//        pacienteValidator.validate(paciente);
-//
-//        for (PacienteValidatorRule regla : reglas) {
-//            verify(regla).validate(paciente);
-//        }
-//    }
-//
-//    @Test
-//    void validateInvalidPaciente() {
-//        Paciente paciente = Paciente.builder()
-//                                .dni("1")
-//                                .nombre("Juan")
-//                                .apellido("Perez")
-//                                .obraSocial("OSDE")
-//                                .email("juan.perez@gmail.com")
-//                                .telefono("123456789")
-//                                .build();
-//
-//        doThrow(new PacienteArgumentoInvalido(""))
-//                .when(reglas.get(0))
-//                .validate(any(Paciente.class));
-//
-//        assertThrows(PacienteArgumentoInvalido.class, () -> {
-//            pacienteValidator.validate(paciente);
-//        });
-//        verify(reglas.get(0), times(1)).validate(paciente);
-//    }
-//}
-
 package microservice.pacientes.application.domain.validator;
 
 import microservice.pacientes.application.domain.model.Paciente;
@@ -92,7 +8,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Arrays;
 import java.util.Collections;
