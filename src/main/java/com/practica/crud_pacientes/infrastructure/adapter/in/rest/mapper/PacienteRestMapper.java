@@ -12,8 +12,6 @@ public interface PacienteRestMapper {
     PacienteRestMapper mapper = Mappers.getMapper(PacienteRestMapper.class);
 
     Paciente requestToDomain(PacienteRequest pacienteRequest);
-    PacienteRequest domainToRequest(Paciente paciente);
 
-    Paciente responseToDomain(PacienteResponse pacienteResponse);
     PacienteResponse domainToResponse(Paciente paciente);
 }
