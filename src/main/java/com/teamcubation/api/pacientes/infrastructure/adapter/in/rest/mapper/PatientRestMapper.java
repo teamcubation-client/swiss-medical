@@ -12,6 +12,7 @@ public class PatientRestMapper {
         patient.setLastName(patientRequest.getLastName());
         patient.setDni(patientRequest.getDni());
         patient.setHealthInsuranceProvider(patientRequest.getHealthInsuranceProvider());
+        patient.setEmail(patientRequest.getEmail());
         patient.setPhoneNumber(patientRequest.getPhoneNumber());
         return patient;
     }
