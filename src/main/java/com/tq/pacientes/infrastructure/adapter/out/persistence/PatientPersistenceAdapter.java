@@ -47,12 +47,6 @@ public class PatientPersistenceAdapter implements PatientRepositoryPort {
     }
 
     @Override
-    public void deleteByDni(String dni) {
-        patientRepositoryJpa.findByDni(dni)
-                .ifPresent(patientRepositoryJpa::delete);
-    }
-
-    @Override
     public List<Patient> searchByFirstName(String firstName) {
         return patientRepositoryJpa.findByFirstNameContainingIgnoreCase(firstName)
                 .stream()
