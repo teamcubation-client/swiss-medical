@@ -20,9 +20,9 @@ public class GlobalExceptionHandler {
     public ErrorResponse handlerPacienteDuplicado(PacienteDuplicadoException exception, HttpServletRequest request){
         return new ErrorResponse(
                 LocalDateTime.now(),
-                HttpStatus.NOT_FOUND.value(),
+                HttpStatus.CONFLICT.value(),
                 exception.getMessage(),
-                HttpStatus.NOT_FOUND.getReasonPhrase(),
+                HttpStatus.CONFLICT.getReasonPhrase(),
                 request.getRequestURI()
         );
     }
