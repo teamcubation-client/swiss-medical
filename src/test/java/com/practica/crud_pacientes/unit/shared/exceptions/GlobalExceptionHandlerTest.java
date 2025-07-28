@@ -2,6 +2,7 @@ package com.practica.crud_pacientes.unit.shared.exceptions;
 
 import com.practica.crud_pacientes.shared.exceptions.ErrorResponse;
 import com.practica.crud_pacientes.shared.exceptions.GlobalExceptionHandler;
+import com.practica.crud_pacientes.shared.exceptions.PacienteDuplicadoException;
 import com.practica.crud_pacientes.shared.exceptions.PacienteNoEncontradoException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -75,5 +76,18 @@ class GlobalExceptionHandlerTest {
         assertThat(errores)
                 .containsEntry("nombre", "El nombre es obligatorio")
                 .containsEntry("dni", "El DNI no es válido");
+    }
+
+    @Test
+    void shouldHandlerPacienteDuplicadoException() {
+        request.setRequestURI("/pacientes/nuevo-paciente");
+        PacienteDuplicadoException exception = new PacienteDuplicadoException();
+
+        ErrorResponse response = handler.handlerPacienteDuplicado(exception, request);
+
+        assertThat(response.getStatus()).isEqualTo(409);
+        assertThat(response.getMensaje()).isEqualTo("Ya existe un paciente con ese DNI.");
+        assertThat(response.getPath()).isEqualTo("/pacientes/nuevo-paciente");
+        assertThat(response.getError()).isEqualTo("Conflict");
     }
 }
