@@ -34,6 +34,16 @@ public class GlobalExceptionHandler {
         return buildResponse(ex, HttpStatus.CONFLICT);
     }
 
+    @ExceptionHandler(MissingBirthDateException.class)
+    public ResponseEntity<ErrorDTO> handleMissingBirthDate(MissingBirthDateException ex) {
+        return buildResponse(ex, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(InvalidPatientAgeException.class)
+    public ResponseEntity<ErrorDTO> handleInvalidPatientAge(InvalidPatientAgeException ex) {
+        return buildResponse(ex, HttpStatus.BAD_REQUEST);
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorDTO> handleException(Exception ex) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
