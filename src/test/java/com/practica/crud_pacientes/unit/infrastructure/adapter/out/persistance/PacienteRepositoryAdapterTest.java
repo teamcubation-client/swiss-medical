@@ -1,4 +1,4 @@
-package com.practica.crud_pacientes.infrastructure.adapter.out.persistance;
+package com.practica.crud_pacientes.unit.infrastructure.adapter.out.persistance;
 
 import com.practica.crud_pacientes.application.domain.model.Paciente;
 import com.practica.crud_pacientes.infrastructure.adapter.out.entity.PacienteEntity;

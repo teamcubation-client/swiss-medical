@@ -1,9 +1,10 @@
-package com.practica.crud_pacientes.infrastructure.adapter.in.rest.controller;
+package com.practica.crud_pacientes.unit.infrastructure.adapter.in.rest.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.practica.crud_pacientes.application.domain.model.Paciente;
 import com.practica.crud_pacientes.application.domain.port.in.Mediator;
 import com.practica.crud_pacientes.application.domain.port.in.PacienteUseCase;
+import com.practica.crud_pacientes.infrastructure.adapter.in.rest.controller.PacienteController;
 import com.practica.crud_pacientes.infrastructure.adapter.in.rest.dto.PacienteRequest;
 import com.practica.crud_pacientes.infrastructure.adapter.in.rest.dto.PacienteResponse;
 import com.practica.crud_pacientes.infrastructure.adapter.in.rest.mapper.PacienteRestMapper;

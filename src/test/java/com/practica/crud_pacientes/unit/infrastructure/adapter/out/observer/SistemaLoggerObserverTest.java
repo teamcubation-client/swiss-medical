@@ -1,8 +1,9 @@
-package com.practica.crud_pacientes.infrastructure.adapter.out.observer;
+package com.practica.crud_pacientes.unit.infrastructure.adapter.out.observer;
 
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
+import com.practica.crud_pacientes.infrastructure.adapter.out.observer.SistemaLoggerObserver;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.LoggerFactory;

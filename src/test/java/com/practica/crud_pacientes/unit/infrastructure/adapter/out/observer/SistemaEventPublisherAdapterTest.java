@@ -1,6 +1,7 @@
-package com.practica.crud_pacientes.infrastructure.adapter.out.observer;
+package com.practica.crud_pacientes.unit.infrastructure.adapter.out.observer;
 
 import com.practica.crud_pacientes.application.domain.port.out.SistemaObserver;
+import com.practica.crud_pacientes.infrastructure.adapter.out.observer.SistemaEventPublisherAdapter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
