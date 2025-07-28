@@ -6,6 +6,7 @@ import com.teamcubation.api.pacientes.infrastructure.adapter.in.exporter.factory
 import com.teamcubation.api.pacientes.infrastructure.adapter.in.exporter.factory.ExporterFactoryProvider;
 import com.teamcubation.api.pacientes.infrastructure.adapter.out.persistence.repository.PatientRepository;
 import com.teamcubation.api.pacientes.shared.exception.DuplicatedPatientException;
+import com.teamcubation.api.pacientes.shared.exception.ExporterTypeNotSupportedException;
 import com.teamcubation.api.pacientes.shared.exception.PatientDniAlreadyInUseException;
 import com.teamcubation.api.pacientes.shared.exception.PatientNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
@@ -566,33 +567,33 @@ class PatientServiceTest {
 
     //TEST EXPORTAR LISTA PACIENTES
     @Test
-    void exportPatients_WhenPatientsExist_ShouldReturnExportedData() {
+    void exportPatients_ShouldReturnExportedData() {
         String format = "csv";
         Patient patient1 = buildPatient(13L, "Roberto", "Torres", "58473659",
                 "SwissMedical", "roberto.torres@example.com", "1188749873");
         List<Patient> patients = List.of(patient1);
 
-        when(patientRepository.findAll(null, null)).thenReturn(patients);
+        when(this.patientRepository.findAll(null, null)).thenReturn(patients);
 
         ExporterFactory factory = mock(ExporterFactory.class);
         PatientExporterPortOut exporter = mock(PatientExporterPortOut.class);
         String exportedData = "id,nombre,apellido,dni,obra_social,email,telefono\n13,Roberto,Torres,58473659,SwissMedical,roberto.torres@example.com,1123556766";
 
-        when(exporterFactoryProvider.getFactory(format)).thenReturn(factory);
+        when(this.exporterFactoryProvider.getFactory(format)).thenReturn(factory);
         when(factory.createPatientExporter()).thenReturn(exporter);
         when(exporter.export(patients)).thenReturn(exportedData);
 
         String result = patientService.exportPatients(format);
 
         assertEquals(exportedData, result);
-        verify(patientRepository).findAll(null, null);
-        verify(exporterFactoryProvider).getFactory(format);
+        verify(this.patientRepository).findAll(null, null);
+        verify(this.exporterFactoryProvider).getFactory(format);
         verify(factory).createPatientExporter();
         verify(exporter).export(patients);
     }
 
     @Test
-    void exportPatients_WhenNoPatients_ShouldStillCallExporter() {
+    void exportPatientsWithEmptyList_ShouldStillCallExporter() {
         String format = "csv";
         List<Patient> patients = new ArrayList<>();
 
@@ -600,9 +601,9 @@ class PatientServiceTest {
         ExporterFactory factory = mock(ExporterFactory.class);
         PatientExporterPortOut exporter = mock(PatientExporterPortOut.class);
 
-        String exportedData = "id,nombre,apellido,dni,obra_social,email,telefono\n"; // solo header, nada más
+        String exportedData = "id,nombre,apellido,dni,obra_social,email,telefono\n"; // solo header, nadathis. más
 
-        when(exporterFactoryProvider.getFactory(format)).thenReturn(factory);
+        when(this.exporterFactoryProvider.getFactory(format)).thenReturn(factory);
         when(factory.createPatientExporter()).thenReturn(exporter);
         when(exporter.export(patients)).thenReturn(exportedData);
 
@@ -610,25 +611,26 @@ class PatientServiceTest {
 
         assertEquals(exportedData, result);
 
-        verify(patientRepository).findAll(null, null);
-        verify(exporterFactoryProvider).getFactory(format);
+        verify(this.patientRepository).findAll(null, null);
+        verify(this.exporterFactoryProvider).getFactory(format);
         verify(factory).createPatientExporter();
         verify(exporter).export(patients);
     }
 
     @Test
-    void exportPatients_WhenFormatNotSupported_ShouldThrowException() {
+    void exportPatientsWithNotSupportedFormat_ShouldThrowException() {
         String invalidFormat = "jpg";
 
         when(this.patientRepository.findAll(null, null)).thenReturn(List.of());
-        try (MockedStatic<ExporterFactoryProvider> mockedProvider = mockStatic(ExporterFactoryProvider.class)) {
-            mockedProvider.when(() -> ExporterFactoryProvider.getFactory(invalidFormat))
-                    .thenThrow(new ExporterTypeNotSupportedException(invalidFormat));
+        when(this.exporterFactoryProvider.getFactory(invalidFormat))
+                .thenThrow(new ExporterTypeNotSupportedException(invalidFormat));
 
-            assertThrows(ExporterTypeNotSupportedException.class,
-                    () -> patientService.exportPatients(invalidFormat));
+        ExporterTypeNotSupportedException exception = assertThrows(ExporterTypeNotSupportedException.class,
+                () -> this.patientService.exportPatients(invalidFormat)
+        );
 
-            verify(this.patientRepository).findAll(null, null);
-        }
+        assertTrue(exception.getMessage().contains("Tipo de exportación ingresado 'jpg' no soportado"));
+        verify(this.patientRepository).findAll(null,null);
+        verify(this.exporterFactoryProvider).getFactory(invalidFormat);
     }
 }
