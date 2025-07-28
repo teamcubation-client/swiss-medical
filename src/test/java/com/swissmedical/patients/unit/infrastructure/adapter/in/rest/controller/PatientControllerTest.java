@@ -1,15 +1,18 @@
-package com.swissmedical.patients.infrastructure.adapter.in.rest.controller;
+package com.swissmedical.patients.unit.infrastructure.adapter.in.rest.controller;
 
 import com.swissmedical.patients.application.domain.model.Patient;
 import com.swissmedical.patients.application.service.PatientService;
+import com.swissmedical.patients.infrastructure.adapter.in.rest.controller.PatientController;
 import com.swissmedical.patients.shared.exceptions.GlobalHandlerException;
+import com.swissmedical.patients.shared.exceptions.PatientDuplicateException;
 import com.swissmedical.patients.shared.exceptions.PatientNotFoundException;
-import com.swissmedical.patients.shared.utils.TestContants;
+import com.swissmedical.patients.unit.shared.utils.TestContants;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -24,6 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(PatientController.class)
 @Import(GlobalHandlerException.class)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 public class PatientControllerTest {
 
   @Autowired
@@ -246,6 +250,18 @@ public class PatientControllerTest {
                             "\"phoneNumber\":\"1234567890\",\"dni\":\"" + TestContants.DNI +
                             "\",\"memberNumber\":\"MEM12345\",\"birthDate\":\"1990-01-01\",\"isActive\":true}"))
             .andExpect(status().isBadRequest());
+  }
+
+  @Test
+  public void testCreatePatientDuplicate() throws Exception {
+    when(patientService.create(any(Patient.class))).thenThrow(new PatientDuplicateException("Patient already exists"));
+
+    mockMvc.perform(post("/api/patients")
+                    .contentType("application/json")
+                    .content("{\"firstName\":\"John\",\"lastName\":\"Doe\",\"email\":\"" + TestContants.EMAIL + "\"," +
+                            "\"phoneNumber\":\"1234567890\",\"dni\":\"" + TestContants.DNI +
+                            "\",\"memberNumber\":\"MEM12345\",\"birthDate\":\"1990-01-01\",\"isActive\":true,\"socialSecurity\":\"Swiss Medical\"}"))
+            .andExpect(status().isConflict());
   }
 
   @Test

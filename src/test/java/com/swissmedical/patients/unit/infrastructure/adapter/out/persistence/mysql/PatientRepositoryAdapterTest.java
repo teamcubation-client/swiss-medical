@@ -1,9 +1,11 @@
-package com.swissmedical.patients.infrastructure.adapter.out.persistence.mysql;
+package com.swissmedical.patients.unit.infrastructure.adapter.out.persistence.mysql;
 
 import com.swissmedical.patients.application.domain.model.Patient;
+import com.swissmedical.patients.infrastructure.adapter.out.persistence.mysql.PatientJpaRepository;
+import com.swissmedical.patients.infrastructure.adapter.out.persistence.mysql.PatientRepositoryAdapter;
 import com.swissmedical.patients.infrastructure.adapter.out.persistence.mysql.mapper.PatientEntityMapper;
 import com.swissmedical.patients.shared.exceptions.PatientNotFoundException;
-import com.swissmedical.patients.shared.utils.TestContants;
+import com.swissmedical.patients.unit.shared.utils.TestContants;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,8 +17,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.*;
 
@@ -132,7 +133,7 @@ public class PatientRepositoryAdapterTest {
 
     Optional<Patient> patient = patientRepositoryAdapter.findByDni(TestContants.DNI);
 
-    assertEquals(true, patient.isPresent());
+    assertTrue(patient.isPresent());
     assertEquals(TestContants.DNI, patient.get().getDni());
   }
 
@@ -142,7 +143,7 @@ public class PatientRepositoryAdapterTest {
 
     Optional<Patient> patient = patientRepositoryAdapter.findByDni(TestContants.DNI);
 
-    assertEquals(false, patient.isPresent());
+    assertFalse(patient.isPresent());
   }
 
   @Test
@@ -153,7 +154,7 @@ public class PatientRepositoryAdapterTest {
 
     Optional<Patient> patient = patientRepositoryAdapter.findById(1L);
 
-    assertEquals(true, patient.isPresent());
+    assertTrue(patient.isPresent());
     assertEquals(TestContants.DNI, patient.get().getDni());
   }
 
@@ -163,7 +164,7 @@ public class PatientRepositoryAdapterTest {
 
     Optional<Patient> patient = patientRepositoryAdapter.findById(1L);
 
-    assertEquals(false, patient.isPresent());
+    assertFalse(patient.isPresent());
   }
 
   @Test
@@ -172,7 +173,7 @@ public class PatientRepositoryAdapterTest {
 
     boolean exists = patientRepositoryAdapter.existsByDni(TestContants.DNI);
 
-    assertEquals(true, exists);
+    assertTrue(exists);
   }
 
   @Test
@@ -181,7 +182,7 @@ public class PatientRepositoryAdapterTest {
 
     boolean exists = patientRepositoryAdapter.existsByDni(TestContants.DNI);
 
-    assertEquals(false, exists);
+    assertFalse(exists);
   }
 
   @Test
@@ -190,7 +191,7 @@ public class PatientRepositoryAdapterTest {
 
     boolean exists = patientRepositoryAdapter.existsByEmail(TestContants.EMAIL);
 
-    assertEquals(true, exists);
+    assertTrue(exists);
   }
 
   @Test
@@ -199,7 +200,7 @@ public class PatientRepositoryAdapterTest {
 
     boolean exists = patientRepositoryAdapter.existsByEmail(TestContants.EMAIL);
 
-    assertEquals(false, exists);
+    assertFalse(exists);
   }
 
   @Test
@@ -208,7 +209,7 @@ public class PatientRepositoryAdapterTest {
 
     boolean exists = patientRepositoryAdapter.existsById(1L);
 
-    assertEquals(true, exists);
+    assertTrue(exists);
   }
 
   @Test
@@ -217,7 +218,7 @@ public class PatientRepositoryAdapterTest {
 
     boolean exists = patientRepositoryAdapter.existsById(1L);
 
-    assertEquals(false, exists);
+    assertFalse(exists);
   }
 
   @Test
@@ -236,9 +237,7 @@ public class PatientRepositoryAdapterTest {
     when(patientJpaRepository.save(PatientEntityMapper.toEntity(patientJohn)))
             .thenThrow(new RuntimeException("Duplicate DNI"));
 
-    assertThrows(RuntimeException.class, () -> {
-      patientRepositoryAdapter.save(patientJohn);
-    });
+    assertThrows(RuntimeException.class, () -> patientRepositoryAdapter.save(patientJohn));
   }
 
   @Test
@@ -257,9 +256,7 @@ public class PatientRepositoryAdapterTest {
   public void testUpdateNotFound() {
     when(patientJpaRepository.existsById(anyLong())).thenReturn(false);
 
-    assertThrows(PatientNotFoundException.class, () -> {
-      patientRepositoryAdapter.update(1L, patientJohn);
-    });
+    assertThrows(PatientNotFoundException.class, () -> patientRepositoryAdapter.update(1L, patientJohn));
   }
 
   @Test
@@ -275,8 +272,6 @@ public class PatientRepositoryAdapterTest {
   public void testDeleteNotFound() {
     when(patientJpaRepository.existsById(1L)).thenReturn(false);
 
-    assertThrows(PatientNotFoundException.class, () -> {
-      patientRepositoryAdapter.delete(1L);
-    });
+    assertThrows(PatientNotFoundException.class, () -> patientRepositoryAdapter.delete(1L));
   }
 }

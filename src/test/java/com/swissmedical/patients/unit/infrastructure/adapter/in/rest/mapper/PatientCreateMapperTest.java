@@ -1,12 +1,15 @@
-package com.swissmedical.patients.infrastructure.adapter.in.rest.mapper;
+package com.swissmedical.patients.unit.infrastructure.adapter.in.rest.mapper;
 
 import com.swissmedical.patients.application.domain.model.Patient;
 import com.swissmedical.patients.infrastructure.adapter.in.rest.dto.PatientCreateDto;
+import com.swissmedical.patients.infrastructure.adapter.in.rest.mapper.PatientCreateMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(MockitoExtension.class)
 public class PatientCreateMapperTest {
@@ -29,16 +32,15 @@ public class PatientCreateMapperTest {
     Patient patient = PatientCreateMapper.toDomain(patientCreateDto);
 
     // Assertions to verify the mapping
-    assert patient != null;
-    assert "John".equals(patient.getFirstName());
-    assert "Doe".equals(patient.getLastName());
-    assert "john@gmail.com".equals(patient.getEmail());
-    assert "1234567890".equals(patient.getPhoneNumber());
-    assert "12345678".equals(patient.getDni());
-    assert "MEM12345".equals(patient.getMemberNumber());
-    assert LocalDate.of(1990, 1, 1).equals(patient.getBirthDate());
-    assert patient.isActive();
-    assert "Swiss Medical".equals(patient.getSocialSecurity());
+    assertEquals("John", patient.getFirstName());
+    assertEquals("Doe", patient.getLastName());
+    assertEquals("john@gmail.com", patient.getEmail());
+    assertEquals("1234567890", patient.getPhoneNumber());
+    assertEquals("12345678", patient.getDni());
+    assertEquals("MEM12345", patient.getMemberNumber());
+    assertEquals(LocalDate.of(1990, 1, 1), patient.getBirthDate());
+    assertEquals(true, patient.isActive());
+    assertEquals("Swiss Medical", patient.getSocialSecurity());
   }
 
   @Test
@@ -60,15 +62,14 @@ public class PatientCreateMapperTest {
     PatientCreateDto patientCreateDto = PatientCreateMapper.toDto(patient);
 
     // Assertions to verify the mapping
-    assert patientCreateDto != null;
-    assert "Jane".equals(patientCreateDto.getFirstName());
-    assert "Doe".equals(patientCreateDto.getLastName());
-    assert "john@gmail.com".equals(patientCreateDto.getEmail());
-    assert "1234567890".equals(patientCreateDto.getPhoneNumber());
-    assert "12345678".equals(patientCreateDto.getDni());
-    assert "MEM12345".equals(patientCreateDto.getMemberNumber());
-    assert "1990-01-01".equals(patientCreateDto.getBirthDate());
-    assert patientCreateDto.isActive();
-    assert "Swiss Medical".equals(patientCreateDto.getSocialSecurity());
+    assertEquals("Jane", patientCreateDto.getFirstName());
+    assertEquals("Doe", patientCreateDto.getLastName());
+    assertEquals("john@gmail.com", patientCreateDto.getEmail());
+    assertEquals("1234567890", patientCreateDto.getPhoneNumber());
+    assertEquals("12345678", patientCreateDto.getDni());
+    assertEquals("MEM12345", patientCreateDto.getMemberNumber());
+    assertEquals("1990-01-01", patientCreateDto.getBirthDate());
+    assertEquals(true, patientCreateDto.isActive());
+    assertEquals("Swiss Medical", patientCreateDto.getSocialSecurity());
   }
 }

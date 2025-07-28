@@ -1,4 +1,4 @@
-package com.swissmedical.patients.shared.utils;
+package com.swissmedical.patients.unit.shared.utils;
 
 public class TestContants {
   public static final String FIRST_NAME = "John";

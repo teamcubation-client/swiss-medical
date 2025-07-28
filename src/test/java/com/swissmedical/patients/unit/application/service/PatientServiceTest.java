@@ -1,10 +1,11 @@
-package com.swissmedical.patients.application.service;
+package com.swissmedical.patients.unit.application.service;
 
 import com.swissmedical.patients.application.domain.model.Patient;
 import com.swissmedical.patients.application.domain.ports.out.PatientRepositoryPort;
+import com.swissmedical.patients.application.service.PatientService;
 import com.swissmedical.patients.shared.exceptions.PatientDuplicateException;
 import com.swissmedical.patients.shared.exceptions.PatientNotFoundException;
-import com.swissmedical.patients.shared.utils.TestContants;
+import com.swissmedical.patients.unit.shared.utils.TestContants;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
