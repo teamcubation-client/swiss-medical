@@ -5,32 +5,42 @@ import microservice.pacientes.application.domain.model.Paciente;
 import microservice.pacientes.infrastructure.adapter.in.rest.dto.PacienteRequestDTO;
 import microservice.pacientes.infrastructure.adapter.out.persistence.mysql.repository.PacienteRepository;
 import org.junit.jupiter.api.*;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
+
+import java.util.List;
+
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@Testcontainers
+// OBS: Para utilizar Testcontainers hay que agregar la notación @Testcontainers a la clase,
+// sacar el perfil de test (para que no detecte H2) y agregar el MySQLContainer + setear las properties.
+
+//@Testcontainers
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
-//@ActiveProfiles("test")
+@ActiveProfiles("test")
 public class PacienteControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
 
-    @Autowired
+    @MockitoSpyBean
     private PacienteRepository pacienteRepository;
 
     @Autowired
@@ -38,7 +48,7 @@ public class PacienteControllerTest {
 
     private Paciente paciente;
 
-    @Container
+/*    @Container
     private static MySQLContainer<?> mysqlContainer = new MySQLContainer<>("mysql:8.0")
             .withDatabaseName("testdb")
             .withUsername("test")
@@ -51,7 +61,7 @@ public class PacienteControllerTest {
         System.setProperty("spring.datasource.username", mysqlContainer.getUsername());
         System.setProperty("spring.datasource.password", mysqlContainer.getPassword());
     }
-
+*/
     @BeforeEach
     void setUp() {
         for (Paciente paciente : pacienteRepository.getAll())
@@ -174,8 +184,11 @@ public class PacienteControllerTest {
     @Test
     @DisplayName("Debe obtener pacientes por nombre")
     void obtenerPacientesPorNombre() throws Exception {
-        pacienteRepository.save(paciente);
+        /*pacienteRepository.save(paciente);
         pacienteRepository.save(new Paciente("87654321", "Juan", "Gonzalez", "Galeno", "juan.gonzalez@mail.com", "123456789"));
+*/
+        // Se mockea solamente el retorno de la DB por que usa un SP para obtener por nombre.
+        when(pacienteRepository.getByNombreContainingIgnoreCase("Juan")).thenReturn(List.of(paciente, paciente));
 
         mockMvc.perform(get("/pacientes?nombre=Juan"))
                 .andExpect(status().isOk())
@@ -183,6 +196,7 @@ public class PacienteControllerTest {
                 .andExpect(jsonPath("$[0].nombre", is("Juan")))
                 .andExpect(jsonPath("$[1].nombre", is("Juan")));
     }
+
     @Test
     @DisplayName("Debe obtener paciente por DNI")
     void obtenerPacientePorDni() throws Exception {
