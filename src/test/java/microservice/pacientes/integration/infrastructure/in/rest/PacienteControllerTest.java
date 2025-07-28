@@ -153,6 +153,25 @@ public class PacienteControllerTest {
     }
 
     @Test
+    @DisplayName("Debe fallar al actualizar un paciente con datos inválidos")
+    void actualizarPacienteConDatosInvalidos() throws Exception {
+        Paciente savedPaciente = pacienteRepository.save(paciente);
+        String pacienteUpdateJson = """
+            {
+                "email": "mail-invalido"
+            }
+            """;
+
+        mockMvc.perform(put("/pacientes/" + savedPaciente.getDni())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(pacienteUpdateJson))
+                .andExpect(status().isBadRequest());
+
+        Paciente pacienteNoActualizado = pacienteRepository.getByDni(savedPaciente.getDni()).orElseThrow();
+        assertEquals("juan@mail.com", pacienteNoActualizado.getEmail());
+    }
+
+    @Test
     @DisplayName("Debe borrar un paciente existente")
     void borrarPacienteExitosamente() throws Exception {
         Paciente savedPaciente = pacienteRepository.save(paciente);
