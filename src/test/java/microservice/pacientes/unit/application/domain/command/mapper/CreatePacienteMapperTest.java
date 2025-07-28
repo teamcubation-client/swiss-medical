@@ -17,7 +17,7 @@ import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(org.mockito.junit.jupiter.MockitoExtension.class)
 @DisplayName("CreatePacienteMapper Tests")
@@ -50,6 +50,7 @@ public class CreatePacienteMapperTest {
         assertEquals(expectedPaciente.getObraSocial(), paciente.getObraSocial());
         assertEquals(expectedPaciente.getEmail(), paciente.getEmail());
         assertEquals(expectedPaciente.getTelefono(), paciente.getTelefono());
+        verify(pacienteFactory, times(1)).create(command.getDni(), command.getNombre(), command.getApellido(), command.getObraSocial(), command.getEmail(), command.getTelefono());
     }
 
     static Stream<Arguments> pacientesProvider() {
@@ -80,6 +81,7 @@ public class CreatePacienteMapperTest {
 
         assertThrows(PacienteArgumentoInvalido.class,
                 () -> createPacienteMapper.toEntity(command));
+        verify(pacienteFactory, times(1)).create(command.getDni(), command.getNombre(), command.getApellido(), command.getObraSocial(), command.getEmail(), command.getTelefono());
     }
 
     static Stream<CreatePacienteCommand> invalidPacientesProvider() {

@@ -40,7 +40,7 @@ public class PacienteFactoryImplTest {
         assertEquals(obraSocial, paciente.getObraSocial());
         assertEquals(email, paciente.getEmail());
         assertEquals(telefono, paciente.getTelefono());
-        verify(pacienteValidator).validate(paciente);
+        verify(pacienteValidator, times(1)).validate(paciente);
     }
 
     static Stream<Arguments> validPacientesProvider() {
@@ -70,7 +70,7 @@ public class PacienteFactoryImplTest {
 
         assertEquals("Argumento invalido", exception.getMessage());
 
-        verify(pacienteValidator).validate(any(Paciente.class));
+        verify(pacienteValidator, times(1)).validate(any(Paciente.class));
     }
 
     static Stream<org.junit.jupiter.params.provider.Arguments> invalidPacienteArgumentsProvider() {

@@ -54,9 +54,9 @@ public class PacienteServiceTest {
 
         Paciente pacienteReturn = pacienteService.create(createPacienteCommand);
 
-        verify(pacientePortOut).existsByDni("12345678");
-        verify(createPacienteMapper).toEntity(createPacienteCommand);
-        verify(pacientePortOut).save(paciente);
+        verify(pacientePortOut, times(1)).existsByDni("12345678");
+        verify(createPacienteMapper, times(1)).toEntity(createPacienteCommand);
+        verify(pacientePortOut, times(1)).save(paciente);
         assertEquals(paciente, pacienteReturn);
     }
 
@@ -69,8 +69,8 @@ public class PacienteServiceTest {
         when(pacientePortOut.existsByDni("12345678")).thenReturn(true);
 
         assertThrows(PacienteDuplicadoException.class, () -> pacienteService.create(createPacienteCommand));
-        verify(pacientePortOut).existsByDni("12345678");
-        verify(createPacienteMapper).toEntity(createPacienteCommand);
+        verify(pacientePortOut, times(1)).existsByDni("12345678");
+        verify(createPacienteMapper, times(1)).toEntity(createPacienteCommand);
     }
 
     @ParameterizedTest
@@ -81,7 +81,7 @@ public class PacienteServiceTest {
                 .when(createPacienteMapper).toEntity(createPacienteCommand);
 
         assertThrows(PacienteArgumentoInvalido.class, () -> pacienteService.create(createPacienteCommand));
-        verify(createPacienteMapper).toEntity(createPacienteCommand);
+        verify(createPacienteMapper, times(1)).toEntity(createPacienteCommand);
     }
 
     static Stream<CreatePacienteCommand> invalidCreatePacienteCommands() {
@@ -103,7 +103,7 @@ public class PacienteServiceTest {
 
         pacienteService.delete("12345678");
 
-        verify(pacientePortOut).getByDni("12345678");
+        verify(pacientePortOut, times(1)).getByDni("12345678");
         verify(pacientePortOut, times(1)).delete(paciente);
     }
 
@@ -113,7 +113,7 @@ public class PacienteServiceTest {
         when(pacientePortOut.getByDni("12345678")).thenReturn(Optional.empty());
 
         assertThrows(PacienteNoEncontradoException.class, () -> pacienteService.delete("12345678"));
-        verify(pacientePortOut).getByDni("12345678");
+        verify(pacientePortOut, times(1)).getByDni("12345678");
     }
 
     @Test
@@ -126,7 +126,7 @@ public class PacienteServiceTest {
 
         List<Paciente> pacientesReturn = pacienteService.getAll();
 
-        verify(pacientePortOut).getAll();
+        verify(pacientePortOut, times(1)).getAll();
         assertEquals(pacientes, pacientesReturn);
     }
 
@@ -138,7 +138,7 @@ public class PacienteServiceTest {
 
         List<Paciente> pacientesReturn = pacienteService.getAll();
 
-        verify(pacientePortOut).getAll();
+        verify(pacientePortOut, times(1)).getAll();
         assertEquals(pacientes, pacientesReturn);
     }
 
@@ -152,7 +152,7 @@ public class PacienteServiceTest {
 
         List<Paciente> pacientesReturn = pacienteService.getByNombreContainingIgnoreCase("Juan");
 
-        verify(pacientePortOut).getByNombreContainingIgnoreCase("Juan");
+        verify(pacientePortOut, times(1)).getByNombreContainingIgnoreCase("Juan");
         assertEquals(pacientes, pacientesReturn);
     }
 
@@ -164,7 +164,7 @@ public class PacienteServiceTest {
 
         List<Paciente> pacientesReturn = pacienteService.getByNombreContainingIgnoreCase("Juan");
 
-        verify(pacientePortOut).getByNombreContainingIgnoreCase("Juan");
+        verify(pacientePortOut, times(1)).getByNombreContainingIgnoreCase("Juan");
         assertEquals(pacientes, pacientesReturn);
     }
 
@@ -177,7 +177,7 @@ public class PacienteServiceTest {
 
         List<Paciente> pacientesReturn = pacienteService.getByNombreContainingIgnoreCase("Agustin");
 
-        verify(pacientePortOut).getByNombreContainingIgnoreCase("Agustin");
+        verify(pacientePortOut, times(1)).getByNombreContainingIgnoreCase("Agustin");
         assertEquals(0, pacientesReturn.size());
     }
 
@@ -189,7 +189,7 @@ public class PacienteServiceTest {
 
         Paciente pacienteReturn = pacienteService.getByDni("12345678");
 
-        verify(pacientePortOut).getByDni("12345678");
+        verify(pacientePortOut, times(1)).getByDni("12345678");
         assertEquals(paciente, pacienteReturn);
     }
 
@@ -199,7 +199,7 @@ public class PacienteServiceTest {
         when(pacientePortOut.getByDni("12345678")).thenReturn(Optional.empty());
 
         assertThrows(PacienteNoEncontradoException.class, () -> pacienteService.getByDni("12345678"));
-        verify(pacientePortOut).getByDni("12345678");
+        verify(pacientePortOut, times(1)).getByDni("12345678");
     }
 
     @Test
@@ -210,7 +210,7 @@ public class PacienteServiceTest {
 
         Paciente pacienteReturn = pacienteService.getByNombre("Juan");
 
-        verify(pacientePortOut).getByNombre("Juan");
+        verify(pacientePortOut, times(1)).getByNombre("Juan");
         assertEquals(paciente, pacienteReturn);
     }
 
@@ -220,7 +220,7 @@ public class PacienteServiceTest {
         when(pacientePortOut.getByNombre("Juan")).thenReturn(Optional.empty());
 
         assertThrows(PacienteNoEncontradoException.class, () -> pacienteService.getByNombre("Juan"));
-        verify(pacientePortOut).getByNombre("Juan");
+        verify(pacientePortOut, times(1)).getByNombre("Juan");
     }
 
     @Test
@@ -233,7 +233,7 @@ public class PacienteServiceTest {
 
         List<Paciente> pacientesReturn = pacienteService.getByObraSocial("OSDE", 10, 0);
 
-        verify(pacientePortOut).getByObraSocial("OSDE", 10, 0);
+        verify(pacientePortOut, times(1)).getByObraSocial("OSDE", 10, 0);
         assertEquals(pacientes, pacientesReturn);
     }
 
@@ -246,7 +246,7 @@ public class PacienteServiceTest {
 
         List<Paciente> pacientesReturn = pacienteService.getByObraSocial("OSDE", 10, 0);
 
-        verify(pacientePortOut).getByObraSocial("OSDE", 10, 0);
+        verify(pacientePortOut, times(1)).getByObraSocial("OSDE", 10, 0);
         assertEquals(0, pacientesReturn.size());
     }
 
@@ -277,9 +277,9 @@ public class PacienteServiceTest {
         assertEquals("OSDE", actualizado.getObraSocial());
         assertEquals("agustin.perez@gmail.com", actualizado.getEmail());
         assertEquals("123456789", actualizado.getTelefono());
-        verify(pacientePortOut).getByDni(dni);
-        verify(pacienteUpdater).update(command, pacienteExistente);
-        verify(pacientePortOut).save(pacienteExistente);
+        verify(pacientePortOut, times(1)).getByDni(dni);
+        verify(pacienteUpdater, times(1)).update(command, pacienteExistente);
+        verify(pacientePortOut, times(1)).save(pacienteExistente);
     }
 
     @Test
@@ -290,7 +290,7 @@ public class PacienteServiceTest {
         when(pacientePortOut.getByDni(dni)).thenReturn(Optional.empty());
 
         assertThrows(PacienteNoEncontradoException.class, () -> pacienteService.update(dni, command));
-        verify(pacientePortOut).getByDni(dni);
+        verify(pacientePortOut, times(1)).getByDni(dni);
     }
 
     @ParameterizedTest
@@ -305,7 +305,7 @@ public class PacienteServiceTest {
 
         assertThrows(PacienteArgumentoInvalido.class,
                 () -> pacienteService.update(DNI, command));
-        verify(pacientePortOut).getByDni(DNI);
+        verify(pacientePortOut, times(1)).getByDni(DNI);
     }
 
     static Stream<UpdatePacienteCommand> invalidUpdatePacienteCommands() {
