@@ -27,8 +27,8 @@ public class GlobalExceptionHandler {
         return buildErrorResponse(ex.getMessage(), HttpStatus.CONFLICT);
     }
 
-    @ExceptionHandler(PatientDniAlreadyInUse.class)
-    public ResponseEntity<ApiResponse<String>> handlePacienteNoActualizado(PatientDniAlreadyInUse ex) {
+    @ExceptionHandler(PatientDniAlreadyInUseException.class)
+    public ResponseEntity<ApiResponse<String>> handlePacienteNoActualizado(PatientDniAlreadyInUseException ex) {
         return buildErrorResponse(ex.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);
     }
 

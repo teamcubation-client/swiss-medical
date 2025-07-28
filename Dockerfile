@@ -6,7 +6,7 @@ WORKDIR /app
 # Copiar todo el código fuente al contenedor
 COPY . .
 # Ejecutar Maven para limpiar y empaquetar sin correr tests
-RUN mvn clean package -DskipTests
+RUN mvn clean package
 
 
 # Etapa 2: Runtime

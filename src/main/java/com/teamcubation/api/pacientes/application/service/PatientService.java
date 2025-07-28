@@ -1,13 +1,13 @@
 package com.teamcubation.api.pacientes.application.service;
 
-import com.teamcubation.api.pacientes.application.domain.port.out.PatientExporterOut;
+import com.teamcubation.api.pacientes.application.domain.port.out.PatientExporterPortOut;
 import com.teamcubation.api.pacientes.infrastructure.adapter.in.exporter.factory.ExporterFactory;
-import com.teamcubation.api.pacientes.infrastructure.adapter.in.exporter.factory.ExporterFactoryProvider;
 import com.teamcubation.api.pacientes.application.domain.model.Patient;
 import com.teamcubation.api.pacientes.application.domain.port.in.PatientPortIn;
 import com.teamcubation.api.pacientes.application.domain.port.out.PatientPortOut;
+import com.teamcubation.api.pacientes.application.domain.port.out.ExporterFactoryProviderPortOut;
 import com.teamcubation.api.pacientes.shared.exception.DuplicatedPatientException;
-import com.teamcubation.api.pacientes.shared.exception.PatientDniAlreadyInUse;
+import com.teamcubation.api.pacientes.shared.exception.PatientDniAlreadyInUseException;
 import com.teamcubation.api.pacientes.shared.exception.PatientNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,10 +19,12 @@ import java.util.Optional;
 public class PatientService implements PatientPortIn {
 
     private final PatientPortOut patientPortOut;
+    private final ExporterFactoryProviderPortOut exporterFactoryProviderPortOut;
     private static final String DNI_FIELD = "DNI";
 
-    public PatientService(PatientPortOut patientPortOut){
+    public PatientService(PatientPortOut patientPortOut, ExporterFactoryProviderPortOut exporterFactoryProviderPortOut) {
         this.patientPortOut = patientPortOut;
+        this.exporterFactoryProviderPortOut = exporterFactoryProviderPortOut;
     }
 
     @Override
@@ -60,7 +62,9 @@ public class PatientService implements PatientPortIn {
 
     @Override
     public List<Patient> getByHealthInsuranceProvider(String healthInsuranceProvider, int page, int size) {
-        return this.patientPortOut.findByHealthInsuranceProvider(healthInsuranceProvider, size, page * size);
+        int MAX_PAGE_SIZE = 30;
+        int finalSize = Math.min(size, MAX_PAGE_SIZE);
+        return this.patientPortOut.findByHealthInsuranceProvider(healthInsuranceProvider, finalSize, page * finalSize);
     }
 
     @Override
@@ -74,7 +78,7 @@ public class PatientService implements PatientPortIn {
             Optional<Patient> patientDuplicatedDNI = this.patientPortOut.findByDni(dni);
             boolean alreadyInUse = patientDuplicatedDNI.isPresent() && !patientDuplicatedDNI.get().getId().equals(id);
             if (alreadyInUse) {
-                throw new PatientDniAlreadyInUse(id);
+                throw new PatientDniAlreadyInUseException(id);
             }
         }
 
@@ -93,9 +97,10 @@ public class PatientService implements PatientPortIn {
     @Override
     public String exportPatients(String format) {
         List<Patient> patients = patientPortOut.findAll(null, null);
-        ExporterFactory factory = ExporterFactoryProvider.getFactory(format);
-        PatientExporterOut exporter = factory.createPatientExporter();
-        return exporter.export(patients);
+        ExporterFactory factory = exporterFactoryProviderPortOut.getFactory(format);
+        PatientExporterPortOut exporter = factory.createPatientExporter();
+        String result = exporter.export(patients);
+        return result;
     }
 
     /**
