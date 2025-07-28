@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.Where;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Getter
@@ -27,7 +28,8 @@ public class PatientEntity {
     private String lastName;
     @Column(unique = true, nullable = false)
     private String dni;
-
+    @Column(nullable = false)
+    private LocalDate birthDate;
     private String healthInsurance;
     private String healthPlan;
     private String address;

@@ -10,7 +10,6 @@ public interface PatientRepositoryPort {
     Optional<Patient> findByDni(String dni);
     List<Patient> findAll();
     Patient update(Patient patient);
-    void deleteByDni(String dni);
     List<Patient> searchByFirstName(String firstName);
     List<Patient> searchByHealthInsurancePaginated(String healthInsurance, int limit, int offset);
 } 
