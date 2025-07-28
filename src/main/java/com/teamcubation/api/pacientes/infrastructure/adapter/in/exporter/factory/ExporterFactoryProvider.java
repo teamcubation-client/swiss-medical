@@ -1,20 +1,23 @@
 package com.teamcubation.api.pacientes.infrastructure.adapter.in.exporter.factory;
 
 import com.teamcubation.api.pacientes.shared.exception.ExporterTypeNotSupportedException;
+import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class ExporterFactoryProvider {
-    private static final Map<String, ExporterFactory> FACTORIES = new HashMap<>();
+@Component
+public class ExporterFactoryProvider implements com.teamcubation.api.pacientes.application.domain.port.out.ExporterFactoryProviderPortOut {
+    private final Map<String, ExporterFactory> factories = new HashMap<>();
 
-    static {
-        FACTORIES.put("csv", new CsvExporterFactory());
-        FACTORIES.put("json", new JsonExporterFactory());
+    public ExporterFactoryProvider() {
+        factories.put("csv", new CsvExporterFactory());
+        factories.put("json", new JsonExporterFactory());
     }
 
-    public static ExporterFactory getFactory(String type) {
-        ExporterFactory factory = FACTORIES.get(type.toLowerCase());
+    @Override
+    public ExporterFactory getFactory(String type) {
+        ExporterFactory factory = factories.get(type.toLowerCase());
         if (factory == null) {
             throw new ExporterTypeNotSupportedException(type);
         }

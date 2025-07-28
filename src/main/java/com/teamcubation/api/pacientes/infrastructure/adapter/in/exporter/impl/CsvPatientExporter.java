@@ -1,12 +1,12 @@
 package com.teamcubation.api.pacientes.infrastructure.adapter.in.exporter.impl;
 
-import com.teamcubation.api.pacientes.application.domain.port.out.PatientExporterOut;
+import com.teamcubation.api.pacientes.application.domain.port.out.PatientExporterPortOut;
 import com.teamcubation.api.pacientes.application.domain.model.Patient;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class CsvPatientExporter implements PatientExporterOut {
+public class CsvPatientExporter implements PatientExporterPortOut {
 
     @Override
     public String export(List<Patient> patients) {
@@ -23,6 +23,7 @@ public class CsvPatientExporter implements PatientExporterOut {
                         patient.getPhoneNumber()))
                 .collect(Collectors.joining("\n"));
 
+        System.out.println(header + body);
         return header + body + "\n";
     }
 }
