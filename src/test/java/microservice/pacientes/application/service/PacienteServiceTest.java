@@ -3,9 +3,7 @@ package microservice.pacientes.application.service;
 import microservice.pacientes.application.domain.model.Paciente;
 import microservice.pacientes.application.domain.port.out.PacientePortOutRead;
 import microservice.pacientes.application.domain.port.out.PacientePortOutWrite;
-import microservice.pacientes.shared.PacienteActivoException;
-import microservice.pacientes.shared.PacienteDuplicadoException;
-import microservice.pacientes.shared.PacienteNotFoundException;
+import microservice.pacientes.shared.*;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -79,7 +77,7 @@ public class PacienteServiceTest {
     }
 
     @Test
-    void crearPaciente_GuardarCuandoDniNoExiste() {
+    void crearPaciente_CrearExitoso() {
         // Simula que no existe duplicado
         when(portOutRead.buscarByDni("12345678")).thenReturn(Optional.empty());
         // Simula que guardo y devuelve el mismo paciente
@@ -106,6 +104,64 @@ public class PacienteServiceTest {
     }
 
     @Test
+    void crearPaciente_FallarSiEmailFormatoIncorrecto(){
+        paciente.setEmail("correo-no-valido");
+
+        when(portOutRead.buscarByDni("12345678"))
+                .thenReturn(Optional.empty());
+
+        assertThrows(
+                InvalidEmailFormatException.class,
+                () -> service.crearPaciente(paciente)
+        );
+
+        verify(portOutRead).buscarByDni("12345678");
+        verify(portOutWrite, never()).save(any());
+    }
+
+    @Test
+    void crearPaciente_FallarSiFechaAltaFutura(){
+        paciente.setFechaAlta(LocalDate.now().plusDays(2));
+
+        when(portOutRead.buscarByDni("12345678"))
+                .thenReturn(Optional.empty());
+
+        assertThrows(
+                InvalidFechaAltaException.class,
+                () -> service.crearPaciente(paciente)
+        );
+
+        verify(portOutRead).buscarByDni("12345678");
+        verify(portOutWrite, never()).save(any());
+    }
+
+    @Test
+    void eliminarPaciente_EliminarExitoso() {
+
+        when(portOutRead.findById(2L))
+                .thenReturn(Optional.of(pacienteInactivo));
+
+        assertDoesNotThrow(() -> service.eliminarPaciente(2L));
+
+        verify(portOutRead, atLeastOnce()).findById(2L);
+        verify(portOutWrite).deleteById(2L);
+    }
+
+    @Test
+    void eliminarPaciente_FallarEliminarSiNoExisteId(){
+        when(portOutRead.findById(1L))
+                .thenReturn(Optional.empty());
+
+        assertThrows(
+                PacienteNotFoundException.class,
+                () -> service.eliminarPaciente(1L)
+        );
+
+        verify(portOutRead, atLeastOnce()).findById(1L);
+        verify(portOutWrite, never()).deleteById(anyLong());
+    }
+
+    @Test
     void eliminarPaciente_FallarEliminarCuandoExisteYEstaActivo() {
         //findById devuelve nuestro paciente activo
         when(portOutRead.findById(1L))
@@ -118,18 +174,6 @@ public class PacienteServiceTest {
 
         verify(portOutRead, atLeastOnce()).findById(1L);
         verify(portOutWrite, never()).deleteById(anyLong());
-    }
-
-    @Test
-    void eliminarPaciente_EliminarSiPacienteInactivo() {
-
-        when(portOutRead.findById(2L))
-                .thenReturn(Optional.of(pacienteInactivo));
-
-        assertDoesNotThrow(() -> service.eliminarPaciente(2L));
-
-        verify(portOutRead, atLeastOnce()).findById(2L);
-        verify(portOutWrite).deleteById(2L);
     }
 
     @Test
@@ -274,7 +318,109 @@ public class PacienteServiceTest {
 
     @Test
     void activarPaciente_FallarSiNoExisteId(){
+        pacienteInactivo.setEstado(false);
+        when(portOutRead.findById(2L))
+                .thenReturn(Optional.empty());
 
+        PacienteNotFoundException ex = assertThrows(
+                PacienteNotFoundException.class,
+                () -> service.activarPaciente(2L)
+        );
 
+        assertTrue(ex.getMessage().contains("2"));
+
+        verify(portOutRead).findById(2L);
+        verify(portOutWrite,never()).save(any());
     }
+
+    @Test
+    void actualizarPaciente_ActualizarExitoso(){
+        when(portOutRead.findById(1L))
+                .thenReturn(Optional.of(paciente));
+
+        Paciente actualizado = Paciente.builder()
+                .nombre("Ana Actualizada")
+                .build();
+
+        when(portOutWrite.update(any(Paciente.class))).thenReturn(actualizado);
+
+        Paciente result = service.actualizarPaciente(1L, paciente);
+
+        assertSame(actualizado, result);
+
+        verify(portOutRead).findById(1L);
+        verify(portOutWrite).update(paciente);
+    }
+
+    @Test
+    void actualizarPaciente_FallarSiNoExiste(){
+        when(portOutRead.findById(1L))
+                .thenReturn(Optional.empty());
+
+        assertThrows(
+                PacienteNotFoundException.class,
+                () -> service.actualizarPaciente(1L, paciente)
+        );
+
+        verify(portOutRead).findById(1L);
+        verify(portOutWrite, never()).update(any());
+    }
+
+    @Test
+    void actualizarPaciente_FallarSiDniDuplicado(){
+        when(portOutRead.findById(1L))
+                .thenReturn(Optional.of(paciente));
+
+        when(portOutRead.buscarByDni("12345678"))
+                .thenReturn(Optional.of(paciente));
+
+        assertThrows(PacienteDuplicadoException.class,
+                () -> service.actualizarPaciente(1L, paciente));
+
+        verify(portOutRead).findById(1L);
+        verify(portOutRead).buscarByDni("12345678");
+        verify(portOutWrite, never()).update(any());
+    }
+
+    @Test
+    void actualizarPaciente_FallarSiEmailFormatoIncorrecto(){
+        paciente.setEmail("correo-no-valido");
+
+        when(portOutRead.findById(1L))
+                .thenReturn(Optional.of(paciente));
+
+        when(portOutRead.buscarByDni("12345678"))
+                .thenReturn(Optional.empty());
+
+        assertThrows(
+                InvalidEmailFormatException.class,
+                () -> service.actualizarPaciente(1L, paciente)
+        );
+
+        verify(portOutRead).findById(1L);
+        verify(portOutRead).buscarByDni("12345678");
+        verify(portOutWrite, never()).update(any());
+    }
+
+    @Test
+    void actualizarPaciente_FallarSiFechaAltaFutura(){
+        paciente.setFechaAlta(LocalDate.now().plusDays(2));
+
+        when(portOutRead.findById(1L))
+                .thenReturn(Optional.of(paciente));
+
+        when(portOutRead.buscarByDni("12345678"))
+                .thenReturn(Optional.empty());
+
+        assertThrows(
+                InvalidFechaAltaException.class,
+                () -> service.actualizarPaciente(1L, paciente)
+        );
+
+        verify(portOutRead).findById(1L);
+        verify(portOutRead).buscarByDni("12345678");
+        verify(portOutWrite, never()).update(any());
+    }
+
+
 }
