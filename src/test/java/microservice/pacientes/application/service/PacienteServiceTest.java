@@ -264,6 +264,20 @@ public class PacienteServiceTest {
     }
 
     @Test
+    void buscarByNombre_FallarSiNull() {
+        when(portOutRead.buscarByNombre("Ana"))
+                .thenReturn(null);
+
+        assertThrows(
+                PacienteNotFoundException.class,
+                () -> service.buscarByNombre("Ana")
+        );
+
+        verify(portOutRead).buscarByNombre("Ana");
+        verifyNoMoreInteractions(portOutRead, portOutWrite);
+    }
+
+    @Test
     void buscarByNombre_FallarCuandoNoHayCoincidencia(){
         when(portOutRead.buscarByNombre("Pepe"))
                 .thenReturn(List.of());
@@ -284,6 +298,21 @@ public class PacienteServiceTest {
 
         assertEquals(2, result.size());
         verify(portOutRead).buscarPorObraSocialPaginado("OSDE", 10, 0);
+    }
+
+    @Test
+    void buscarPorObraSocialPaginado_FallarSiNull() {
+
+        when(portOutRead.buscarPorObraSocialPaginado("OSDE", 10, 0))
+                .thenReturn(null);
+
+        assertThrows(
+                PacienteNotFoundException.class,
+                () -> service.buscarPorObraSocialPaginado("OSDE", 10, 0)
+        );
+
+        verify(portOutRead).buscarPorObraSocialPaginado("OSDE", 10, 0);
+        verifyNoMoreInteractions(portOutRead, portOutWrite);
     }
 
     @Test
@@ -331,6 +360,23 @@ public class PacienteServiceTest {
 
         verify(portOutRead).findById(2L);
         verify(portOutWrite,never()).save(any());
+    }
+
+    @Test
+    void desactivarPaciente_SiExisteId(){
+        paciente.setEstado(true);
+        when(portOutRead.findById(1L))
+                .thenReturn(Optional.of(paciente));
+
+        paciente.setEstado(false);
+        when(portOutWrite.save(paciente)).thenReturn(paciente);
+
+        Paciente result = service.desactivarPaciente(1L);
+
+        assertFalse(result.isEstado(), "El paciente esta desactivado");
+
+        verify(portOutRead).findById(1L);
+        verify(portOutWrite).save(paciente);
     }
 
     @Test
