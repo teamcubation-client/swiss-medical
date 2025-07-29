@@ -5,6 +5,7 @@ import com.swissmedical.patients.application.domain.model.Patient;
 import com.swissmedical.patients.application.domain.ports.out.PatientRepositoryPort;
 import com.swissmedical.patients.infrastructure.adapter.in.rest.dto.PatientCreateDto;
 import com.swissmedical.patients.unit.shared.utils.TestContants;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -35,9 +36,12 @@ class PatientsApplicationTests {
   @Autowired
   private ObjectMapper objectMapper;
 
-  @Test
-  @Rollback
-  public void createPatient() throws Exception {
+  private Patient patient;
+
+  private PatientCreateDto patientCreateDto;
+
+  @BeforeEach
+  public void setUp() {
     PatientCreateDto patientCreateDto = PatientCreateDto.builder()
             .firstName("John")
             .lastName("Doe")
@@ -50,6 +54,11 @@ class PatientsApplicationTests {
             .socialSecurity("Swiss Medical")
             .build();
 
+  }
+
+  @Test
+  @Rollback
+  public void createPatient() throws Exception {
     doReturn(false).when(patientRepositoryPort).existsByDni("12345678");
     doReturn(false).when(patientRepositoryPort).existsByEmail(TestContants.EMAIL);
 
@@ -62,5 +71,32 @@ class PatientsApplicationTests {
     verify(patientRepositoryPort).existsByDni("12345678");
     verify(patientRepositoryPort).existsByEmail(TestContants.EMAIL);
     verify(patientRepositoryPort).save(any(Patient.class));
+  }
+
+  @Test
+  public void createPatientWithExistingDni() throws Exception {
+    doReturn(true).when(patientRepositoryPort).existsByDni("12345678");
+
+    mockMvc.perform(post("/api/patients")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(patientCreateDto)))
+            .andExpect(status().isConflict())
+            .andExpect(jsonPath("$.message").value("DNI already exists"));
+
+    verify(patientRepositoryPort, never()).save(any(Patient.class));
+  }
+
+  @Test
+  public void createPatientWithExistingEmail() throws Exception {
+    doReturn(false).when(patientRepositoryPort).existsByDni("12345678");
+    doReturn(true).when(patientRepositoryPort).existsByEmail(TestContants.EMAIL);
+
+    mockMvc.perform(post("/api/patients")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(patientCreateDto)))
+            .andExpect(status().isConflict())
+            .andExpect(jsonPath("$.message").value("Email already exists"));
+
+    verify(patientRepositoryPort, never()).save(any(Patient.class));
   }
 }
