@@ -12,16 +12,16 @@ import com.teamcubation.api.pacientes.shared.exception.PatientNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.MockitoAnnotations;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -33,349 +33,424 @@ class PatientServiceTest {
 
     private PatientService patientService;
 
-    @MockBean
+    @Mock
     private PatientRepository patientRepository;
 
-    @MockBean
+    @Mock
     private ExporterFactoryProvider exporterFactoryProvider;
+
+    @Mock
+    private ExporterFactory exporterFactory;
+
+    @Mock
+    private PatientExporterPortOut patientExporter;
 
     @BeforeEach
     public void setUp() {
-        MockitoAnnotations.openMocks(this);
         this.patientService = new PatientService(this.patientRepository, exporterFactoryProvider);
     }
 
-    private Patient buildPatient(Long id, String name, String lastName, String dni, String healthInsuranceProvider, String email, String phoneNumber) {
-        Patient patient = new Patient();
-        patient.setId(id);
-        patient.setName(name);
-        patient.setLastName(lastName);
-        patient.setDni(dni);
-        patient.setHealthInsuranceProvider(healthInsuranceProvider);
-        patient.setEmail(email);
-        patient.setPhoneNumber(phoneNumber);
-        return patient;
+    //Se puede usar para utilizar paciente por defecto o crear nuevos pacientes
+    static class PatientBuilder {
+        private Long id;
+        private String name = "Ana";
+        private String lastName = "Torres";
+        private String dni = "35784627";
+        private String insurance = null;
+        private String email = null;
+        private String phone = null;
+
+        PatientBuilder withId(Long id) { this.id = id; return this; }
+        PatientBuilder withName(String name) { this.name = name; return this; }
+        PatientBuilder withLastName(String lastName) { this.lastName = lastName; return this; }
+        PatientBuilder withDni(String dni) { this.dni = dni; return this; }
+        PatientBuilder withInsurance(String insurance) { this.insurance = insurance; return this; }
+        PatientBuilder withEmail(String email) { this.email = email; return this; }
+        PatientBuilder withPhone(String phone) { this.phone = phone; return this; }
+
+        Patient build() {
+            Patient p = new Patient();
+            p.setId(id);
+            p.setName(name);
+            p.setLastName(lastName);
+            p.setDni(dni);
+            p.setHealthInsuranceProvider(insurance);
+            p.setEmail(email);
+            p.setPhoneNumber(phone);
+            return p;
+        }
+    }
+
+    private List<Patient> defaultPatients() {
+        return List.of(
+                new PatientBuilder().withId(1L).build(),
+                new PatientBuilder().withId(2L)
+                        .withName("Juan")
+                        .withLastName("Pérez")
+                        .withDni("47837645")
+                        .build()
+        );
+    }
+
+    private void assertPatientEquals(Patient expected, Patient actual) {
+        assertAll(
+                () -> assertEquals(expected.getId(), actual.getId(),
+                        "El ID del paciente no coincide"),
+                () -> assertEquals(expected.getName(), actual.getName(),
+                        "El nombre del paciente no coincide"),
+                () -> assertEquals(expected.getLastName(), actual.getLastName(),
+                        "El apellido del paciente no coincide"),
+                () -> assertEquals(expected.getDni(), actual.getDni(),
+                        "El DNI del paciente no coincide"),
+                () -> assertEquals(expected.getEmail(), actual.getEmail(),
+                        "El email del paciente no coincide"),
+                () -> assertEquals(expected.getHealthInsuranceProvider(), actual.getHealthInsuranceProvider(),
+                        "La obra social del paciente no coincide"),
+                () -> assertEquals(expected.getPhoneNumber(), actual.getPhoneNumber(),
+                        "El teléfono del paciente no coincide")
+        );
     }
 
     //TEST CREAR PACIENTE
     @Test
-    void createPatient_ShouldReturnPatientCreatedWhitAllFieldsComplete() {
-        Patient patient = buildPatient(null, "Ana", "Torres", "35784627",
-                "Swiss Medical", "anatorres@gmail.com", "1144773898");
+    void createPatient_ShouldReturnPatientCreatedWithAllFieldsComplete() {
+        Patient toCreate = new PatientBuilder()
+                .withEmail("anatorres@gmail.com")
+                .withPhone("1144773898")
+                .withInsurance("Swiss Medical")
+                .build();
+        Patient saved = new PatientBuilder()
+                .withId(1L)
+                .withEmail("anatorres@gmail.com")
+                .withPhone("1144773898")
+                .withInsurance("Swiss Medical")
+                .build();
 
-        Patient savedPatient = buildPatient(1L, "Ana", "Torres", "35784627",
-                "Swiss Medical", "anatorres@gmail.com", "1144773898");
+        when(this.patientRepository.save(toCreate)).thenReturn(saved);
 
-        when(this.patientRepository.save(patient)).thenReturn(savedPatient);
-
-        Patient result = this.patientService.create(patient);
-        assertAll(
-                () -> assertEquals(1L, result.getId()),
-                () -> assertEquals("Ana", result.getName()),
-                () -> assertEquals("Torres", result.getLastName()),
-                () -> assertEquals("35784627", result.getDni()),
-                () -> assertEquals("anatorres@gmail.com",result.getEmail()),
-                () -> assertEquals("Swiss Medical",result.getHealthInsuranceProvider()),
-                () -> assertEquals("1144773898",result.getPhoneNumber())
-        );
-        verify(this.patientRepository).save(patient);
+        Patient result = this.patientService.create(toCreate);
+        assertPatientEquals(saved, result);
+        verify(this.patientRepository).save(toCreate);
     }
 
     @Test
     void createPatientWithRequiredFields_ShouldReturnPatientCreated(){
-        Patient patient = buildPatient(null, "Ana", "Torres", "35784627",
-                null, null, null);
-
-        Patient savedPatient = buildPatient(1L, "Ana", "Torres", "35784627",
-                null, null, null);
+        Patient patient = new PatientBuilder().build();
+        Patient savedPatient = new PatientBuilder().withId(1L).build();
 
         when(this.patientRepository.save(patient)).thenReturn(savedPatient);
 
         Patient result = this.patientService.create(patient);
-        assertAll(
-                () -> assertEquals(1L, result.getId()),
-                () -> assertEquals("Ana", result.getName()),
-                () -> assertEquals("Torres", result.getLastName()),
-                () -> assertEquals("35784627", result.getDni()),
-                () -> assertNull(result.getEmail()),
-                () -> assertNull(result.getHealthInsuranceProvider()),
-                () -> assertNull(result.getPhoneNumber())
-        );
+        assertPatientEquals(savedPatient, result);
         verify(this.patientRepository).save(patient);
     }
 
     @Test
     void createPatientWithDuplicateDni_ShouldThrowException() {
-        Patient patient = buildPatient(null,null,null,"47837645",
-                null,null,null);
+        Patient patient = new PatientBuilder().build();
 
         when(this.patientRepository.findByDni(patient.getDni()))
                 .thenReturn(Optional.of(new Patient()));
 
         DuplicatedPatientException exception = assertThrows(DuplicatedPatientException.class,
-                () -> { this.patientService.create(patient);}
+                () -> this.patientService.create(patient)
         );
 
-        assertTrue(exception.getMessage().contains("Ya existe un paciente con DNI: 47837645"));
+        assertTrue(exception.getMessage().contains("Ya existe un paciente con DNI: " + patient.getDni()),
+                "El mensaje de la excepción no coincide");
         verify(this.patientRepository).findByDni(patient.getDni());
     }
 
     //TEST OBTENER PACIENTES
     @Test
     void getPatientsWithNullFilter_ShouldReturnAllPatients() {
-        Patient p1 = buildPatient(1L, "Ana", "Torres", "35784627",
-                null, null, null);
-        Patient p2 = buildPatient(2L, "Juan", "Pérez", "47837645",
-                null, null, null);
-        Patient p3 = buildPatient(3L, "Lucía", "González", "56987412",
-                null, null, null);
+        List<Patient> patients = defaultPatients();
 
-        List<Patient> patients = List.of(p1, p2, p3);
+        when(this.patientRepository.findAll(null, null)).thenReturn(patients);
 
-        when(this.patientRepository.findAll(null,null)).thenReturn(patients);
-        List<Patient> result = this.patientService.getAll(null,null);
-        assertEquals(patients,result);
-        verify(this.patientRepository).findAll(null,null);
+        List<Patient> result = this.patientService.getAll(null, null);
+
+        assertEquals(patients, result, "La lista devuelta debe coincidir con la lista esperada de pacientes");
+        verify(this.patientRepository).findAll(null, null);
     }
 
     @Test
     void getPatientsWithEmptyFilter_ShouldReturnAllPatients() {
-        Patient p1 = buildPatient(1L, "Ana", "Torres", "35784627",
-                null, null, null);
-        Patient p2 = buildPatient(2L, "Juan", "Pérez", "47837645",
-                null, null, null);
-        Patient p3 = buildPatient(3L, "Lucía", "González", "56987412",
-                null, null, null);
-
-        List<Patient> patients = List.of(p1, p2, p3);
+        List<Patient> patients = defaultPatients();
 
         when(this.patientRepository.findAll("","")).thenReturn(patients);
+
         List<Patient> result = this.patientService.getAll("","");
-        assertEquals(patients,result);
+        assertEquals(patients, result,
+                "La lista devuelta debe coincidir exactamente con la lista esperada de pacientes");
         verify(this.patientRepository).findAll("","");
     }
 
     @Test
-    void getPatientsWithFullDniFilter_ShouldReturnPatientWithDni() {
-        Patient patient = buildPatient(3L, "Lucía", "González", "23456789",
-                null, null, null);
+    void getPatientsWithNoResults_ShouldReturnEmptyList() {
+        String dni = "34567898";
+        when(this.patientRepository.findAll(dni, null)).thenReturn(Collections.emptyList());
 
-        List<Patient> patients = List.of(patient);
+        List<Patient> result = this.patientService.getAll(dni, null);
 
-        when(this.patientRepository.findAll("23456789",null)).thenReturn(patients);
-        List<Patient> result = this.patientService.getAll("23456789",null);
-
-        assertFalse(result.isEmpty());
-        assertAll(
-                () -> result.forEach(
-                        p -> assertEquals("23456789",p.getDni())
-                )
-        );
-        verify(this.patientRepository).findAll("23456789",null);
+        assertTrue(result.isEmpty(),
+                "La lista devuelta debe estar vacía cuando no hay pacientes que coincidan con el filtro");
+        verify(this.patientRepository).findAll(dni, null);
     }
 
     @Test
-    void getPatientsWithPartialDniFilter_ShouldReturnEmptyList() {
-        when(this.patientRepository.findAll("2345",null)).thenReturn(Collections.emptyList());
+    void getPatientsWithDniFilter_ShouldReturnOnePatientWithDni() {
+        Patient patient = new PatientBuilder().build();
+        List<Patient> patients = List.of(patient);
+        String dni = patient.getDni();
 
-        List<Patient> result = this.patientService.getAll("2345",null);
-        assertTrue(result.isEmpty());
-        verify(this.patientRepository).findAll("2345",null);
+        when(this.patientRepository.findAll(dni,null)).thenReturn(patients);
+        List<Patient> result = this.patientService.getAll(dni,null);
+
+        assertEquals(1, result.size(),
+                "Debe devolverse exactamente un paciente con el DNI: " + dni);
+
+        assertTrue(result.stream().allMatch(p -> dni.equals(p.getDni())),
+                "El paciente devuelto debe tener el DNI esperado: " + dni);
+
+        assertPatientEquals(patient, result.get(0));
+        verify(this.patientRepository).findAll(dni, null);
     }
 
     @Test
     void getPatientsWithNonexistentDniFiltered_ShouldReturnEmptyList() {
-        when(this.patientRepository.findAll("23456789",null)).thenReturn(Collections.emptyList());
+        String nonExistent = "23456789";
+        when(this.patientRepository.findAll(nonExistent,null)).thenReturn(Collections.emptyList());
 
-        List<Patient> result = this.patientService.getAll("23456789",null);
-        assertTrue(result.isEmpty());
-        verify(this.patientRepository).findAll("23456789",null);
+        List<Patient> result = this.patientService.getAll(nonExistent,null);
+
+        assertTrue(result.isEmpty(),
+                "Cuando no existen pacientes con el DNI especificado debe devolver una lista vacía");
+        verify(this.patientRepository).findAll(nonExistent,null);
     }
 
     @Test
     void getPatientsWithFullNameFilter_ShouldReturnMatchingPatients() {
-        Patient juan = buildPatient(1L, "Juan", "Pérez", "12345678",
-                null, null, null);
-        Patient juan2 = buildPatient(2L, "juan", "García", "87654321",
-                null, null, null);
-        Patient juan3 = buildPatient(3L, "JUAN", "López", "23456789",
-                null, null, null);
+        Patient juan1 = new PatientBuilder().withId(1L).withName("Juan").withLastName("Pérez").withDni("12345678").build();
+        Patient juan2 = new PatientBuilder().withId(2L).withName("juan").withLastName("García").withDni("87654321").build();
+        Patient juan3 = new PatientBuilder().withId(3L).withName("JUAN").withLastName("López").withDni("23456789").build();
 
-        List<Patient> patientsWithSameName = List.of(juan, juan2, juan3);
+        List<Patient> patientsWithSameName = List.of(juan1, juan2, juan3);
 
-        when(this.patientRepository.findAll(null,"Juan")).thenReturn(patientsWithSameName);
-        List<Patient> result = this.patientService.getAll(null,"Juan");
-        assertAll(
-                () -> assertEquals(patientsWithSameName.size(), result.size()),
-                () -> result.forEach(
-                        p -> assertTrue(p.getName().equalsIgnoreCase("Juan"))
-                )
-        );
+        when(this.patientRepository.findAll(null, "Juan")).thenReturn(patientsWithSameName);
 
-        verify(this.patientRepository).findAll(null,"Juan");
+        List<Patient> result = this.patientService.getAll(null, "Juan");
+
+        assertEquals(patientsWithSameName.size(), result.size(),
+                "El número de pacientes devueltos no coincide con la lista esperada");
+
+        assertTrue(result.stream().allMatch(p -> p.getName().equalsIgnoreCase("Juan")),
+                "Todos los pacientes devueltos deben tener nombre 'Juan', ignorando mayúsculas");
+
+        verify(this.patientRepository).findAll(null, "Juan");
     }
 
     @Test
     void getPatientsWithPartialNameFilter_ShouldReturnPatientsWithMatchFiltered() {
-        Patient patient = buildPatient(1L, "Jorge", "Pérez", "12345678",
-                null, null, null);
-        Patient patient2 = buildPatient(2L, "jonathan", "García", "87654321",
-                null, null, null);
-        Patient patient3 = buildPatient(3L, "JOEL", "López", "23456789",
-                null, null, null);
+        Patient patient1 = new PatientBuilder()
+                .withId(1L).withName("Jorge").withLastName("Pérez").withDni("12345678").build();
+        Patient patient2 = new PatientBuilder()
+                .withId(2L).withName("jonathan").withLastName("García").withDni("87654321").build();
+        Patient patient3 = new PatientBuilder()
+                .withId(3L).withName("JOEL").withLastName("López").withDni("23456789").build();
 
-        List<Patient> patientsWithMatchName = List.of(patient, patient2, patient3);
+        List<Patient> patientsWithMatchName = List.of(patient1, patient2, patient3);
+        String nameFilter = "Jo";
 
-        when(this.patientRepository.findAll(null,"Jo")).thenReturn(patientsWithMatchName);
-        List<Patient> result = this.patientService.getAll(null,"Jo");
+        when(this.patientRepository.findAll(null, nameFilter)).thenReturn(patientsWithMatchName);
 
-        assertAll(
-                () -> assertEquals(patientsWithMatchName.size(), result.size()),
-                () -> result.forEach(p -> assertTrue(p.getName().toLowerCase().startsWith("jo")))
-        );
-        verify(this.patientRepository).findAll(null, "Jo");
+        List<Patient> result = this.patientService.getAll(null, nameFilter);
+
+        assertEquals(patientsWithMatchName.size(), result.size(),
+                "La cantidad de pacientes devuelta no coincide con la esperada para el filtro: " + nameFilter);
+
+        assertTrue(result.stream().allMatch(
+                        p -> p.getName().toLowerCase().startsWith(nameFilter.toLowerCase())),
+                "Todos los pacientes devueltos deberían tener un nombre que comience con: " + nameFilter);
+
+        verify(this.patientRepository).findAll(null, nameFilter);
     }
 
     @Test
     void getPatientsWithNonexistentNameFiltered_ShouldReturnEmptyList() {
-        when(this.patientRepository.findAll(null,"Yoiner")).thenReturn(Collections.emptyList());
+        String nameFilter = "Yoiner";
 
-        List<Patient> result = this.patientService.getAll(null, "Yoiner");
-        assertTrue(result.isEmpty());
-        verify(this.patientRepository).findAll(null, "Yoiner");
+        when(this.patientRepository.findAll(null, nameFilter))
+                .thenReturn(Collections.emptyList());
+
+        List<Patient> result = this.patientService.getAll(null, nameFilter);
+
+        assertTrue(result.isEmpty(),
+                "La lista debería estar vacía porque no existen pacientes con el nombre: " + nameFilter);
+
+        verify(this.patientRepository).findAll(null, nameFilter);
     }
 
     @Test
     void getPatientsWithFullDniAndPartialNameFiltered_ShouldReturnMatchingPatients() {
-        Patient patient = buildPatient(2L, "Juan", "Pérez", "47837645",
-                null, null, null);
+        String dniFilter = "47837645";
+        String nameFilter = "Ju";
 
-        List<Patient> patients = List.of(patient);
+        Patient expectedPatient = new PatientBuilder()
+                .withId(2L)
+                .withName("Juan")
+                .withLastName("Pérez")
+                .withDni(dniFilter)
+                .build();
 
-        when(this.patientRepository.findAll("47837645","Ju")).thenReturn(patients);
+        List<Patient> patients = List.of(expectedPatient);
 
-        List<Patient> result = this.patientService.getAll("47837645","Ju");
-        assertAll(
-                () -> assertEquals(patients.size(), result.size()),
-                () -> result.forEach(
-                        p -> {
-                            assertTrue(p.getName().equalsIgnoreCase("Juan"));
-                            assertEquals(p.getDni(), "47837645");
-                        }
-                )
-        );
-        verify(this.patientRepository).findAll("47837645","Ju");
+        when(this.patientRepository.findAll(dniFilter, nameFilter)).thenReturn(patients);
+
+        List<Patient> result = this.patientService.getAll(dniFilter, nameFilter);
+
+        assertEquals(1, result.size(),
+                "Se esperaba exactamente un paciente para el filtro DNI: " + dniFilter + " y nombre: " + nameFilter);
+
+        Patient actual = result.get(0);
+        assertTrue(actual.getName().equalsIgnoreCase("Juan"),
+                "El nombre del paciente no coincide con el esperado (Juan) para el filtro: " + nameFilter);
+        assertEquals(dniFilter, actual.getDni(),
+                "El DNI del paciente no coincide con el esperado: " + dniFilter);
+
+        assertPatientEquals(expectedPatient, actual);
+
+        verify(this.patientRepository).findAll(dniFilter, nameFilter);
     }
 
     @Test
     void getPatientsWithNonexistentDniAndNameFiltered_ShouldReturnEmptyList() {
-        when(this.patientRepository.findAll("39284750","Ana")).thenReturn(Collections.emptyList());
+        String dni = "39284750";
+        String name = "Ana";
+        when(this.patientRepository.findAll(dni,name)).thenReturn(Collections.emptyList());
 
-        List<Patient> result = this.patientService.getAll("39284750","Ana");
+        List<Patient> result = this.patientService.getAll(dni,name);
         assertTrue(result.isEmpty());
-        verify(this.patientRepository).findAll("39284750","Ana");
+        verify(this.patientRepository).findAll(dni,name);
     }
 
     //TEST OBTENER PACIENTES POR ID
     @Test
     void getPatientByExistentId_ShouldReturnPatientWithId() {
-        Patient patient = buildPatient(1L, "Ana", "Torres", "35784627",
-                "Swiss Medical", "ana.torres@example.com", "1144773898");
-        when(this.patientRepository.findById(1L)).thenReturn(Optional.of(patient));
+        Long id = 1L;
 
-        Patient result = this.patientService.getById(1L);
+        Patient expectedPatient = new PatientBuilder()
+                .withId(id)
+                .withName("Ana")
+                .withLastName("Torres")
+                .withDni("35784627")
+                .withInsurance("Swiss Medical")
+                .withEmail("ana.torres@example.com")
+                .withPhone("1144773898")
+                .build();
 
-        assertAll(
-                () -> assertNotNull(result),
-                () -> assertEquals(1L, result.getId()),
-                () -> assertEquals("Ana", result.getName()),
-                () -> assertEquals("Torres", result.getLastName()),
-                () -> assertEquals("35784627", result.getDni()),
-                () -> assertEquals("Swiss Medical", result.getHealthInsuranceProvider()),
-                () -> assertEquals("ana.torres@example.com", result.getEmail()),
-                () -> assertEquals("1144773898", result.getPhoneNumber())
-        );
-        verify(this.patientRepository).findById(1L);
+        when(this.patientRepository.findById(id)).thenReturn(Optional.of(expectedPatient));
+
+        Patient result = this.patientService.getById(id);
+
+        assertNotNull(result, "El paciente no debería ser nulo para el ID: " + id);
+        assertPatientEquals(expectedPatient, result);
+
+        verify(this.patientRepository).findById(id);
     }
 
     @Test
     void getPatientByNonExistentId_ShouldThrowException() {
-        when(this.patientRepository.findById(5L)).thenReturn(Optional.empty());
+        long id = 5L;
+        when(this.patientRepository.findById(id)).thenReturn(Optional.empty());
 
         PatientNotFoundException exception = assertThrows(PatientNotFoundException.class,
-                () -> { this.patientService.getById(5L);}
+                () -> { this.patientService.getById(id);}
         );
-        assertTrue(exception.getMessage().contains("Paciente con ID: 5 no encontrado"));
-        verify(this.patientRepository).findById(5L);
+        assertTrue(exception.getMessage().contains("Paciente con ID: " + id + " no encontrado"));
+        verify(this.patientRepository).findById(id);
     }
 
     //TEST OBTENER PACIENTES POR DNI
     @Test
     void getPatientByExistentDni_ShouldReturnPatientWithDni() {
-        Patient patient = buildPatient(1L, "Ana", "Torres", "35784627",
-                "Swiss Medical", "ana.torres@example.com", "1144773898");
-        when(this.patientRepository.findByDni("35784627")).thenReturn(Optional.of(patient));
+        String dni = "35784627";
 
-        Patient result = this.patientService.getByDni("35784627");
+        Patient expectedPatient = new PatientBuilder()
+                .withId(1L)
+                .withName("Ana")
+                .withLastName("Torres")
+                .withDni(dni)
+                .withInsurance("Swiss Medical")
+                .withEmail("ana.torres@example.com")
+                .withPhone("1144773898")
+                .build();
 
-        assertAll(
-                () -> assertNotNull(result),
-                () -> assertEquals(1L, result.getId()),
-                () -> assertEquals("Ana", result.getName()),
-                () -> assertEquals("Torres", result.getLastName()),
-                () -> assertEquals("35784627", result.getDni()),
-                () -> assertEquals("Swiss Medical", result.getHealthInsuranceProvider()),
-                () -> assertEquals("ana.torres@example.com", result.getEmail()),
-                () -> assertEquals("1144773898", result.getPhoneNumber())
-        );
-        verify(this.patientRepository).findByDni("35784627");
+        when(this.patientRepository.findByDni(dni)).thenReturn(Optional.of(expectedPatient));
+
+        Patient result = this.patientService.getByDni(dni);
+
+        assertNotNull(result, "El paciente no debería ser nulo para el DNI: " + dni);
+        assertPatientEquals(expectedPatient, result);
+
+        verify(this.patientRepository).findByDni(dni);
     }
 
     @Test
     void getPatientByNonExistentDni_ShouldThrowException() {
-        when(this.patientRepository.findByDni("35784627")).thenReturn(Optional.empty());
+        String dni = "35784627";
+
+        when(this.patientRepository.findByDni(dni)).thenReturn(Optional.empty());
 
         PatientNotFoundException exception = assertThrows(PatientNotFoundException.class,
-                () -> { this.patientService.getByDni("35784627");}
+                () -> this.patientService.getByDni(dni)
         );
-        assertTrue(exception.getMessage().contains("Paciente con DNI: 35784627 no encontrado"));
-        verify(this.patientRepository).findByDni("35784627");
+
+        assertTrue(exception.getMessage().contains("Paciente con DNI: " + dni + " no encontrado"),
+                "El mensaje de la excepción no coincide");
+
+        verify(this.patientRepository).findByDni(dni);
     }
 
     //TEST OBTENER PACIENTE POR NOMBRE
     @Test
     void getPatientByExistentFullName_ShouldReturnPatientsWithMatchingName() {
-        Patient patient = buildPatient(1L, "Florencia", "Martínez", "12345678",
-                "OSDE", "flor.martinez@example.com", "1134567890");
+        Patient patient = new PatientBuilder().build();
+        String name = patient.getName();
+        Patient patient2 = new PatientBuilder()
+                .withId(2L)
+                .withName(name)
+                .withLastName("Gómez")
+                .withDni("87654321")
+                .build();
 
-        Patient patient2 = buildPatient(2L, "Florencia", "Gómez", "87654321",
-                "Swiss Medical", "flor.gomez@example.com", "1198765432");
-
-        Patient patient3 = buildPatient(3L, "Florencia", "López", "45678912",
-                "Galeno", "flor.lopez@example.com", "1176543210");
+        Patient patient3 = new PatientBuilder()
+                .withId(3L)
+                .withName(name)
+                .withLastName("López")
+                .withDni("45678912")
+                .build();
         List<Patient> patients = List.of(patient,patient2,patient3);
 
-        when(this.patientRepository.findByName("Florencia")).thenReturn(patients);
+        when(this.patientRepository.findByName(name)).thenReturn(patients);
 
-        List<Patient> result = this.patientService.getByName("Florencia");
-        assertAll(
-                () -> assertEquals(patients.size(), result.size()),
-                () -> result.forEach(
-                        p -> {
-                            assertTrue(p.getName().equalsIgnoreCase("Florencia"));
-                        }
-                )
-        );
-        verify(this.patientRepository).findByName("Florencia");
+        List<Patient> result = this.patientService.getByName(name);
+        assertEquals(patients.size(), result.size(), "La cantidad de pacientes devueltos debe coincidir");
+
+        for (int i = 0; i < patients.size(); i++) {
+            assertPatientEquals(patients.get(i), result.get(i));
+        }
+        verify(this.patientRepository).findByName(name);
     }
 
     @Test
     void getPatientByNonExistentFullName_ShouldReturnEmptyList() {
-        when(this.patientRepository.findByName("Florencia")).thenReturn(Collections.emptyList());
+        String name = "Ana";
+        when(this.patientRepository.findByName(name)).thenReturn(Collections.emptyList());
 
-        List<Patient> result = this.patientService.getByName("Florencia");
+        List<Patient> result = this.patientService.getByName(name);
         assertTrue(result.isEmpty());
-        verify(this.patientRepository).findByName("Florencia");
+        verify(this.patientRepository).findByName(name);
     }
 
     //TEST OBTENER PACIENTE POR OBRA SOCIAL
@@ -385,21 +460,26 @@ class PatientServiceTest {
         int page = 1;
         int size = 5;
 
-        Patient patient1 = buildPatient(1L, "Ana", "Torres", "35784627",
-                healthInsuranceProvider, "ana.torres@example.com", "1144773898");
-        Patient patient2 = buildPatient(2L, "Juan", "Pérez", "47837645",
-                healthInsuranceProvider, "juan.perez@example.com", "1133557799");
-        List<Patient> expectedPatients = List.of(patient1, patient2);
+        Patient patient = new PatientBuilder().build();
+        patient.setHealthInsuranceProvider(healthInsuranceProvider);
+        Patient patient2 = new PatientBuilder().build();
+        patient2.setDni("23456453");
+        patient2.setHealthInsuranceProvider(healthInsuranceProvider);
+        List<Patient> expectedPatients = List.of(patient, patient2);
 
         when(this.patientRepository.findByHealthInsuranceProvider(healthInsuranceProvider, size, page * size))
                 .thenReturn(expectedPatients);
 
         List<Patient> result = this.patientService.getByHealthInsuranceProvider(healthInsuranceProvider, page, size);
 
-        assertNotNull(result);
-        assertEquals(2, result.size());
-        assertEquals("Ana", result.get(0).getName());
-        assertEquals("Swiss Medical", result.get(0).getHealthInsuranceProvider());
+        assertNotNull(result, "La lista de pacientes no debe ser nula");
+        assertEquals(expectedPatients.size(), result.size(), "Cantidad de pacientes devueltos incorrecta");
+
+        for (int i = 0; i < expectedPatients.size(); i++) {
+            assertPatientEquals(expectedPatients.get(i), result.get(i));
+            assertEquals(healthInsuranceProvider, result.get(i).getHealthInsuranceProvider(),
+                    "El paciente debe tener el proveedor de salud esperado");
+        }
 
         verify(this.patientRepository).findByHealthInsuranceProvider(healthInsuranceProvider, size, page * size);
     }
@@ -415,93 +495,117 @@ class PatientServiceTest {
 
         List<Patient> result = this.patientService.getByHealthInsuranceProvider(healthInsuranceProvider, page, size);
 
-        assertNotNull(result);
-        assertTrue(result.isEmpty());
+        assertNotNull(result, "La lista de pacientes no debe ser nula");
+        assertTrue(result.isEmpty(), "La lista debe estar vacía cuando no hay pacientes con ese proveedor");
 
         verify(this.patientRepository).findByHealthInsuranceProvider(healthInsuranceProvider, size, 0);
     }
 
     @Test
-    void getPatientByHealthInsuranceProviderWithExcessiveSizeSet_ShouldReturnMaxSizeSetAllowed() {
+    void getPatientByHealthInsuranceProviderWithExcessiveSizeSet_ShouldLimitSizeAndReturnPatients() {
         String healthInsurance = "OSDE";
-        int page = 999;
-        int size = 10;
+        int page = 0;
+        int requestedSize = 1000;
+        int maxAllowedSize = 30;   // valor máximo establecido en el servicio
 
-        when(this.patientRepository.findByHealthInsuranceProvider(healthInsurance, size, page * size))
-                .thenReturn(Collections.emptyList());
+        List<Patient> patients = IntStream.range(0, maxAllowedSize)
+                .mapToObj(i -> new PatientBuilder().withId((long) i).build())
+                .collect(Collectors.toList());
 
-        List<Patient> result = patientService.getByHealthInsuranceProvider(healthInsurance, page, size);
+        when(this.patientRepository.findByHealthInsuranceProvider(healthInsurance, maxAllowedSize, 0))
+                .thenReturn(patients);
 
-        assertTrue(result.isEmpty());
-        verify(this.patientRepository).findByHealthInsuranceProvider(healthInsurance, size, page * size);
+        List<Patient> result =  this.patientService.getByHealthInsuranceProvider(healthInsurance, page, requestedSize);
+
+        assertNotNull(result, "La lista no debe ser nula");
+        assertEquals(maxAllowedSize, result.size(), "La lista debe contener el máximo permitido de pacientes");
+
+        verify(this.patientRepository).findByHealthInsuranceProvider(healthInsurance, maxAllowedSize, 0);
     }
 
     //TEST ACTUALIZAR POR ID
     @Test
     void updatePatientByValidIdWithFullUpdate_ShouldReplaceAllFields() {
         Long id = 1L;
-        Patient existingPatient = buildPatient(id, "Juan", "Pérez", "39847562",
-                "OSDE", "juan@mail.com", "1188749873");
+        Patient existingPatient = new PatientBuilder()
+                .withId(id)
+                .build();
 
-        Patient updateRequest = buildPatient(id, "Carlos", "Gómez", "40234567",
-                "Galeno", "carlos_gomez@mail.com", "1199999999");
-
-        Patient expectedPatient = buildPatient(id, "Carlos", "Gómez", "40234567",
-                "Galeno", "carlos_gomez@mail.com", "1199999999");
+        Patient updatedPatient = new PatientBuilder()
+                .withId(id)
+                .withName("Analía")
+                .withLastName("Gómez")
+                .withInsurance("OSDE")
+                .withEmail("nuevo_mail@example.com")
+                .withPhone("47563765")
+                .build();
 
         when(this.patientRepository.findById(id)).thenReturn(Optional.of(existingPatient));
-        when(this.patientRepository.save(any(Patient.class))).thenReturn(expectedPatient);
+        when(this.patientRepository.save(any(Patient.class))).thenReturn(updatedPatient);
 
-        Patient result = this.patientService.updateById(id, updateRequest);
+        Patient result = this.patientService.updateById(id, updatedPatient);
 
-        ArgumentCaptor<Patient> captor = ArgumentCaptor.forClass(Patient.class);
-        verify(this.patientRepository).save(captor.capture());
-        Patient savedPatient = captor.getValue();
+        assertPatientEquals(updatedPatient, result);
 
-        assertEquals(expectedPatient.getName(), savedPatient.getName());
-        assertEquals(expectedPatient.getLastName(), savedPatient.getLastName());
-        assertEquals(expectedPatient.getDni(), savedPatient.getDni());
-        assertEquals(expectedPatient.getHealthInsuranceProvider(), savedPatient.getHealthInsuranceProvider());
-        assertEquals(expectedPatient.getEmail(), savedPatient.getEmail());
-        assertEquals(expectedPatient.getPhoneNumber(), savedPatient.getPhoneNumber());
-        assertEquals(expectedPatient, result);
+        verify(this.patientRepository).findById(id);
+        verify(this.patientRepository).save(any(Patient.class));
     }
 
     @Test
     void updatePatientByValidIdWithPartialUpdate_ShouldUpdateOnlyProvidedFields() {
-        Long id = 1L;
-        Patient existingPatient = buildPatient(id, "Juan", "Pérez", "39847562",
-                "OSDE", "juan@mail.com", "1188749873");
-        Patient updateRequest = buildPatient(id, null, null, null,
-                "Swiss Medical", "juan_perez@gmail.com", null);
+        long id = 1L;
 
-        Patient expectedPatient = buildPatient(id, "Juan", "Pérez", "39847562",
-                "Swiss Medical", "juan_perez@gmail.com", "1188749873");
+        // Paciente original con datos completos
+        Patient patientOriginal = new PatientBuilder()
+                .withId(id)
+                .withName("Ana")
+                .withLastName("Torres")
+                .withDni("35784627")
+                .withInsurance(null)
+                .withEmail(null)
+                .withPhone(null)
+                .build();
 
+        // Datos que se quieren actualizar (algunos null)
+        Patient updatedPatient = new PatientBuilder()
+                .withId(id)
+                .withName(null)
+                .withLastName(null)
+                .withDni(null)
+                .withInsurance("Swiss Medical")
+                .withEmail("ana_torres@example.com")
+                .withPhone("1188749873")
+                .build();
 
-        when(this.patientRepository.findById(id)).thenReturn(Optional.of(existingPatient));
-        when(this.patientRepository.save(any(Patient.class))).thenReturn(expectedPatient);
+        // Paciente esperado después de la actualización:
+        // conserva nombre, apellido y dni originales, actualiza los otros campos
+        Patient patientFinal = new PatientBuilder()
+                .withId(id)
+                .withName("Ana")
+                .withLastName("Torres")
+                .withDni("35784627")
+                .withInsurance("Swiss Medical")
+                .withEmail("ana_torres@example.com")
+                .withPhone("1188749873")
+                .build();
 
-        Patient result = this.patientService.updateById(id, updateRequest);
+        when(this.patientRepository.findById(id)).thenReturn(Optional.of(patientOriginal));
+        when(this.patientRepository.save(any(Patient.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        ArgumentCaptor<Patient> captor = ArgumentCaptor.forClass(Patient.class); //Tuve que usarlo porque el metodo save devuelve otra instancia del objeto Patient
-        verify(this.patientRepository).save(captor.capture());
-        Patient savedPatient = captor.getValue();
+        Patient result = this.patientService.updateById(id, updatedPatient);
 
-        assertEquals(expectedPatient.getName(), savedPatient.getName());
-        assertEquals(expectedPatient.getLastName(), savedPatient.getLastName());
-        assertEquals(expectedPatient.getDni(), savedPatient.getDni());
-        assertEquals(expectedPatient.getHealthInsuranceProvider(), savedPatient.getHealthInsuranceProvider());
-        assertEquals(expectedPatient.getEmail(), savedPatient.getEmail());
-        assertEquals(expectedPatient.getPhoneNumber(), savedPatient.getPhoneNumber());
-        assertEquals(expectedPatient, result);
+        assertPatientEquals(patientFinal, result);
+
+        verify(this.patientRepository).findById(id);
+        verify(this.patientRepository).save(any(Patient.class));
     }
 
     @Test
     void updatePatientByIdButNotFound_ShouldThrowPatientNotFoundException() {
         Long id = 1L;
-        Patient updateRequest = buildPatient(id, "Carlos", "Gómez", "40234567",
-                "Galeno", "carlos_gomez@mail.com", "1199999999");
+        Patient updateRequest = new PatientBuilder()
+                .withId(id)
+                .build();
 
         when(this.patientRepository.findById(id)).thenReturn(Optional.empty());
 
@@ -515,23 +619,29 @@ class PatientServiceTest {
     @Test
     void updatePatientByIdWithDuplicateDni_ShouldThrowPatientDniAlreadyInUse() {
         Long id = 1L;
+        Patient patient = new PatientBuilder()
+                .withId(id)
+                .withDni("39847562")
+                .build();
 
-        Patient existingPatient = buildPatient(id, "Juan", "Pérez", "39847562",
-                "OSDE", "juan@mail.com", "1188749873");
+        // Paciente que ya tiene el DNI que se quiere utilizar
+        Patient patient2 = new PatientBuilder()
+                .withId(2L)
+                .withDni("12345678")
+                .build();
 
-        Patient otherPatient = buildPatient(2L, "Ana", "López", "40234567",
-                "Swiss Medical", "ana_lopez@mail.com", "1177777777");
+        // UpdateRequest con el DNI duplicado
+        Patient updateRequest = new PatientBuilder()
+                .withId(id)
+                .withDni("12345678")
+                .build();
 
-        // El request intenta cambiar a un DNI que ya usa otro paciente
-        Patient updateRequest = buildPatient(id, "Juan", "Pérez", "40234567",
-                "OSDE", "juan_perez@mail.com", "1188749873");
-
-        when(this.patientRepository.findById(id)).thenReturn(Optional.of(existingPatient));
-        when(this.patientRepository.findByDni(updateRequest.getDni()))
-                .thenReturn(Optional.of(otherPatient));
+        when(this.patientRepository.findById(id)).thenReturn(Optional.of(patient));
+        when(this.patientRepository.findByDni(updateRequest.getDni())).thenReturn(Optional.of(patient2));
 
         assertThrows(PatientDniAlreadyInUseException.class,
-                () -> this.patientService.updateById(id, updateRequest));
+                () -> this.patientService.updateById(id, updateRequest),
+                "Se esperaba PatientDniAlreadyInUseException");
 
         verify(this.patientRepository).findById(id);
         verify(this.patientRepository).findByDni(updateRequest.getDni());
@@ -542,12 +652,12 @@ class PatientServiceTest {
     @Test
     void deleteByValidId_ShouldDeletePatient() {
         Long id = 1L;
-        Patient existingPatient = new Patient(); // o usar buildPatient si tenés helper
+        Patient existingPatient = new Patient();
         existingPatient.setId(id);
 
         when(this.patientRepository.findById(id)).thenReturn(Optional.of(existingPatient));
 
-        patientService.deleteById(id);
+        this.patientService.deleteById(id);
 
         verify(this.patientRepository).findById(id);
         verify(this.patientRepository).deleteById(id);
@@ -570,27 +680,25 @@ class PatientServiceTest {
     @Test
     void exportPatients_ShouldReturnExportedData() {
         String format = "csv";
-        Patient patient1 = buildPatient(13L, "Roberto", "Torres", "58473659",
-                "SwissMedical", "roberto.torres@example.com", "1188749873");
+        Patient patient1 = new PatientBuilder().withId(13L).withName("Roberto").withLastName("Torres")
+                .withDni("58473659").withInsurance("SwissMedical")
+                .withEmail("roberto.torres@example.com").withPhone("1188749873").build();
         List<Patient> patients = List.of(patient1);
 
+        when(exporterFactoryProvider.getFactory(anyString())).thenReturn(exporterFactory);
+        when(exporterFactory.createPatientExporter()).thenReturn(patientExporter);
         when(this.patientRepository.findAll(null, null)).thenReturn(patients);
 
-        ExporterFactory factory = mock(ExporterFactory.class);
-        PatientExporterPortOut exporter = mock(PatientExporterPortOut.class);
         String exportedData = "id,nombre,apellido,dni,obra_social,email,telefono\n13,Roberto,Torres,58473659,SwissMedical,roberto.torres@example.com,1123556766";
-
-        when(this.exporterFactoryProvider.getFactory(format)).thenReturn(factory);
-        when(factory.createPatientExporter()).thenReturn(exporter);
-        when(exporter.export(patients)).thenReturn(exportedData);
+        when(this.patientExporter.export(patients)).thenReturn(exportedData);
 
         String result = patientService.exportPatients(format);
 
-        assertEquals(exportedData, result);
+        assertEquals(exportedData, result, "El resultado de exportación debe coincidir con los datos esperados");
         verify(this.patientRepository).findAll(null, null);
         verify(this.exporterFactoryProvider).getFactory(format);
-        verify(factory).createPatientExporter();
-        verify(exporter).export(patients);
+        verify(this.exporterFactory).createPatientExporter();
+        verify(this.patientExporter).export(patients);
     }
 
     @Test
@@ -598,24 +706,19 @@ class PatientServiceTest {
         String format = "csv";
         List<Patient> patients = new ArrayList<>();
 
+        when(exporterFactoryProvider.getFactory(anyString())).thenReturn(exporterFactory);
+        when(exporterFactory.createPatientExporter()).thenReturn(patientExporter);
         when(this.patientRepository.findAll(null, null)).thenReturn(patients);
-        ExporterFactory factory = mock(ExporterFactory.class);
-        PatientExporterPortOut exporter = mock(PatientExporterPortOut.class);
-
-        String exportedData = "id,nombre,apellido,dni,obra_social,email,telefono\n"; // solo header, nadathis. más
-
-        when(this.exporterFactoryProvider.getFactory(format)).thenReturn(factory);
-        when(factory.createPatientExporter()).thenReturn(exporter);
-        when(exporter.export(patients)).thenReturn(exportedData);
+        when(this.patientExporter.export(patients)).thenReturn("id,nombre,apellido,dni,obra_social,email,telefono\n");
 
         String result = patientService.exportPatients(format);
 
-        assertEquals(exportedData, result);
-
+        assertEquals("id,nombre,apellido,dni,obra_social,email,telefono\n", result,
+                "La exportación de una lista vacía debe devolver solo el header");
         verify(this.patientRepository).findAll(null, null);
         verify(this.exporterFactoryProvider).getFactory(format);
-        verify(factory).createPatientExporter();
-        verify(exporter).export(patients);
+        verify(this.exporterFactory).createPatientExporter();
+        verify(this.patientExporter).export(patients);
     }
 
     @Test
@@ -627,10 +730,11 @@ class PatientServiceTest {
                 .thenThrow(new ExporterTypeNotSupportedException(invalidFormat));
 
         ExporterTypeNotSupportedException exception = assertThrows(ExporterTypeNotSupportedException.class,
-                () -> this.patientService.exportPatients(invalidFormat)
-        );
+                () -> this.patientService.exportPatients(invalidFormat),
+                "Se esperaba un ExporterTypeNotSupportedException");
 
-        assertTrue(exception.getMessage().contains("Tipo de exportación ingresado 'jpg' no soportado"));
+        assertTrue(exception.getMessage().contains("Tipo de exportación ingresado 'jpg' no soportado"),
+                "El mensaje no coincide");
         verify(this.patientRepository).findAll(null,null);
         verify(this.exporterFactoryProvider).getFactory(invalidFormat);
     }
