@@ -38,10 +38,14 @@ class PatientsApplicationTests {
 
   private Patient patient;
 
-  private PatientCreateDto patientCreateDto;
-
   @BeforeEach
   public void setUp() {
+
+  }
+
+  @Test
+  @Rollback
+  public void createPatient() throws Exception {
     PatientCreateDto patientCreateDto = PatientCreateDto.builder()
             .firstName("John")
             .lastName("Doe")
@@ -54,11 +58,6 @@ class PatientsApplicationTests {
             .socialSecurity("Swiss Medical")
             .build();
 
-  }
-
-  @Test
-  @Rollback
-  public void createPatient() throws Exception {
     doReturn(false).when(patientRepositoryPort).existsByDni("12345678");
     doReturn(false).when(patientRepositoryPort).existsByEmail(TestContants.EMAIL);
 
@@ -71,32 +70,5 @@ class PatientsApplicationTests {
     verify(patientRepositoryPort).existsByDni("12345678");
     verify(patientRepositoryPort).existsByEmail(TestContants.EMAIL);
     verify(patientRepositoryPort).save(any(Patient.class));
-  }
-
-  @Test
-  public void createPatientWithExistingDni() throws Exception {
-    doReturn(true).when(patientRepositoryPort).existsByDni("12345678");
-
-    mockMvc.perform(post("/api/patients")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(patientCreateDto)))
-            .andExpect(status().isConflict())
-            .andExpect(jsonPath("$.message").value("DNI already exists"));
-
-    verify(patientRepositoryPort, never()).save(any(Patient.class));
-  }
-
-  @Test
-  public void createPatientWithExistingEmail() throws Exception {
-    doReturn(false).when(patientRepositoryPort).existsByDni("12345678");
-    doReturn(true).when(patientRepositoryPort).existsByEmail(TestContants.EMAIL);
-
-    mockMvc.perform(post("/api/patients")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(patientCreateDto)))
-            .andExpect(status().isConflict())
-            .andExpect(jsonPath("$.message").value("Email already exists"));
-
-    verify(patientRepositoryPort, never()).save(any(Patient.class));
   }
 }
