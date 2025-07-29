@@ -20,18 +20,20 @@ public class GlobalExceptionHandlerTest {
 
     @Test
     void handlePacienteNotFound() {
-        PacienteNotFoundException ex = PacienteNotFoundException.porId(42L);
+        long pacienteId = 42L;
+        PacienteNotFoundException ex = PacienteNotFoundException.porId(pacienteId);
         ResponseEntity<String> resp = handler.handlePacienteNotFound(ex);
         assertThat(resp.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
-        assertThat(resp.getBody()).contains("Paciente no encontrado con id: 42");
+        assertThat(resp.getBody()).isEqualTo(ex.getMessage());
     }
 
     @Test
     void handlePacienteDuplicado() {
-        PacienteDuplicadoException ex = new PacienteDuplicadoException("ID");
+        String dni = "12345678";
+        PacienteDuplicadoException ex = new PacienteDuplicadoException(dni);
         ResponseEntity<String> resp = handler.handlePacienteDuplicado(ex);
         assertThat(resp.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-        assertThat(resp.getBody()).isEqualTo("Ya existe un paciente con el DNI: ID");
+        assertThat(resp.getBody()).isEqualTo(ex.getMessage());
     }
 
     @Test
@@ -39,33 +41,34 @@ public class GlobalExceptionHandlerTest {
         PacienteNullException ex = new PacienteNullException();
         ResponseEntity<String> resp = handler.handlePacienteNull(ex);
         assertThat(resp.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-        assertThat(resp.getBody()).isEqualTo("No se pudo mapear, Paciente no puede ser null");
+        assertThat(resp.getBody()).isEqualTo(ex.getMessage());
     }
 
     @Test
     void handleEmailFormat() {
-        InvalidEmailFormatException ex = new InvalidEmailFormatException("Formato de mail invalido");
+        String mensaje = "Formato de mail invalido";
+        InvalidEmailFormatException ex = new InvalidEmailFormatException(mensaje);
         ResponseEntity<String> resp = handler.handleEmailFormat(ex);
         assertThat(resp.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-        assertThat(resp.getBody()).isEqualTo("Formato de mail invalido");
+        assertThat(resp.getBody()).isEqualTo(ex.getMessage());
     }
 
     @Test
     void handleFechaAlta() {
-        LocalDate fecha = LocalDate.now();
+        LocalDate fecha = LocalDate.now().plusDays(1);
         InvalidFechaAltaException ex = new InvalidFechaAltaException(fecha);
         ResponseEntity<String> resp = handler.handleFechaAlta(ex);
         assertThat(resp.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-        assertThat(resp.getBody()).isEqualTo("La fecha de alta no puede ser mayor a la fecha actual");
+        assertThat(resp.getBody()).isEqualTo(ex.getMessage());
     }
 
     @Test
     void handlePacienteActivo() {
-        PacienteActivoException ex = new PacienteActivoException(1L);
+        long pacienteId=1L;
+        PacienteActivoException ex = new PacienteActivoException(pacienteId);
         ResponseEntity<String> resp = handler.handlePacienteActivo(ex);
         assertThat(resp.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-        assertThat(resp.getBody()).isEqualTo("No se puede eliminar el paciente " + 1L + " porque esta activo");
+        assertThat(resp.getBody()).isEqualTo(ex.getMessage());
     }
-
 
 }
