@@ -9,8 +9,11 @@ import com.teamcubation.api.pacientes.infrastructure.adapter.in.rest.response.Ap
 import com.teamcubation.api.pacientes.infrastructure.adapter.in.rest.response.SuccessResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+import javax.validation.constraints.Pattern;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,7 +37,7 @@ public class PatientController implements IPatientAPI {
     @Override
     @GetMapping
     public ResponseEntity<ApiResponse<List<PatientResponse>>> getAll(@RequestParam(required = false) String dni,
-                                                        @RequestParam(value = "nombre", required = false) String name) {
+                                                                     @RequestParam(value = "nombre", required = false) String name) {
         List<Patient> patients = this.patientPortIn.getAll(dni, name);
         List<PatientResponse> response = new ArrayList<>();
 

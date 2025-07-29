@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
 
 
 @Schema(description = "Datos necesarios para crear o actualizar un paciente")
@@ -21,10 +22,10 @@ public class PatientRequest {
     private String lastName;
 
     @NotBlank
+    @Pattern(regexp = "\\d{8}", message = "El DNI debe tener 8 dígitos numéricos")
     @Schema(description = "Documento Nacional de Identidad", example = "12345678", requiredMode = Schema.RequiredMode.REQUIRED)
     private String dni;
 
-    @NotBlank
     @Email
     @Schema(description = "Correo electrónico de contacto", example = "maria.gomez@example.com", requiredMode = Schema.RequiredMode.REQUIRED)
     private String email;
@@ -34,6 +35,7 @@ public class PatientRequest {
     private String healthInsuranceProvider;
 
     @JsonProperty("telefono")
+    @Pattern(regexp = "^\\+[1-9]\\d{7,14}$", message = "El teléfono debe estar en formato E.164 (ej: +5491144947756)")
     @Schema(description = "Teléfono de contacto", example = "12345678")
     private String phoneNumber;
 

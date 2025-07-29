@@ -4,7 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.teamcubation.api.pacientes.application.domain.model.Patient;
 import com.teamcubation.api.pacientes.application.service.PatientService;
 import com.teamcubation.api.pacientes.infrastructure.adapter.in.rest.dto.PatientRequest;
-import com.teamcubation.api.pacientes.infrastructure.adapter.in.rest.dto.PatientResponse;
+import com.teamcubation.api.pacientes.shared.exception.ExporterTypeNotSupportedException;
+import com.teamcubation.api.pacientes.shared.exception.JsonExportException;
 import com.teamcubation.api.pacientes.shared.exception.PatientDniAlreadyInUseException;
 import com.teamcubation.api.pacientes.shared.exception.PatientNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
@@ -83,8 +84,8 @@ class PatientControllerTest {
         private String insurance;
         private String phone;
 
-        PatientControllerTest.PatientRequestBuilder withName(String name) { this.name = name; return this; }
-        PatientControllerTest.PatientRequestBuilder withLastName(String lastName) { this.lastName = lastName; return this; }
+        PatientControllerTest.PatientRequestBuilder withName() { this.name = null; return this; }
+        PatientControllerTest.PatientRequestBuilder withLastName() { this.lastName = null; return this; }
         PatientControllerTest.PatientRequestBuilder withDni(String dni) { this.dni = dni; return this; }
         PatientControllerTest.PatientRequestBuilder withInsurance(String insurance) { this.insurance = insurance; return this; }
         PatientControllerTest.PatientRequestBuilder withEmail(String email) { this.email = email; return this; }
@@ -98,23 +99,6 @@ class PatientControllerTest {
             p.setHealthInsuranceProvider(insurance);
             p.setEmail(email);
             p.setPhoneNumber(phone);
-            return p;
-        }
-    }
-    static class PatientResponseBuilder {
-        private String name = "Roberto";
-        private String lastName = "Gonzáles";
-        private String dni = "35784627";
-
-        PatientControllerTest.PatientResponseBuilder withName(String name) { this.name = name; return this; }
-        PatientControllerTest.PatientResponseBuilder withLastName(String lastName) { this.lastName = lastName; return this; }
-        PatientControllerTest.PatientResponseBuilder withDni(String dni) { this.dni = dni; return this; }
-
-        PatientResponse build() {
-            PatientResponse p = new PatientResponse();
-            p.setName(name);
-            p.setLastName(lastName);
-            p.setDni(dni);
             return p;
         }
     }
@@ -181,7 +165,7 @@ class PatientControllerTest {
     @Test
     void createPatientWithMissingName_ShouldReturn400() throws Exception {
         PatientRequest request = new PatientRequestBuilder()
-                .withName(null)
+                .withName()
                 .build();
 
         mockMvc.perform(post(baseURL)
@@ -194,7 +178,7 @@ class PatientControllerTest {
     @Test
     void createPatientWithMissingLastName_ShouldReturn400() throws Exception {
         PatientRequest request = new PatientRequestBuilder()
-                .withLastName(null)
+                .withLastName()
                 .build();
 
         mockMvc.perform(post(baseURL)
@@ -569,7 +553,7 @@ class PatientControllerTest {
                 .andExpect(jsonPath("$.message").value("Ocurrió un error inesperado: Error inesperado"));
     }
 
-    //TEST OBTENER POR ID
+    //TEST OBTENER PACIENTE POR ID
     @Test
     void getByIdWithValidId_ShouldReturn200WithPatientData() throws Exception {
         Patient patient = new PatientBuilder().withId(1L).build();
@@ -832,28 +816,31 @@ class PatientControllerTest {
                 .andExpect(status().isBadRequest());
     }
 
-    //TEST OBTENER PACIENTE POR NOMBRE
+    //TEST OBTENER PACIENTES POR NOMBRE
     @Test
     void getByNameWithValidName_ShouldReturn200WithNonEmptyList() throws Exception {
-        Patient patient = new PatientBuilder().withName("Ana").build();
+        Patient patient = new PatientBuilder().withId(1L).build();
         List<Patient> patients = List.of(patient);
+        String name = patient.getName();
 
-        when(patientService.getByName("Ana")).thenReturn(patients);
+        when(patientService.getByName(name)).thenReturn(patients);
 
-        mockMvc.perform(get(baseURL + "/nombre/Ana")
+        mockMvc.perform(get(baseURL + "/nombre/" + name)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.data").isArray())
-                .andExpect(jsonPath("$.data.length()").value(patients.size()))
-                .andExpect(jsonPath("$.data[0].name").value("Ana"));
+                .andExpect(jsonPath("$.data[0].id").value(1))
+                .andExpect(jsonPath("$.data[0].name").value(name))
+                .andExpect(jsonPath("$.data[0].lastName").value(patient.getLastName()))
+                .andExpect(jsonPath("$.data[0].dni").value(patient.getDni()));
     }
 
     @Test
     void getByNameWithValidName_ShouldReturn200WithEmptyList() throws Exception {
-        when(patientService.getByName("NoExiste")).thenReturn(Collections.emptyList());
+        when(patientService.getByName("nonExistent")).thenReturn(Collections.emptyList());
 
-        mockMvc.perform(get(baseURL + "/nombre/NoExiste")
+        mockMvc.perform(get(baseURL + "/nombre/nonExistent")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true))
@@ -880,6 +867,192 @@ class PatientControllerTest {
                 .andExpect(status().isInternalServerError())
                 .andExpect(jsonPath("$.success").value(false))
                 .andExpect(jsonPath("$.message").value("Ocurrió un error inesperado: Error inesperado"));
+    }
+
+    //TEST OBTENER PACIENTES POR OBRA SOCIAL
+    @Test
+    void getByHealthInsuranceProviderWithValidProviderAndEmptyList_ShouldReturn200WithEmptyList() throws Exception {
+        when(patientService.getByHealthInsuranceProvider("OSDE", 0, 5))
+                .thenReturn(Collections.emptyList());
+
+        mockMvc.perform(get(baseURL + "/obra-social")
+                        .param("obra_social", "OSDE")
+                        .param("page", "0")
+                        .param("size", "5")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.data").isArray())
+                .andExpect(jsonPath("$.data").isEmpty());
+    }
+
+    @Test
+    void getByHealthInsuranceProviderWithValidProviderAndPatients_ShouldReturn200WithPatients() throws Exception {
+        String validProvider = "Swiss Medical";
+        Patient patient = new PatientBuilder().withId(1L).withInsurance(validProvider).build();
+        Patient patient2 = new PatientBuilder().withId(2L).withName("Juan").withLastName("Perez").withDni("12345678").withInsurance(validProvider).build();
+        List<Patient> patients = List.of(patient, patient2);
+
+        when(patientService.getByHealthInsuranceProvider(validProvider, 0, 5))
+                .thenReturn(patients);
+
+        mockMvc.perform(get(baseURL + "/obra-social")
+                        .param("obra_social", validProvider)
+                        .param("page", "0")
+                        .param("size", "5")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.data").isArray())
+                .andExpect(jsonPath("$.data.length()").value(patients.size()))
+                .andExpect(jsonPath("$.data[0].id").value(1))
+                .andExpect(jsonPath("$.data[0].name").value(patient.getName()))
+                .andExpect(jsonPath("$.data[0].lastName").value(patient.getLastName()))
+                .andExpect(jsonPath("$.data[0].dni").value(patient.getDni()))
+                .andExpect(jsonPath("$.data[1].id").value(2))
+                .andExpect(jsonPath("$.data[1].name").value(patient2.getName()))
+                .andExpect(jsonPath("$.data[1].lastName").value(patient2.getLastName()))
+                .andExpect(jsonPath("$.data[1].dni").value(patient2.getDni()));
+    }
+
+    @Test
+    void getByHealthInsuranceProviderWithInvalidProvider_ShouldReturn400() throws Exception {
+        mockMvc.perform(get(baseURL + "/obra-social")
+                        .param("obra_social", "OSDE-123")
+                        .param("page", "0")
+                        .param("size", "5")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void getByHealthInsuranceProviderWithNegativePage_ShouldReturn400() throws Exception {
+        mockMvc.perform(get(baseURL + "/obra-social")
+                        .param("obra_social", "OSDE")
+                        .param("page", "-1")
+                        .param("size", "5")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void getByHealthInsuranceProviderWithTooSmallSize_ShouldReturn400() throws Exception {
+        mockMvc.perform(get(baseURL + "/obra-social")
+                        .param("obra_social", "OSDE")
+                        .param("page", "0")
+                        .param("size", "1")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void getByHealthInsuranceProviderWithUnexpectedError_ShouldReturn500() throws Exception {
+        when(patientService.getByHealthInsuranceProvider("OSDE", 0, 5))
+                .thenThrow(new RuntimeException("error"));
+
+        mockMvc.perform(get(baseURL + "/obra-social")
+                        .param("obra_social", "OSDE")
+                        .param("page", "0")
+                        .param("size", "5")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isInternalServerError())
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.message").value("Ocurrió un error inesperado: error"));
+    }
+
+    //TEST EXPORTAR PACIENTES
+    @Test
+    void exportWithValidCsvFormatAndPatients_ShouldReturn200WithCsvContent() throws Exception {
+        String csvContent = "id,nombre,apellido,dni,obra_social,email,telefono\n1,Juan,Perez,12345678,OSDE,juan@mail.com,123456789\n";
+        when(patientService.exportPatients("csv")).thenReturn(csvContent);
+
+        mockMvc.perform(get(baseURL + "/exportar")
+                        .param("formato", "csv")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.data").value(csvContent));
+    }
+
+    @Test
+    void exportWithValidCsvFormatAndNoPatients_ShouldReturn200WithOnlyHeaders() throws Exception {
+        String csvHeaders = "id,nombre,apellido,dni,obra_social,email,telefono\n";
+        when(patientService.exportPatients("csv")).thenReturn(csvHeaders);
+
+        mockMvc.perform(get(baseURL + "/exportar")
+                        .param("formato", "csv")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.data").value(csvHeaders));
+    }
+
+    @Test
+    void exportWithValidJsonFormatAndPatients_ShouldReturn200WithJsonArray() throws Exception {
+        String jsonContent = "[{\"id\":1,\"nombre\":\"Juan\",\"apellido\":\"Perez\",\"dni\":\"12345678\"}]";
+        when(patientService.exportPatients("json")).thenReturn(jsonContent);
+
+        mockMvc.perform(get(baseURL + "/exportar")
+                        .param("formato", "json")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.data").value(jsonContent));
+    }
+
+    @Test
+    void exportWithValidJsonFormatAndNoPatients_ShouldReturn200WithEmptyArray() throws Exception {
+        when(patientService.exportPatients("json")).thenReturn("[]");
+
+        mockMvc.perform(get(baseURL + "/exportar")
+                        .param("formato", "json")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.data").value("[]"));
+    }
+
+    @Test
+    void exportWithUnsupportedFormat_ShouldReturn500() throws Exception {
+        String unsupportedFormat = "xml";
+        when(patientService.exportPatients(unsupportedFormat))
+                .thenThrow(new ExporterTypeNotSupportedException(unsupportedFormat));
+
+        mockMvc.perform(get(baseURL + "/exportar")
+                        .param("formato", unsupportedFormat)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isInternalServerError())
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.message").value("Tipo de exportación ingresado '" + unsupportedFormat + "' no soportado"));
+    }
+
+    @Test
+    void exportWithJsonProcessingError_ShouldReturn500() throws Exception {
+        when(patientService.exportPatients("json"))
+                .thenThrow(new JsonExportException("pacientes", new RuntimeException("Error interno")));
+
+        mockMvc.perform(get(baseURL + "/exportar")
+                        .param("formato", "json")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isInternalServerError())
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.message").value("Error al serializar pacientes a JSON"));
+    }
+
+    @Test
+    void exportWithValidFormatAndEmptyString_ShouldReturn200WithEmptyString() throws Exception {
+        when(patientService.exportPatients("csv"))
+                .thenReturn("");
+
+        mockMvc.perform(get(baseURL + "/exportar")
+                        .param("formato", "csv")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.data").value(
+                        ""
+                        )
+                );
     }
 
 }
