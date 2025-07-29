@@ -1,10 +1,7 @@
 package microservice.pacientes.infrastructure.adapter.out.persistence;
 
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 
@@ -12,7 +9,8 @@ import javax.persistence.*;
  * Entidad que representa a un paciente
  * Contiene informacion personal y de contacto, ademas de la obra social al que pertenece el paciente
  */
-@Data
+@Getter
+@Setter
 @Entity
 @Builder
 @AllArgsConstructor
