@@ -7,7 +7,7 @@ import java.lang.reflect.Constructor;
 import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.*;
-
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class PacienteMapperTest {
 
@@ -42,7 +42,9 @@ public class PacienteMapperTest {
         //a modelo
         Paciente model = PacienteMapper.toModel(entidad);
         assertNotNull(model);
-        assertEquals(paciente, model);
+        assertThat(model)
+                .usingRecursiveComparison()
+                .isEqualTo(paciente);
     }
 
     @Test

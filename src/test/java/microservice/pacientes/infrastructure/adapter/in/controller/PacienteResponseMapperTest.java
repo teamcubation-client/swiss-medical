@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class PacienteResponseMapperTest {
 
@@ -41,7 +42,9 @@ public class PacienteResponseMapperTest {
         // DTO → Modelo
         Paciente model2 = PacienteResponseMapper.toModel(dto);
         assertNotNull(model2);
-        assertEquals(model, model2);
+        assertThat(model2)
+                .usingRecursiveComparison()
+                .isEqualTo(model);
     }
 
     @Test

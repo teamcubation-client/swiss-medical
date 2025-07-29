@@ -71,7 +71,10 @@ public class PacientePersistenceAdapterTest {
 
         List<Paciente> out = adaptador.findByNombreContainingIgnoreCase("an");
 
-        assertThat(out).containsExactly(pacienteActivo);
+        assertThat(out)
+                .usingRecursiveFieldByFieldElementComparator()
+                .containsExactly(pacienteActivo);
+
         verify(repositorio).findByNombreContainingIgnoreCase("an");
     }
 
@@ -90,7 +93,11 @@ public class PacientePersistenceAdapterTest {
                 .thenReturn(Optional.of(entidadActivo));
 
         Optional<Paciente> paciente = adaptador.buscarByDni("12345678");
-        assertThat(paciente).contains(pacienteActivo);
+
+        assertThat(paciente).isPresent();
+        assertThat(paciente.get())
+                .usingRecursiveComparison()
+                .isEqualTo(pacienteActivo);
         verify(repositorio).buscarByDni("12345678");
     }
 
@@ -108,8 +115,12 @@ public class PacientePersistenceAdapterTest {
         when(repositorio.buscarByNombre("Carlos"))
                 .thenReturn(List.of(entidadInactivo));
 
-        assertThat(adaptador.buscarByNombre("Carlos"))
+        List<Paciente> paciente = adaptador.buscarByNombre("Carlos");
+
+        assertThat(paciente)
+                .usingRecursiveFieldByFieldElementComparator()
                 .containsExactly(pacienteInactivo);
+
         verify(repositorio).buscarByNombre("Carlos");
     }
 
@@ -118,8 +129,13 @@ public class PacientePersistenceAdapterTest {
         when(repositorio.buscarPorObraSocialPaginado("OSDE", 5, 0))
                 .thenReturn(List.of(entidadActivo, entidadInactivo));
 
-        assertThat(adaptador.buscarPorObraSocialPaginado("OSDE", 5, 0))
-                .hasSize(2).contains(pacienteActivo,pacienteInactivo);
+        List<Paciente> resultado = adaptador.buscarPorObraSocialPaginado("OSDE", 5, 0);
+
+        assertThat(resultado)
+                .hasSize(2)
+                .usingRecursiveFieldByFieldElementComparator()
+                .containsExactly(pacienteActivo, pacienteInactivo);
+
         verify(repositorio).buscarPorObraSocialPaginado("OSDE", 5, 0);
     }
 
@@ -128,7 +144,13 @@ public class PacientePersistenceAdapterTest {
     void findById_existeId() {
         when(repositorio.findById(2L)).thenReturn(Optional.of(entidadInactivo));
 
-        assertThat(adaptador.findById(2L)).contains(pacienteInactivo);
+        Optional<Paciente> opt = adaptador.findById(2L);
+
+        assertThat(opt).isPresent();
+        assertThat(opt.get())
+                .usingRecursiveComparison()
+                .isEqualTo(pacienteInactivo);
+
         verify(repositorio).findById(2L);
     }
 
@@ -257,7 +279,11 @@ public class PacientePersistenceAdapterTest {
     void findAll() {
         when(repositorio.findAll()).thenReturn(List.of(entidadActivo, entidadInactivo));
 
-        assertThat(adaptador.findAll()).containsExactly(pacienteActivo, pacienteInactivo);
+        List<Paciente> pacientes = adaptador.findAll();
+
+        assertThat(pacientes)
+                .usingRecursiveFieldByFieldElementComparator()
+                .containsExactly(pacienteActivo, pacienteInactivo);
 
         verify(repositorio).findAll();
     }

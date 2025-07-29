@@ -1,8 +1,5 @@
 package microservice.pacientes.application.domain.model;
-import lombok.Builder;
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 /**
  * Modelo que representa a un paciente
@@ -11,6 +8,7 @@ import lombok.Setter;
 @Setter
 @Getter
 @Builder
+@AllArgsConstructor
 public class Paciente {
     private long id;
     private String nombre;
