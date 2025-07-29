@@ -1,77 +1,61 @@
 package microservice.pacientes.infrastructure.validation;
 
-
 import microservice.pacientes.application.domain.model.Paciente;
-import microservice.pacientes.application.domain.port.out.PacientePortOutRead;
 import microservice.pacientes.application.validation.PacienteValidator;
-import microservice.pacientes.shared.PacienteDuplicadoException;
+import microservice.pacientes.shared.PacienteActivoException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import java.util.Optional;
-
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
-public class DniDuplicadoValidatorTest {
-
-    @Mock
-    private PacientePortOutRead portOutRead;
+public class EstadoInactivoValidatorTest {
 
     @InjectMocks
-    private DniDuplicadoValidator validator;
+    private EstadoInactivoValidator validator;
     private Paciente paciente;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
+
         paciente = Paciente.builder()
                 .id(1L)
                 .dni("12345678")
                 .nombre("Ana")
                 .apellido("Lopez")
+                .email("analopez@gmail.com")
+                .estado(true)
                 .build();
     }
 
-
-
     @Test
-    void validador_ExisteDni() {
-        when(portOutRead.buscarByDni("12345678"))
-                .thenReturn(Optional.of(paciente));
+    void validador_EstadoActivo(){
+        paciente.setEstado(true);
 
-        PacienteDuplicadoException ex = assertThrows(
-                PacienteDuplicadoException.class,
+        PacienteActivoException ex = assertThrows(
+                PacienteActivoException.class,
                 () -> validator.validate(paciente)
         );
 
-        assertTrue(ex.getMessage().contains("12345678"));
-
-        verify(portOutRead).buscarByDni("12345678");
+        assertTrue(ex.getMessage().contains("1"));
     }
 
     @Test
-    void validador_NoExisteDni() {
-        when(portOutRead.buscarByDni("12345678"))
-                .thenReturn(Optional.empty());
+    void validador_EstadoInactivo() {
+        paciente.setEstado(false);
 
         assertDoesNotThrow(() -> validator.validate(paciente));
-
-        verify(portOutRead).buscarByDni("12345678");
     }
 
     @Test
     void validador_DelegarSiguienteCadena() {
-
+        paciente.setEstado(false);
         PacienteValidator nextValidator = mock(PacienteValidator.class);
-
         validator.setNext(nextValidator);
-
-        when(portOutRead.buscarByDni("12345678"))
-                .thenReturn(Optional.empty());
 
         assertDoesNotThrow(() -> validator.validate(paciente));
 

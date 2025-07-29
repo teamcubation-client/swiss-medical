@@ -1,81 +1,77 @@
 package microservice.pacientes.infrastructure.validation;
 
-
 import microservice.pacientes.application.domain.model.Paciente;
-import microservice.pacientes.application.domain.port.out.PacientePortOutRead;
 import microservice.pacientes.application.validation.PacienteValidator;
-import microservice.pacientes.shared.PacienteDuplicadoException;
+import microservice.pacientes.shared.InvalidEmailFormatException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import java.util.Optional;
-
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
-public class DniDuplicadoValidatorTest {
+public class EmailFormatValidatorTest {
 
-    @Mock
-    private PacientePortOutRead portOutRead;
 
     @InjectMocks
-    private DniDuplicadoValidator validator;
+    private EmailFormatValidator validator;
     private Paciente paciente;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
+
         paciente = Paciente.builder()
                 .id(1L)
                 .dni("12345678")
                 .nombre("Ana")
                 .apellido("Lopez")
+                .email("analopez@gmail.com")
                 .build();
     }
 
-
-
     @Test
-    void validador_ExisteDni() {
-        when(portOutRead.buscarByDni("12345678"))
-                .thenReturn(Optional.of(paciente));
+    void validador_EmailValido(){
+        paciente.setEmail("usuario@dominio.com");
 
-        PacienteDuplicadoException ex = assertThrows(
-                PacienteDuplicadoException.class,
-                () -> validator.validate(paciente)
-        );
-
-        assertTrue(ex.getMessage().contains("12345678"));
-
-        verify(portOutRead).buscarByDni("12345678");
+        assertDoesNotThrow(()-> validator.validate(paciente));
     }
 
     @Test
-    void validador_NoExisteDni() {
-        when(portOutRead.buscarByDni("12345678"))
-                .thenReturn(Optional.empty());
+    void validador_EmailInvalido(){
+        paciente.setEmail("sin-arroba");
 
-        assertDoesNotThrow(() -> validator.validate(paciente));
+        InvalidEmailFormatException ex = assertThrows(
+                InvalidEmailFormatException.class,
+                () -> validator.validate(paciente)
+        );
 
-        verify(portOutRead).buscarByDni("12345678");
+        assertEquals("Formato de mail invalido",ex.getMessage());
+    }
+
+    @Test
+    void validador_EmailNulo() {
+
+        paciente.setEmail(null);
+
+        InvalidEmailFormatException ex = assertThrows(
+                InvalidEmailFormatException.class,
+                () -> validator.validate(paciente)
+        );
+
+        assertEquals("Formato de mail invalido", ex.getMessage());
     }
 
     @Test
     void validador_DelegarSiguienteCadena() {
-
+        paciente.setEmail("usuario@dominio.com");
         PacienteValidator nextValidator = mock(PacienteValidator.class);
-
         validator.setNext(nextValidator);
-
-        when(portOutRead.buscarByDni("12345678"))
-                .thenReturn(Optional.empty());
 
         assertDoesNotThrow(() -> validator.validate(paciente));
 
         verify(nextValidator).validate(paciente);
     }
-
 }
