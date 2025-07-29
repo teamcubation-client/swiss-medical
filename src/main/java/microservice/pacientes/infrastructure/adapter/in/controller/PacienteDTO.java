@@ -4,15 +4,16 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PastOrPresent;
 
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
 
 /**
  * Data Transfer Object para transferir informacion de pacientes entre capas de la aplicacion
  * Incluye datos personales, de contacto y la obra social del paciente
  */
-@Data
+@AllArgsConstructor
 @Builder
+@Getter
+@Setter
 public class PacienteDTO {
     private Long id;
     @NotBlank(message = "El nombre es obligatorio")
@@ -31,5 +32,5 @@ public class PacienteDTO {
     private String tipoPlanObraSocial;
     @NotNull(message = "La fecha de alta es obligatorio")
     private java.time.LocalDate fechaAlta;
-    private boolean estado;
-} 
+    private Boolean estado;
+}

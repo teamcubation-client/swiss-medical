@@ -19,5 +19,4 @@ public class Paciente {
     private String tipoPlanObraSocial;
     private java.time.LocalDate fechaAlta;
     private boolean estado;
-
 } 

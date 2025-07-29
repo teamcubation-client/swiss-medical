@@ -34,6 +34,6 @@ public class PacienteDTOTest {
         assertEquals("112233456", dto1.getTelefono());
         assertEquals("PlanA", dto1.getTipoPlanObraSocial());
         assertEquals(fecha, dto1.getFechaAlta());
-        assertTrue(dto1.isEstado());
+        assertTrue(dto1.getEstado());
     }
 }

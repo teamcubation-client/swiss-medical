@@ -45,7 +45,7 @@ public final class PacienteResponseMapper {
                 .telefono(pacienteDTO.getTelefono())
                 .tipoPlanObraSocial(pacienteDTO.getTipoPlanObraSocial())
                 .fechaAlta(pacienteDTO.getFechaAlta())
-                .estado(pacienteDTO.isEstado())
+                .estado(pacienteDTO.getEstado())
                 .build();
     }
 

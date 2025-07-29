@@ -36,7 +36,7 @@ public class PacienteResponseMapperTest {
         assertEquals(model.getTelefono(), dto.getTelefono());
         assertEquals(model.getTipoPlanObraSocial(), dto.getTipoPlanObraSocial());
         assertEquals(model.getFechaAlta(), dto.getFechaAlta());
-        assertTrue(dto.isEstado());
+        assertTrue(dto.getEstado());
 
         // DTO → Modelo
         Paciente model2 = PacienteResponseMapper.toModel(dto);
