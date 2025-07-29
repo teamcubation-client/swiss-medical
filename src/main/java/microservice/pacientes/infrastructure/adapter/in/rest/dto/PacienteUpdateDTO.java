@@ -1,10 +1,12 @@
 package microservice.pacientes.infrastructure.adapter.in.rest.dto;
 
 import jakarta.validation.constraints.Pattern;
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
 
-@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Setter
+@Getter
 @Builder
 public class PacienteUpdateDTO {
     @Pattern(regexp = ".*\\S.*", message = "El nombre no puede ser vacío")

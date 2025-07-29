@@ -1,13 +1,13 @@
 package microservice.pacientes.infrastructure.adapter.in.rest.dto;
 
 import jakarta.validation.constraints.NotBlank;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
 
-@Data
 @Builder
 @AllArgsConstructor
+@NoArgsConstructor
+@Setter
+@Getter
 public class PacienteRequestDTO {
     @NotBlank(message = "El DNI es obligatorio")
     private String dni;
