@@ -16,6 +16,9 @@ public class PatientSaveFactory {
     }
 
     public PatientSaveTemplate getPatientSaveStrategy(Patient patient, PatientRepositoryPort patientRepositoryPort) {
+        if (patient == null || patientRepositoryPort == null) {
+            throw new IllegalArgumentException("Patient and PatientRepositoryPort must not be null");
+        }
         PatientType type = classifier.classify(patient);
 
         return switch (type) {

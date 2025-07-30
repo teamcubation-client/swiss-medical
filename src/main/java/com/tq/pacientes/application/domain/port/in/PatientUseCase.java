@@ -13,5 +13,5 @@ public interface PatientUseCase {
     List<Patient> searchByHealthInsurancePaginated(String healthInsurance, int limit, int offset);
     Patient update(Long id, Patient patientDetails);
     void delete(Long id);
-    void activate(Long id);
+    Patient activate(Long id);
 } 

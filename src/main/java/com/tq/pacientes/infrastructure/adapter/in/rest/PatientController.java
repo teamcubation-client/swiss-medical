@@ -58,6 +58,9 @@ results = patientUseCase.searchByFirstName(firstName);
 
     @GetMapping("/first-name/{firstName}")
     public ResponseEntity<List<PatientResponse>> searchByFirstName(@PathVariable String firstName) {
+        if (firstName == null || firstName.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
         List<Patient> results = patientUseCase.searchByFirstName(firstName);
         if (results.isEmpty()) {
             return ResponseEntity.noContent().build();
@@ -70,6 +73,9 @@ results = patientUseCase.searchByFirstName(firstName);
 
     @GetMapping("/dni/{dni}")
     public ResponseEntity<PatientResponse> findByDni(@PathVariable String dni) {
+        if (dni == null || dni.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
         Optional<Patient> patient = patientUseCase.getByDni(dni);
         return patient.map(value -> ResponseEntity.ok(patientRestMapper.toResponse(value)))
                 .orElse(ResponseEntity.noContent().build());
@@ -116,8 +122,8 @@ results = patientUseCase.searchByFirstName(firstName);
     }
 
     @PatchMapping("/{id}/activate")
-    public ResponseEntity<Void> activate(@PathVariable Long id) {
-        patientUseCase.activate(id);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<PatientResponse> activate(@PathVariable Long id) {
+        Patient activatedPatient = patientUseCase.activate(id);
+        return ResponseEntity.ok(patientRestMapper.toResponse(activatedPatient));
     }
 } 

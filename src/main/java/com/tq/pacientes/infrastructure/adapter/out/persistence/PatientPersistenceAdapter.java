@@ -67,4 +67,11 @@ public class PatientPersistenceAdapter implements PatientRepositoryPort {
         return patientRepositoryJpa.findById(id)
                 .map(PatientPersistenceMapper::toDomain);
     }
+
+    @Override
+    public Optional<Patient> findByIdIgnoringActive(Long id) {
+        return patientRepositoryJpa.findByIdWithoutActiveFilter(id)
+                .map(PatientPersistenceMapper::toDomain);
+    }
+
 } 

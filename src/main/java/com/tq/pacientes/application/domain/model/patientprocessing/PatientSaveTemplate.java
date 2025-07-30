@@ -24,7 +24,9 @@ public abstract class PatientSaveTemplate {
     protected abstract void validate(Patient patient);
     protected abstract void preProcess(Patient patient);
     protected void persist(Patient patient) {
-        patientRepositoryPort.save(patient);
+        Patient savedPatient = patientRepositoryPort.save(patient);
+        patient.setId(savedPatient.getId());
     }
+
     protected abstract void postProcess(Patient patient);
 }

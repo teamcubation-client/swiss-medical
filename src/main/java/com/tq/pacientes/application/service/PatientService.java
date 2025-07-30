@@ -112,14 +112,14 @@ public class PatientService implements PatientUseCase {
     }
 
     @Override
-    public void activate(Long id) {
-        Patient patient = getById(id)
+    public Patient activate(Long id) {
+        Patient patient = patientRepositoryPort.findByIdIgnoringActive(id)
                 .orElseThrow(() -> new PatientNotFoundException(id));
         if (Boolean.TRUE.equals(patient.getActive())) {
             throw new PatientAlreadyActiveException(id);
         }
         patient.setActive(true);
         patient.setLastModifiedDate(LocalDateTime.now());
-        patientRepositoryPort.update(patient);
+        return patientRepositoryPort.update(patient);
     }
 }
