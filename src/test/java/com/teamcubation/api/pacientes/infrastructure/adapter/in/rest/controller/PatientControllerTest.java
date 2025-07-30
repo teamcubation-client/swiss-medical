@@ -339,7 +339,7 @@ class PatientControllerTest {
     }
 
     @Test
-    void createPatientWithExistingDni_ShouldReturn422() throws Exception {
+    void createPatientWithExistingDni_ShouldReturn409() throws Exception {
         PatientRequest request = new PatientRequestBuilder()
                 .withDni("35784627")
                 .build();
@@ -352,7 +352,7 @@ class PatientControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request))
                         .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isUnprocessableEntity())
+                .andExpect(status().isConflict())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.success").value(false))
                 .andExpect(jsonPath("$.message").value("El DNI ingresado ya se encuentra en uso en paciente con id: " + id));
@@ -668,7 +668,7 @@ class PatientControllerTest {
     }
 
     @Test
-    void updateByIdWithDniAlreadyInUse_ShouldReturn422() throws Exception {
+    void updateByIdWithDniAlreadyInUse_ShouldReturn409() throws Exception {
         long validId = 1L;
         PatientRequest request = new PatientRequestBuilder().build();
 
@@ -679,7 +679,7 @@ class PatientControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request))
                         .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isUnprocessableEntity())
+                .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.success").value(false))
                 .andExpect(jsonPath("$.message").value("El DNI ingresado ya se encuentra en uso en paciente con id: " + validId));
     }
