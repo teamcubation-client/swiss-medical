@@ -1,7 +1,10 @@
-package com.tq.pacientes.application.service;
+package com.tq.pacientes.unit.service;
 
 import com.tq.pacientes.application.domain.model.Patient;
+import com.tq.pacientes.application.domain.model.patientprocessing.PatientSaveFactory;
+import com.tq.pacientes.application.domain.model.patientprocessing.PatientSaveTemplate;
 import com.tq.pacientes.application.domain.port.out.PatientRepositoryPort;
+import com.tq.pacientes.application.service.PatientService;
 import com.tq.pacientes.shared.exceptions.DuplicatePatientException;
 import com.tq.pacientes.shared.exceptions.PatientAlreadyActiveException;
 import com.tq.pacientes.shared.exceptions.PatientDniNotFoundException;
@@ -26,8 +29,16 @@ class PatientServiceTest {
     @Mock
     private PatientRepositoryPort repository;
 
+    @Mock
+    private PatientSaveFactory patientSaveFactory;
+
+    @Mock
+    private PatientSaveTemplate saveTemplate;
+
+
     @InjectMocks
     private PatientService service;
+
 
     private Patient patient;
 
@@ -44,14 +55,21 @@ class PatientServiceTest {
 
     @Test
     void shouldCreatePatient_whenDniNotExists() {
+        // Configurar mocks
         when(repository.findByDni(patient.getDni())).thenReturn(Optional.empty());
-        when(repository.save(any(Patient.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(patientSaveFactory.getPatientSaveStrategy(eq(patient), any(PatientRepositoryPort.class)))
+                .thenReturn(saveTemplate);
+        doNothing().when(saveTemplate).save(patient);
 
         Patient saved = service.create(patient);
 
         assertEquals(patient.getDni(), saved.getDni());
-        verify(repository).save(any(Patient.class));
+        assertNotNull(saved.getCreationDate());
+        assertNotNull(saved.getLastModifiedDate());
+        verify(patientSaveFactory).getPatientSaveStrategy(eq(patient), any(PatientRepositoryPort.class));
+        verify(saveTemplate).save(patient);
     }
+
 
     @Test
     void shouldThrowException_whenCreatingPatientWithDuplicateDni() {

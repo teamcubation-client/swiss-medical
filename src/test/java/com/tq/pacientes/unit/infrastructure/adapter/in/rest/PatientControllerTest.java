@@ -1,8 +1,9 @@
-package com.tq.pacientes.infrastructure.adapter.in.rest;
+package com.tq.pacientes.unit.adapter.in.rest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tq.pacientes.application.domain.model.Patient;
-import com.tq.pacientes.application.service.PatientService;
+import com.tq.pacientes.application.domain.port.in.PatientUseCase;
+import com.tq.pacientes.infrastructure.adapter.in.rest.PatientController;
 import com.tq.pacientes.infrastructure.adapter.in.rest.dto.PatientRequest;
 import com.tq.pacientes.infrastructure.adapter.in.rest.dto.PatientResponse;
 import com.tq.pacientes.infrastructure.adapter.in.rest.mapper.PatientRestMapper;
@@ -11,8 +12,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDateTime;
@@ -34,10 +35,10 @@ class PatientControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @MockBean
-    private PatientService patientService;
+    @MockitoBean
+    private PatientUseCase patientUseCase;
 
-    @MockBean
+    @MockitoBean
     private PatientRestMapper patientRestMapper;
 
     private Patient patient;
@@ -48,48 +49,47 @@ class PatientControllerTest {
     void setUp() {
         patient = Patient.builder()
                 .id(1L)
-                .firstName("John")
-                .lastName("Doe")
+                .firstName("Juan")
+                .lastName("Carlos")
                 .dni("12345678")
                 .healthInsurance("OSDE")
                 .healthPlan("210")
-                .address("123 St")
+                .address("Calle 123")
                 .phoneNumber("1123456789")
-                .email("john@example.com")
+                .email("jc@mail.com")
                 .active(true)
                 .creationDate(LocalDateTime.now())
                 .lastModifiedDate(LocalDateTime.now())
                 .build();
 
         patientRequest = PatientRequest.builder()
-                .firstName("John")
-                .lastName("Doe")
+                .firstName("Juan")
+                .lastName("Carlos")
                 .dni("12345678")
                 .healthInsurance("OSDE")
                 .healthPlan("210")
-                .address("123 St")
+                .address("Calle 123")
                 .phoneNumber("1123456789")
-                .email("john@example.com")
+                .email("jc@mail.com")
                 .build();
 
         patientResponse = PatientResponse.builder()
                 .id(1L)
-                .firstName("John")
-                .lastName("Doe")
+                .firstName("Juan")
+                .lastName("Carlos")
                 .dni("12345678")
                 .healthInsurance("OSDE")
                 .healthPlan("210")
-                .address("123 St")
+                .address("Calle 123")
                 .phoneNumber("1123456789")
-                .email("john@example.com")
-                .active(true)
+                .email("jc@mail.com")
                 .build();
     }
 
     @Test
     void create_ShouldReturnCreatedPatient() throws Exception {
         when(patientRestMapper.toDomain(patientRequest)).thenReturn(patient);
-        when(patientService.create(patient)).thenReturn(patient);
+        when(patientUseCase.create(patient)).thenReturn(patient);
         when(patientRestMapper.toResponse(patient)).thenReturn(patientResponse);
 
         mockMvc.perform(post("/api/patients")
@@ -101,7 +101,7 @@ class PatientControllerTest {
 
     @Test
     void search_ShouldReturnAllPatients() throws Exception {
-        when(patientService.getAll()).thenReturn(List.of(patient));
+        when(patientUseCase.getAll()).thenReturn(List.of(patient));
         when(patientRestMapper.toResponse(patient)).thenReturn(patientResponse);
 
         mockMvc.perform(get("/api/patients"))
@@ -111,7 +111,7 @@ class PatientControllerTest {
 
     @Test
     void findByDni_ShouldReturnPatient() throws Exception {
-        when(patientService.getByDni("12345678")).thenReturn(Optional.of(patient));
+        when(patientUseCase.getByDni("12345678")).thenReturn(Optional.of(patient));
         when(patientRestMapper.toResponse(patient)).thenReturn(patientResponse);
 
         mockMvc.perform(get("/api/patients/dni/{dni}", "12345678"))
@@ -121,7 +121,7 @@ class PatientControllerTest {
 
     @Test
     void findById_ShouldReturnPatient() throws Exception {
-        when(patientService.getById(1L)).thenReturn(Optional.of(patient));
+        when(patientUseCase.getById(1L)).thenReturn(Optional.of(patient));
         when(patientRestMapper.toResponse(patient)).thenReturn(patientResponse);
 
         mockMvc.perform(get("/api/patients/1"))
@@ -131,7 +131,7 @@ class PatientControllerTest {
 
     @Test
     void getByHealthInsurance_ShouldReturnPaginatedPatients() throws Exception {
-        when(patientService.searchByHealthInsurancePaginated("OSDE", 10, 0)).thenReturn(List.of(patient));
+        when(patientUseCase.searchByHealthInsurancePaginated("OSDE", 10, 0)).thenReturn(List.of(patient));
         when(patientRestMapper.toResponse(patient)).thenReturn(patientResponse);
 
         mockMvc.perform(get("/api/patients/health-insurance")
@@ -143,7 +143,7 @@ class PatientControllerTest {
     @Test
     void update_ShouldReturnUpdatedPatient() throws Exception {
         when(patientRestMapper.toDomain(patientRequest)).thenReturn(patient);
-        when(patientService.update(eq(1L), any())).thenReturn(patient);
+        when(patientUseCase.update(eq(1L), any())).thenReturn(patient);
         when(patientRestMapper.toResponse(patient)).thenReturn(patientResponse);
 
         mockMvc.perform(patch("/api/patients/1")
@@ -155,7 +155,7 @@ class PatientControllerTest {
 
     @Test
     void delete_ShouldReturnNoContent() throws Exception {
-        doNothing().when(patientService).delete(1L);
+        doNothing().when(patientUseCase).delete(1L);
 
         mockMvc.perform(delete("/api/patients/1"))
                 .andExpect(status().isNoContent());
@@ -163,7 +163,7 @@ class PatientControllerTest {
 
     @Test
     void activate_ShouldReturnOk() throws Exception {
-        doNothing().when(patientService).activate(1L);
+        doNothing().when(patientUseCase).activate(1L);
 
         mockMvc.perform(patch("/api/patients/1/activate"))
                 .andExpect(status().isOk());
