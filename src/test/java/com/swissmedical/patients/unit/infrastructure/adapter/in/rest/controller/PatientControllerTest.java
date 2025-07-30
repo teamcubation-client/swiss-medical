@@ -6,7 +6,7 @@ import com.swissmedical.patients.infrastructure.adapter.in.rest.controller.Patie
 import com.swissmedical.patients.shared.exceptions.GlobalHandlerException;
 import com.swissmedical.patients.shared.exceptions.PatientDuplicateException;
 import com.swissmedical.patients.shared.exceptions.PatientNotFoundException;
-import com.swissmedical.patients.unit.shared.utils.TestContants;
+import com.swissmedical.patients.unit.shared.utils.TestConstants;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,9 +43,9 @@ public class PatientControllerTest {
     patientJohn = Patient.builder()
             .firstName("John")
             .lastName("Doe")
-            .email(TestContants.EMAIL)
+            .email(TestConstants.EMAIL)
             .phoneNumber("1234567890")
-            .dni(TestContants.DNI)
+            .dni(TestConstants.DNI)
             .memberNumber("MEM12345")
             .birthDate(LocalDate.of(1990, 1, 1))
             .isActive(true)
@@ -96,8 +96,8 @@ public class PatientControllerTest {
             .andExpect(jsonPath("$").isArray())
             .andExpect(jsonPath("$[0].firstName").value("John"))
             .andExpect(jsonPath("$[0].lastName").value("Doe"))
-            .andExpect(jsonPath("$[0].email").value(TestContants.EMAIL))
-            .andExpect(jsonPath("$[0].dni").value(TestContants.DNI));
+            .andExpect(jsonPath("$[0].email").value(TestConstants.EMAIL))
+            .andExpect(jsonPath("$[0].dni").value(TestConstants.DNI));
   }
 
   @Test
@@ -117,8 +117,8 @@ public class PatientControllerTest {
             .andExpect(jsonPath("$").isArray())
             .andExpect(jsonPath("$[0].firstName").value("John"))
             .andExpect(jsonPath("$[0].lastName").value("Doe"))
-            .andExpect(jsonPath("$[0].email").value(TestContants.EMAIL))
-            .andExpect(jsonPath("$[0].dni").value(TestContants.DNI));
+            .andExpect(jsonPath("$[0].email").value(TestConstants.EMAIL))
+            .andExpect(jsonPath("$[0].dni").value(TestConstants.DNI));
   }
 
   @Test
@@ -152,19 +152,19 @@ public class PatientControllerTest {
   public void testGetPatientByDni() throws Exception {
     when(patientService.getByDni(anyString())).thenReturn(patientJohn);
 
-    mockMvc.perform(get("/api/patients/dni/{dni}", TestContants.DNI))
+    mockMvc.perform(get("/api/patients/dni/{dni}", TestConstants.DNI))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.firstName").value("John"))
             .andExpect(jsonPath("$.lastName").value("Doe"))
-            .andExpect(jsonPath("$.email").value(TestContants.EMAIL))
-            .andExpect(jsonPath("$.dni").value(TestContants.DNI));
+            .andExpect(jsonPath("$.email").value(TestConstants.EMAIL))
+            .andExpect(jsonPath("$.dni").value(TestConstants.DNI));
   }
 
   @Test
   public void testGetPatientByDniNotFound() throws Exception {
     when(patientService.getByDni(anyString())).thenThrow(new PatientNotFoundException("Patient not found"));
 
-    mockMvc.perform(get("/api/patients/dni/{dni}", TestContants.DNI))
+    mockMvc.perform(get("/api/patients/dni/{dni}", TestConstants.DNI))
             .andExpect(status().isNoContent());
   }
 
@@ -172,15 +172,15 @@ public class PatientControllerTest {
   public void testGetPatientsBySocialSecurity() throws Exception {
     when(patientService.getBySocialSecurity(anyString(), anyInt(), anyInt())).thenReturn(List.of(patientJohn));
 
-    mockMvc.perform(get("/api/patients/social-security/{socialSecurity}", TestContants.SOCIAL_SECURITY)
+    mockMvc.perform(get("/api/patients/social-security/{socialSecurity}", TestConstants.SOCIAL_SECURITY)
                     .param("page", "1")
                     .param("size", "10"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$").isArray())
             .andExpect(jsonPath("$[0].firstName").value("John"))
             .andExpect(jsonPath("$[0].lastName").value("Doe"))
-            .andExpect(jsonPath("$[0].email").value(TestContants.EMAIL))
-            .andExpect(jsonPath("$[0].dni").value(TestContants.DNI));
+            .andExpect(jsonPath("$[0].email").value(TestConstants.EMAIL))
+            .andExpect(jsonPath("$[0].dni").value(TestConstants.DNI));
   }
 
   @Test
@@ -189,7 +189,7 @@ public class PatientControllerTest {
             new PatientNotFoundException("Patient not found")
     );
 
-    mockMvc.perform(get("/api/patients/social-security/{socialSecurity}", TestContants.SOCIAL_SECURITY)
+    mockMvc.perform(get("/api/patients/social-security/{socialSecurity}", TestConstants.SOCIAL_SECURITY)
                     .param("page", "1")
                     .param("size", "10"))
             .andExpect(status().isNoContent());
@@ -202,15 +202,15 @@ public class PatientControllerTest {
             patientJane
     ));
 
-    mockMvc.perform(get("/api/patients/social-security/{socialSecurity}", TestContants.SOCIAL_SECURITY)
+    mockMvc.perform(get("/api/patients/social-security/{socialSecurity}", TestConstants.SOCIAL_SECURITY)
                     .param("page", "1")
                     .param("size", "10"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$").isArray())
             .andExpect(jsonPath("$[0].firstName").value("John"))
             .andExpect(jsonPath("$[0].lastName").value("Doe"))
-            .andExpect(jsonPath("$[0].email").value(TestContants.EMAIL))
-            .andExpect(jsonPath("$[0].dni").value(TestContants.DNI));
+            .andExpect(jsonPath("$[0].email").value(TestConstants.EMAIL))
+            .andExpect(jsonPath("$[0].dni").value(TestConstants.DNI));
   }
 
   @Test
@@ -220,7 +220,7 @@ public class PatientControllerTest {
             new IllegalArgumentException("Invalid page or size")
     );
 
-    mockMvc.perform(get("/api/patients/social-security/{socialSecurity}", TestContants.SOCIAL_SECURITY)
+    mockMvc.perform(get("/api/patients/social-security/{socialSecurity}", TestConstants.SOCIAL_SECURITY)
                     .param("page", "-1")
                     .param("size", "10"))
             .andExpect(status().isBadRequest());
@@ -232,22 +232,22 @@ public class PatientControllerTest {
 
     mockMvc.perform(post("/api/patients")
                     .contentType("application/json")
-                    .content("{\"firstName\":\"John\",\"lastName\":\"Doe\",\"email\":\"" + TestContants.EMAIL + "\"," +
-                            "\"phoneNumber\":\"1234567890\",\"dni\":\"" + TestContants.DNI +
+                    .content("{\"firstName\":\"John\",\"lastName\":\"Doe\",\"email\":\"" + TestConstants.EMAIL + "\"," +
+                            "\"phoneNumber\":\"1234567890\",\"dni\":\"" + TestConstants.DNI +
                             "\",\"memberNumber\":\"MEM12345\",\"birthDate\":\"1990-01-01\",\"isActive\":true,\"socialSecurity\":\"Swiss Medical\"}"))
             .andExpect(status().isCreated())
             .andExpect(jsonPath("$.firstName").value("John"))
             .andExpect(jsonPath("$.lastName").value("Doe"))
-            .andExpect(jsonPath("$.email").value(TestContants.EMAIL))
-            .andExpect(jsonPath("$.dni").value(TestContants.DNI));
+            .andExpect(jsonPath("$.email").value(TestConstants.EMAIL))
+            .andExpect(jsonPath("$.dni").value(TestConstants.DNI));
   }
 
   @Test
   public void testCreatePatientBadRequest() throws Exception {
     mockMvc.perform(post("/api/patients")
                     .contentType("application/json")
-                    .content("{\"firstName\":\"\",\"lastName\":\"Doe\",\"email\":\"" + TestContants.EMAIL + "\"," +
-                            "\"phoneNumber\":\"1234567890\",\"dni\":\"" + TestContants.DNI +
+                    .content("{\"firstName\":\"\",\"lastName\":\"Doe\",\"email\":\"" + TestConstants.EMAIL + "\"," +
+                            "\"phoneNumber\":\"1234567890\",\"dni\":\"" + TestConstants.DNI +
                             "\",\"memberNumber\":\"MEM12345\",\"birthDate\":\"1990-01-01\",\"isActive\":true}"))
             .andExpect(status().isBadRequest());
   }
@@ -258,8 +258,8 @@ public class PatientControllerTest {
 
     mockMvc.perform(post("/api/patients")
                     .contentType("application/json")
-                    .content("{\"firstName\":\"John\",\"lastName\":\"Doe\",\"email\":\"" + TestContants.EMAIL + "\"," +
-                            "\"phoneNumber\":\"1234567890\",\"dni\":\"" + TestContants.DNI +
+                    .content("{\"firstName\":\"John\",\"lastName\":\"Doe\",\"email\":\"" + TestConstants.EMAIL + "\"," +
+                            "\"phoneNumber\":\"1234567890\",\"dni\":\"" + TestConstants.DNI +
                             "\",\"memberNumber\":\"MEM12345\",\"birthDate\":\"1990-01-01\",\"isActive\":true,\"socialSecurity\":\"Swiss Medical\"}"))
             .andExpect(status().isConflict());
   }
@@ -268,33 +268,33 @@ public class PatientControllerTest {
   public void testUpdatePatient() throws Exception {
     when(patientService.update(anyLong(), any(Patient.class))).thenReturn(patientJohn);
 
-    mockMvc.perform(put("/api/patients/{id}", TestContants.ID)
+    mockMvc.perform(put("/api/patients/{id}", TestConstants.ID)
                     .contentType("application/json")
-                    .content("{\"firstName\":\"John\",\"lastName\":\"Doe\",\"email\":\"" + TestContants.EMAIL + "\"," +
-                            "\"phoneNumber\":\"1234567890\",\"dni\":\"" + TestContants.DNI +
+                    .content("{\"firstName\":\"John\",\"lastName\":\"Doe\",\"email\":\"" + TestConstants.EMAIL + "\"," +
+                            "\"phoneNumber\":\"1234567890\",\"dni\":\"" + TestConstants.DNI +
                             "\",\"memberNumber\":\"MEM12345\",\"birthDate\":\"1990-01-01\",\"isActive\":true,\"socialSecurity\":\"Swiss Medical\"}"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.firstName").value("John"))
             .andExpect(jsonPath("$.lastName").value("Doe"))
-            .andExpect(jsonPath("$.email").value(TestContants.EMAIL))
-            .andExpect(jsonPath("$.dni").value(TestContants.DNI));
+            .andExpect(jsonPath("$.email").value(TestConstants.EMAIL))
+            .andExpect(jsonPath("$.dni").value(TestConstants.DNI));
   }
 
   @Test
   public void testUpdatePatientNotFound() throws Exception {
     when(patientService.update(anyLong(), any(Patient.class))).thenThrow(new PatientNotFoundException("Patient not found"));
 
-    mockMvc.perform(put("/api/patients/{id}", TestContants.ID)
+    mockMvc.perform(put("/api/patients/{id}", TestConstants.ID)
                     .contentType("application/json")
-                    .content("{\"firstName\":\"John\",\"lastName\":\"Doe\",\"email\":\"" + TestContants.EMAIL + "\"," +
-                            "\"phoneNumber\":\"1234567890\",\"dni\":\"" + TestContants.DNI +
+                    .content("{\"firstName\":\"John\",\"lastName\":\"Doe\",\"email\":\"" + TestConstants.EMAIL + "\"," +
+                            "\"phoneNumber\":\"1234567890\",\"dni\":\"" + TestConstants.DNI +
                             "\",\"memberNumber\":\"MEM12345\",\"birthDate\":\"1990-01-01\",\"isActive\":true,\"socialSecurity\":\"Swiss Medical\"}"))
             .andExpect(status().isNoContent());
   }
 
   @Test
   public void testDeletePatient() throws Exception {
-    mockMvc.perform(delete("/api/patients/{id}", TestContants.ID))
+    mockMvc.perform(delete("/api/patients/{id}", TestConstants.ID))
             .andExpect(status().isNoContent());
   }
 }

@@ -5,7 +5,7 @@ import com.swissmedical.patients.infrastructure.adapter.out.persistence.mysql.Pa
 import com.swissmedical.patients.infrastructure.adapter.out.persistence.mysql.PatientRepositoryAdapter;
 import com.swissmedical.patients.infrastructure.adapter.out.persistence.mysql.mapper.PatientEntityMapper;
 import com.swissmedical.patients.shared.exceptions.PatientNotFoundException;
-import com.swissmedical.patients.unit.shared.utils.TestContants;
+import com.swissmedical.patients.unit.shared.utils.TestConstants;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,6 +14,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
+import java.util.Deque;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
@@ -38,9 +40,9 @@ public class PatientRepositoryAdapterTest {
     patientJohn = Patient.builder()
             .firstName("John")
             .lastName("Doe")
-            .email(TestContants.EMAIL)
+            .email(TestConstants.EMAIL)
             .phoneNumber("1234567890")
-            .dni(TestContants.DNI)
+            .dni(TestConstants.DNI)
             .memberNumber("MEM12345")
             .birthDate(LocalDate.of(1990, 1, 1))
             .isActive(true)
@@ -67,158 +69,180 @@ public class PatientRepositoryAdapterTest {
             PatientEntityMapper.toEntity(patientJane)
     ));
 
-    List<Patient> patients = patientRepositoryAdapter.findAll(10, 0);
+    Deque<Patient> patients = new LinkedList<>(patientRepositoryAdapter.findAll(10, 0));
 
     assertEquals(2, patients.size());
-    assertEquals(TestContants.DNI, patients.get(0).getDni());
-    assertEquals(TestContants.EMAIL, patients.get(0).getEmail());
+    assertEquals(TestConstants.DNI, patients.getFirst().getDni());
+    assertEquals(TestConstants.EMAIL, patients.getFirst().getEmail());
+    verify(patientJpaRepository, times(1)).findAll(anyInt(), anyInt());
   }
 
   @Test
   public void testFindAllWithEmptyResult() {
     when(patientJpaRepository.findAll(anyInt(), anyInt())).thenReturn(List.of());
 
-    List<Patient> patients = patientRepositoryAdapter.findAll(10, 0);
+    Deque<Patient> patients = new LinkedList<>(patientRepositoryAdapter.findAll(10, 0));
 
     assertEquals(0, patients.size());
+    verify(patientJpaRepository, times(1)).findAll(anyInt(), anyInt());
   }
 
   @Test
   public void testFindByFirstName() {
-    when(patientJpaRepository.findByFirstName(TestContants.FIRST_NAME)).thenReturn(List.of(
+    when(patientJpaRepository.findByFirstName(TestConstants.FIRST_NAME)).thenReturn(List.of(
             PatientEntityMapper.toEntity(patientJohn)
     ));
 
-    List<Patient> patients = patientRepositoryAdapter.findByFirstName(TestContants.FIRST_NAME);
+    Deque<Patient> patients = new LinkedList<>(patientRepositoryAdapter.findByFirstName(TestConstants.FIRST_NAME));
 
     assertEquals(1, patients.size());
-    assertEquals(TestContants.FIRST_NAME, patients.get(0).getFirstName());
+    assertEquals(TestConstants.FIRST_NAME, patients.getFirst().getFirstName());
+    verify(patientJpaRepository, times(1)).findByFirstName(TestConstants.FIRST_NAME);
   }
 
   @Test
   public void testFindByFirstNameNotFound() {
-    when(patientJpaRepository.findByFirstName(TestContants.FIRST_NAME)).thenReturn(List.of());
+    when(patientJpaRepository.findByFirstName(TestConstants.FIRST_NAME)).thenReturn(List.of());
 
-    List<Patient> patients = patientRepositoryAdapter.findByFirstName(TestContants.FIRST_NAME);
+    Deque<Patient> patients = new LinkedList<>(patientRepositoryAdapter.findByFirstName(TestConstants.FIRST_NAME));
 
     assertEquals(0, patients.size());
+    verify(patientJpaRepository, times(1)).findByFirstName(TestConstants.FIRST_NAME);
   }
 
   @Test
   public void testFindBySocialSecurity() {
-    when(patientJpaRepository.findBySocialSecurity(TestContants.SOCIAL_SECURITY, 10, 0)).thenReturn(List.of(
+    when(patientJpaRepository.findBySocialSecurity(TestConstants.SOCIAL_SECURITY, 10, 0)).thenReturn(List.of(
             PatientEntityMapper.toEntity(patientJohn)
     ));
 
-    List<Patient> patients = patientRepositoryAdapter.findBySocialSecurity(TestContants.SOCIAL_SECURITY, 10, 0);
+    Deque<Patient> patients =
+            new LinkedList<>(patientRepositoryAdapter.findBySocialSecurity(TestConstants.SOCIAL_SECURITY,
+                    10,
+                    0));
 
     assertEquals(1, patients.size());
-    assertEquals(TestContants.SOCIAL_SECURITY, patients.get(0).getSocialSecurity());
+    assertEquals(TestConstants.SOCIAL_SECURITY, patients.getFirst().getSocialSecurity());
+    verify(patientJpaRepository, times(1)).findBySocialSecurity(TestConstants.SOCIAL_SECURITY, 10, 0);
   }
 
   @Test
   public void testFindBySocialSecurityNotFound() {
-    when(patientJpaRepository.findBySocialSecurity(TestContants.SOCIAL_SECURITY, 10, 0)).thenReturn(List.of());
+    when(patientJpaRepository.findBySocialSecurity(TestConstants.SOCIAL_SECURITY, 10, 0)).thenReturn(List.of());
 
-    List<Patient> patients = patientRepositoryAdapter.findBySocialSecurity(TestContants.SOCIAL_SECURITY, 10, 0);
+    Deque<Patient> patients =
+            new LinkedList<>(patientRepositoryAdapter.findBySocialSecurity(TestConstants.SOCIAL_SECURITY,
+                    10,
+                    0));
 
     assertEquals(0, patients.size());
+    verify(patientJpaRepository, times(1)).findBySocialSecurity(TestConstants.SOCIAL_SECURITY, 10, 0);
   }
 
   @Test
   public void testFindByDni() {
-    when(patientJpaRepository.findByDni(TestContants.DNI)).thenReturn(
+    when(patientJpaRepository.findByDni(TestConstants.DNI)).thenReturn(
             Optional.of(PatientEntityMapper.toEntity(patientJohn))
     );
 
-    Optional<Patient> patient = patientRepositoryAdapter.findByDni(TestContants.DNI);
+    Optional<Patient> patient = patientRepositoryAdapter.findByDni(TestConstants.DNI);
 
     assertTrue(patient.isPresent());
-    assertEquals(TestContants.DNI, patient.get().getDni());
+    assertEquals(TestConstants.DNI, patient.get().getDni());
+    verify(patientJpaRepository, times(1)).findByDni(TestConstants.DNI);
   }
 
   @Test
   public void testFindByDniNotFound() {
-    when(patientJpaRepository.findByDni(TestContants.DNI)).thenReturn(Optional.empty());
+    when(patientJpaRepository.findByDni(TestConstants.DNI)).thenReturn(Optional.empty());
 
-    Optional<Patient> patient = patientRepositoryAdapter.findByDni(TestContants.DNI);
+    Optional<Patient> patient = patientRepositoryAdapter.findByDni(TestConstants.DNI);
 
     assertFalse(patient.isPresent());
+    verify(patientJpaRepository, times(1)).findByDni(TestConstants.DNI);
   }
 
   @Test
   public void testFindById() {
-    when(patientJpaRepository.findById(1L)).thenReturn(
+    when(patientJpaRepository.findById(TestConstants.ID)).thenReturn(
             Optional.of(PatientEntityMapper.toEntity(patientJohn))
     );
 
-    Optional<Patient> patient = patientRepositoryAdapter.findById(1L);
+    Optional<Patient> patient = patientRepositoryAdapter.findById(TestConstants.ID);
 
     assertTrue(patient.isPresent());
-    assertEquals(TestContants.DNI, patient.get().getDni());
+    assertEquals(TestConstants.DNI, patient.get().getDni());
+    verify(patientJpaRepository, times(1)).findById(TestConstants.ID);
   }
 
   @Test
   public void testFindByIdNotFound() {
-    when(patientJpaRepository.findById(1L)).thenReturn(Optional.empty());
+    when(patientJpaRepository.findById(TestConstants.ID)).thenReturn(Optional.empty());
 
-    Optional<Patient> patient = patientRepositoryAdapter.findById(1L);
+    Optional<Patient> patient = patientRepositoryAdapter.findById(TestConstants.ID);
 
     assertFalse(patient.isPresent());
+    verify(patientJpaRepository, times(1)).findById(TestConstants.ID);
   }
 
   @Test
   public void testExistsByDni() {
-    when(patientJpaRepository.existsByDni(TestContants.DNI)).thenReturn(true);
+    when(patientJpaRepository.existsByDni(TestConstants.DNI)).thenReturn(true);
 
-    boolean exists = patientRepositoryAdapter.existsByDni(TestContants.DNI);
+    boolean exists = patientRepositoryAdapter.existsByDni(TestConstants.DNI);
 
     assertTrue(exists);
+    verify(patientJpaRepository, times(1)).existsByDni(TestConstants.DNI);
   }
 
   @Test
   public void testExistsByDniNotFound() {
-    when(patientJpaRepository.existsByDni(TestContants.DNI)).thenReturn(false);
+    when(patientJpaRepository.existsByDni(TestConstants.DNI)).thenReturn(false);
 
-    boolean exists = patientRepositoryAdapter.existsByDni(TestContants.DNI);
+    boolean exists = patientRepositoryAdapter.existsByDni(TestConstants.DNI);
 
     assertFalse(exists);
+    verify(patientJpaRepository, times(1)).existsByDni(TestConstants.DNI);
   }
 
   @Test
   public void testExistsByEmail() {
-    when(patientJpaRepository.existsByEmail(TestContants.EMAIL)).thenReturn(true);
+    when(patientJpaRepository.existsByEmail(TestConstants.EMAIL)).thenReturn(true);
 
-    boolean exists = patientRepositoryAdapter.existsByEmail(TestContants.EMAIL);
+    boolean exists = patientRepositoryAdapter.existsByEmail(TestConstants.EMAIL);
 
     assertTrue(exists);
+    verify(patientJpaRepository, times(1)).existsByEmail(TestConstants.EMAIL);
   }
 
   @Test
   public void testExistsByEmailNotFound() {
-    when(patientJpaRepository.existsByEmail(TestContants.EMAIL)).thenReturn(false);
+    when(patientJpaRepository.existsByEmail(TestConstants.EMAIL)).thenReturn(false);
 
-    boolean exists = patientRepositoryAdapter.existsByEmail(TestContants.EMAIL);
+    boolean exists = patientRepositoryAdapter.existsByEmail(TestConstants.EMAIL);
 
     assertFalse(exists);
+    verify(patientJpaRepository, times(1)).existsByEmail(TestConstants.EMAIL);
   }
 
   @Test
   public void testExistsById() {
-    when(patientJpaRepository.existsById(1L)).thenReturn(true);
+    when(patientJpaRepository.existsById(TestConstants.ID)).thenReturn(true);
 
-    boolean exists = patientRepositoryAdapter.existsById(1L);
+    boolean exists = patientRepositoryAdapter.existsById(TestConstants.ID);
 
     assertTrue(exists);
+    verify(patientJpaRepository, times(1)).existsById(TestConstants.ID);
   }
 
   @Test
   public void testExistsByIdNotFound() {
-    when(patientJpaRepository.existsById(1L)).thenReturn(false);
+    when(patientJpaRepository.existsById(TestConstants.ID)).thenReturn(false);
 
-    boolean exists = patientRepositoryAdapter.existsById(1L);
+    boolean exists = patientRepositoryAdapter.existsById(TestConstants.ID);
 
     assertFalse(exists);
+    verify(patientJpaRepository, times(1)).existsById(TestConstants.ID);
   }
 
   @Test
@@ -228,8 +252,9 @@ public class PatientRepositoryAdapterTest {
 
     Patient savedPatient = patientRepositoryAdapter.save(patientJohn);
 
-    assertEquals(TestContants.DNI, savedPatient.getDni());
-    assertEquals(TestContants.EMAIL, savedPatient.getEmail());
+    assertEquals(TestConstants.DNI, savedPatient.getDni());
+    assertEquals(TestConstants.EMAIL, savedPatient.getEmail());
+    verify(patientJpaRepository, times(1)).save(PatientEntityMapper.toEntity(patientJohn));
   }
 
   @Test
@@ -246,32 +271,34 @@ public class PatientRepositoryAdapterTest {
     when(patientJpaRepository.save(any()))
             .thenReturn(PatientEntityMapper.toEntity(patientJohn));
 
-    Patient updatedPatient = patientRepositoryAdapter.update(1L, patientJohn);
+    Patient updatedPatient = patientRepositoryAdapter.update(TestConstants.ID, patientJohn);
 
-    assertEquals(TestContants.DNI, updatedPatient.getDni());
-    assertEquals(TestContants.EMAIL, updatedPatient.getEmail());
+    assertEquals(TestConstants.DNI, updatedPatient.getDni());
+    assertEquals(TestConstants.EMAIL, updatedPatient.getEmail());
+    verify(patientJpaRepository, times(1)).existsById(anyLong());
+    verify(patientJpaRepository, times(1)).save(any());
   }
 
   @Test
   public void testUpdateNotFound() {
     when(patientJpaRepository.existsById(anyLong())).thenReturn(false);
 
-    assertThrows(PatientNotFoundException.class, () -> patientRepositoryAdapter.update(1L, patientJohn));
+    assertThrows(PatientNotFoundException.class, () -> patientRepositoryAdapter.update(TestConstants.ID, patientJohn));
   }
 
   @Test
   public void testDelete() {
-    when(patientJpaRepository.existsById(1L)).thenReturn(true);
+    when(patientJpaRepository.existsById(TestConstants.ID)).thenReturn(true);
 
-    patientRepositoryAdapter.delete(1L);
+    patientRepositoryAdapter.delete(TestConstants.ID);
 
-    verify(patientJpaRepository, times(1)).deleteById(1L);
+    verify(patientJpaRepository, times(1)).deleteById(TestConstants.ID);
   }
 
   @Test
   public void testDeleteNotFound() {
-    when(patientJpaRepository.existsById(1L)).thenReturn(false);
+    when(patientJpaRepository.existsById(TestConstants.ID)).thenReturn(false);
 
-    assertThrows(PatientNotFoundException.class, () -> patientRepositoryAdapter.delete(1L));
+    assertThrows(PatientNotFoundException.class, () -> patientRepositoryAdapter.delete(TestConstants.ID));
   }
 }

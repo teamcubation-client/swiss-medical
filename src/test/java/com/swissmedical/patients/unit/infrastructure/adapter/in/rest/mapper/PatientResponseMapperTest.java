@@ -29,10 +29,8 @@ public class PatientResponseMapperTest {
             .socialSecurity("Swiss Medical")
             .build();
 
-    // Assuming you have a mapper class to convert DTO to model
     Patient patientModel = PatientResponseMapper.toDomain(patient);
 
-    // Assertions to verify the mapping
     assertEquals("John", patientModel.getFirstName());
     assertEquals("Doe", patientModel.getLastName());
     assertEquals("john@gmail.com", patientModel.getEmail());
@@ -59,10 +57,8 @@ public class PatientResponseMapperTest {
             .socialSecurity("Swiss Medical")
             .build();
 
-    // Assuming you have a mapper class to convert model to DTO
     PatientResponseDto patientResponseDto = PatientResponseMapper.toDto(patient);
 
-    // Assertions to verify the mapping
     assertEquals(1L, patientResponseDto.getId());
     assertEquals("Jane", patientResponseDto.getFirstName());
     assertEquals("Doe", patientResponseDto.getLastName());

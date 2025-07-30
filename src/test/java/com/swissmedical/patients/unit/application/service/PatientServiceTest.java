@@ -5,7 +5,7 @@ import com.swissmedical.patients.application.domain.ports.out.PatientRepositoryP
 import com.swissmedical.patients.application.service.PatientService;
 import com.swissmedical.patients.shared.exceptions.PatientDuplicateException;
 import com.swissmedical.patients.shared.exceptions.PatientNotFoundException;
-import com.swissmedical.patients.unit.shared.utils.TestContants;
+import com.swissmedical.patients.unit.shared.utils.TestConstants;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,6 +14,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
+import java.util.Deque;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
@@ -38,9 +40,9 @@ public class PatientServiceTest {
     patient = Patient.builder()
             .firstName("John")
             .lastName("Doe")
-            .email(TestContants.EMAIL)
+            .email(TestConstants.EMAIL)
             .phoneNumber("1234567890")
-            .dni(TestContants.DNI)
+            .dni(TestConstants.DNI)
             .memberNumber("MEM12345")
             .birthDate(LocalDate.of(1990, 1, 1))
             .isActive(true)
@@ -58,17 +60,23 @@ public class PatientServiceTest {
     List<Patient> patients = patientService.getAll("", 1, 10);
 
     assertEquals(2, patients.size());
+    verify(repository, times(1)).findAll(10, 0);
   }
 
   @Test
-  public void testGetAllWithInvalidPageAndSize() {
+  public void testGetAllWithInvalidPage() {
     assertThrows(IllegalArgumentException.class, () -> {
       patientService.getAll("", -1, 10);
     });
+    verify(repository, never()).findAll(anyInt(), anyInt());
+  }
 
+  public void testGetAllWithInvalidSize() {
     assertThrows(IllegalArgumentException.class, () -> {
       patientService.getAll("", 1, -10);
     });
+
+    verify(repository, never()).findAll(anyInt(), anyInt());
   }
 
   @Test
@@ -78,10 +86,11 @@ public class PatientServiceTest {
             Patient.builder().firstName("John").lastName("Doe").build()
     ));
 
-    List<Patient> patients = patientService.getAll(name, 1, 10);
+    Deque<Patient> patients = new LinkedList<>(patientService.getAll(name, 1, 10));
 
     assertEquals(1, patients.size());
-    assertEquals("John", patients.get(0).getFirstName());
+    assertEquals("John", patients.getFirst().getFirstName());
+    verify(repository, times(1)).findByFirstName(name);
   }
 
   @Test
@@ -92,23 +101,26 @@ public class PatientServiceTest {
     assertThrows(PatientNotFoundException.class, () -> {
       patientService.getAll(name, 1, 10);
     });
+    verify(repository, times(1)).findByFirstName(name);
   }
 
   @Test
   public void testGetByDni() {
-    when(repository.findByDni(TestContants.DNI)).thenReturn(Optional.of(patient));
-    Patient result = patientService.getByDni(TestContants.DNI);
+    when(repository.findByDni(TestConstants.DNI)).thenReturn(Optional.of(patient));
+    Patient result = patientService.getByDni(TestConstants.DNI);
 
     assertEquals(patient, result);
+    verify(repository, times(1)).findByDni(TestConstants.DNI);
   }
 
   @Test
   public void testGetByDniNotFound() {
-    when(repository.findByDni(TestContants.DNI)).thenReturn(Optional.empty());
+    when(repository.findByDni(TestConstants.DNI)).thenReturn(Optional.empty());
 
     assertThrows(PatientNotFoundException.class, () -> {
-      patientService.getByDni(TestContants.DNI);
+      patientService.getByDni(TestConstants.DNI);
     });
+    verify(repository, times(1)).findByDni(TestConstants.DNI);
   }
 
   @Test
@@ -119,10 +131,11 @@ public class PatientServiceTest {
             Patient.builder().firstName("John").lastName("Doe").socialSecurity("Swiss Medical").build()
     ));
 
-    List<Patient> patients = patientService.getBySocialSecurity(socialSecurity, 1, 10);
+    Deque<Patient> patients = new LinkedList<>(patientService.getBySocialSecurity(socialSecurity, 1, 10));
 
     assertEquals(1, patients.size());
-    assertEquals("John", patients.get(0).getFirstName());
+    assertEquals("John", patients.getFirst().getFirstName());
+    verify(repository, times(1)).findBySocialSecurity(socialSecurity, 10, 0);
   }
 
   @Test
@@ -134,28 +147,31 @@ public class PatientServiceTest {
     assertThrows(PatientNotFoundException.class, () -> {
       patientService.getBySocialSecurity(socialSecurity, 1, 10);
     });
+    verify(repository, times(1)).findBySocialSecurity(socialSecurity, 10, 0);
   }
 
   @Test
   public void testCreatePatient() {
-    when(repository.existsByDni(TestContants.DNI)).thenReturn(false);
-    when(repository.existsByEmail(TestContants.EMAIL)).thenReturn(false);
+    when(repository.existsByDni(TestConstants.DNI)).thenReturn(false);
+    when(repository.existsByEmail(TestConstants.EMAIL)).thenReturn(false);
     when(repository.save(any())).thenReturn(patient);
 
     Patient result = patientService.create(patient);
 
-    // Assertions can be added here to verify the result
-    // For example, you can use assertEquals to check if the returned patient matches the created
     assertEquals(patient, result);
+    verify(repository, times(1)).existsByDni(TestConstants.DNI);
+    verify(repository, times(1)).existsByEmail(TestConstants.EMAIL);
+    verify(repository, times(1)).save(patient);
   }
 
   @Test
   public void shouldThrowErrorWhenDuplicateDni() {
-    when(repository.existsByDni(TestContants.DNI)).thenReturn(true);
+    when(repository.existsByDni(TestConstants.DNI)).thenReturn(true);
 
     assertThrows(PatientDuplicateException.class, () -> {
       patientService.create(patient);
     });
+    verify(repository, times(1)).existsByDni(TestConstants.DNI);
   }
 
   @Test
@@ -168,42 +184,47 @@ public class PatientServiceTest {
     assertThrows(PatientDuplicateException.class, () -> {
       patientService.create(patient);
     });
+    verify(repository, times(1)).existsByEmail(email);
   }
 
   @Test
   public void testUpdatePatient() {
-    when(repository.findById(TestContants.ID)).thenReturn(Optional.of(patient));
+    when(repository.findById(TestConstants.ID)).thenReturn(Optional.of(patient));
     when(repository.save(any())).thenReturn(patient);
 
-    Patient updatedPatient = patientService.update(1L, patient);
+    Patient updatedPatient = patientService.update(TestConstants.ID, patient);
 
     assertEquals(patient, updatedPatient);
+    verify(repository, times(1)).findById(TestConstants.ID);
+    verify(repository, times(1)).save(patient);
   }
 
   @Test
   public void testUpdatePatientNotFound() {
-    when(repository.findById(TestContants.ID)).thenReturn(Optional.empty());
+    when(repository.findById(TestConstants.ID)).thenReturn(Optional.empty());
 
     assertThrows(PatientNotFoundException.class, () -> {
-      patientService.update(1L, patient);
+      patientService.update(TestConstants.ID, patient);
     });
+    verify(repository, times(1)).findById(TestConstants.ID);
   }
 
   @Test
   public void testDeletePatient() {
-    when(repository.existsById(TestContants.ID)).thenReturn(true);
+    when(repository.existsById(TestConstants.ID)).thenReturn(true);
 
-    patientService.delete(TestContants.ID);
+    patientService.delete(TestConstants.ID);
 
-    verify(repository, times(1)).delete(TestContants.ID);
+    verify(repository, times(1)).delete(TestConstants.ID);
   }
 
   @Test
   public void testDeletePatientNotFound() {
-    when(repository.existsById(TestContants.ID)).thenReturn(false);
+    when(repository.existsById(TestConstants.ID)).thenReturn(false);
 
     assertThrows(PatientNotFoundException.class, () -> {
-      patientService.delete(TestContants.ID);
+      patientService.delete(TestConstants.ID);
     });
+    verify(repository, times(1)).existsById(TestConstants.ID);
   }
 }
