@@ -2,6 +2,8 @@ package com.teamcubation.api.pacientes.shared.exception;
 
 import com.teamcubation.api.pacientes.infrastructure.adapter.in.rest.response.ApiResponse;
 import com.teamcubation.api.pacientes.infrastructure.adapter.in.rest.response.ErrorResponse;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -34,7 +36,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(PatientDniAlreadyInUseException.class)
     public ResponseEntity<ApiResponse<String>> PatientDniAlreadyInUse(PatientDniAlreadyInUseException ex) {
-        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(new ErrorResponse<>(ex.getMessage()));
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(new ErrorResponse<>(ex.getMessage()));
     }
 
     @ExceptionHandler(ExporterTypeNotSupportedException.class)
@@ -67,6 +69,16 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponse<String>> handleHttpMessageNotReadableException(HttpMessageNotReadableException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse<>(INVALID_REQUEST_DATA_ERROR + ex.getMessage()));
 
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ApiResponse<String>> handleDataIntegrityViolationException(DataIntegrityViolationException ex) {
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(new ErrorResponse<>(ex.getMessage()));
+    }
+
+    @ExceptionHandler(EmptyResultDataAccessException.class)
+    public ResponseEntity<ApiResponse<String>> handleEmptyResultDataAccessException(EmptyResultDataAccessException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse<>(ex.getMessage()));
     }
 
     @ExceptionHandler(Exception.class)

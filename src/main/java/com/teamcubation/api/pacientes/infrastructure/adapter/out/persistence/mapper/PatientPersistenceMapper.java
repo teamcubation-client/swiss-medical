@@ -24,6 +24,7 @@ public class PatientPersistenceMapper {
         patient.setLastName(patientEntity.getLastName());
         patient.setDni(patientEntity.getDni());
         patient.setHealthInsuranceProvider(patientEntity.getHealthInsuranceProvider());
+        patient.setEmail(patientEntity.getEmail());
         patient.setPhoneNumber(patientEntity.getPhoneNumber());
         return patient;
     }
