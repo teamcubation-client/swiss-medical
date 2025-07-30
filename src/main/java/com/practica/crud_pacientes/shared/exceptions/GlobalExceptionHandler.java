@@ -17,56 +17,69 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(PacienteDuplicadoException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
-    public ErrorResponse handlerPacienteDuplicado(PacienteDuplicadoException exception, HttpServletRequest request){
-        return new ErrorResponse(
-                LocalDateTime.now(),
-                HttpStatus.CONFLICT.value(),
+    public ErrorResponse handlePacienteDuplicado(PacienteDuplicadoException exception, HttpServletRequest request){
+        return buildError(
+                HttpStatus.CONFLICT,
                 exception.getMessage(),
-                HttpStatus.CONFLICT.getReasonPhrase(),
                 request.getRequestURI()
         );
     }
 
     @ExceptionHandler(PacienteNoEncontradoException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponse handlerPacienteNoEncontrado(PacienteNoEncontradoException exception, HttpServletRequest request){
-        return new ErrorResponse(
-                LocalDateTime.now(),
-                HttpStatus.NOT_FOUND.value(),
+    public ErrorResponse handlePacienteNoEncontrado(PacienteNoEncontradoException exception, HttpServletRequest request){
+        return buildError(
+                HttpStatus.NOT_FOUND,
                 exception.getMessage(),
-                HttpStatus.NOT_FOUND.getReasonPhrase(),
                 request.getRequestURI()
         );
     }
 
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ErrorResponse handlerExcepcionGenerica(Exception ex, HttpServletRequest request) {
+    public ErrorResponse handleExcepcionGenerica(Exception ex, HttpServletRequest request) {
         String mensaje = "Ocurrió un error inesperado: " + ex.getMessage();
-        return new ErrorResponse(
-                LocalDateTime.now(),
-                HttpStatus.INTERNAL_SERVER_ERROR.value(),
+        return buildError(
+                HttpStatus.INTERNAL_SERVER_ERROR,
                 mensaje,
-                HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
                 request.getRequestURI()
         );
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handlerValidationsException(MethodArgumentNotValidException exception, HttpServletRequest request){
+    public ErrorResponse handleValidationsException(MethodArgumentNotValidException exception, HttpServletRequest request){
         Map<String, String> errores = new HashMap<>();
 
         for (FieldError error : exception.getBindingResult().getFieldErrors()) {
             errores.put(error.getField(), error.getDefaultMessage());
         }
 
+        return buildError(
+                HttpStatus.BAD_REQUEST,
+                "Errores de validacion",
+                request.getRequestURI(),
+                errores
+        );
+    }
+
+    private ErrorResponse buildError(HttpStatus status, String message, String path) {
         return new ErrorResponse(
                 LocalDateTime.now(),
-                HttpStatus.BAD_REQUEST.value(),
-                "Errores de validacion",
-                HttpStatus.BAD_REQUEST.getReasonPhrase(),
-                request.getRequestURI(),
+                status.value(),
+                message,
+                status.getReasonPhrase(),
+                path
+        );
+    }
+
+    private ErrorResponse buildError(HttpStatus status, String message, String path, Map<String, String> errores) {
+        return new ErrorResponse(
+                LocalDateTime.now(),
+                status.value(),
+                message,
+                status.getReasonPhrase(),
+                path,
                 errores
         );
     }
