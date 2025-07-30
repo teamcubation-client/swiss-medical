@@ -49,7 +49,7 @@ public class PacienteRepositoryAdapter implements PacienteRepositoryPort {
     }
 
     @Override
-    public Paciente getByDni(String dni) {
+    public Paciente getPacienteByDni(String dni) {
         PacienteEntity pacienteEntity = pacienteJpaRepository.getByDni(dni);
         return mapper.entityToDomain(pacienteEntity);
     }
@@ -63,7 +63,7 @@ public class PacienteRepositoryAdapter implements PacienteRepositoryPort {
     }
 
     @Override
-    public List<Paciente> getPacietesbyObraSocial(String obraSocial, int limite, int off) {
+    public List<Paciente> getPacientesByObraSocial(String obraSocial, int limite, int off) {
         List<PacienteEntity> pacientesEntity = pacienteJpaRepository.getPacietesbyObraSocial(obraSocial, limite, off);
         return pacientesEntity.stream()
                 .map(mapper::entityToDomain)
