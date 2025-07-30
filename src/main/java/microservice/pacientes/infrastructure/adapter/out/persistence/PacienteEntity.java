@@ -14,6 +14,7 @@ import javax.persistence.*;
 @Entity
 @Builder
 @AllArgsConstructor
+@NoArgsConstructor
 @Table (name ="paciente")
 public class PacienteEntity {
     @Id
