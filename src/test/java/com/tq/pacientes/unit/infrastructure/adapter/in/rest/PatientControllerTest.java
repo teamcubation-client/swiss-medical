@@ -1,4 +1,4 @@
-package com.tq.pacientes.unit.adapter.in.rest;
+package com.tq.pacientes.unit.infrastructure.adapter.in.rest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tq.pacientes.application.domain.model.Patient;
@@ -22,8 +22,7 @@ import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -97,6 +96,8 @@ class PatientControllerTest {
                         .content(new ObjectMapper().writeValueAsString(patientRequest)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").value(1L));
+
+        verify(patientUseCase, times(1)).create(patient);
     }
 
     @Test
@@ -107,6 +108,43 @@ class PatientControllerTest {
         mockMvc.perform(get("/api/patients"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id").value(1L));
+
+        verify(patientUseCase, times(1)).getAll();
+    }
+
+    @Test
+    void search_ShouldReturnPatientByDni() throws Exception {
+        when(patientUseCase.getByDni("12345678")).thenReturn(Optional.of(patient));
+        when(patientRestMapper.toResponse(patient)).thenReturn(patientResponse);
+
+        mockMvc.perform(get("/api/patients?dni=12345678"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id").value(1L))
+                .andExpect(jsonPath("$[0].dni").value("12345678"));
+
+        verify(patientUseCase, times(1)).getByDni("12345678");
+    }
+
+    @Test
+    void search_ShouldReturnPatientsByFirstName() throws Exception {
+        when(patientUseCase.searchByFirstName("Juan")).thenReturn(List.of(patient));
+        when(patientRestMapper.toResponse(patient)).thenReturn(patientResponse);
+
+        mockMvc.perform(get("/api/patients?firstName=Juan"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].firstName").value("Juan"));
+
+        verify(patientUseCase, times(1)).searchByFirstName("Juan");
+    }
+
+    @Test
+    void search_ShouldReturnNoContent_WhenNoResults() throws Exception {
+        when(patientUseCase.getAll()).thenReturn(List.of());
+
+        mockMvc.perform(get("/api/patients"))
+                .andExpect(status().isNoContent());
+
+        verify(patientUseCase, times(1)).getAll();
     }
 
     @Test
@@ -117,6 +155,108 @@ class PatientControllerTest {
         mockMvc.perform(get("/api/patients/dni/{dni}", "12345678"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.dni").value("12345678"));
+
+        verify(patientUseCase, times(1)).getByDni("12345678");
+    }
+
+
+    @Test
+    void searchByFirstName_ShouldReturnPatients() throws Exception {
+        when(patientUseCase.searchByFirstName("Juan")).thenReturn(List.of(patient));
+        when(patientRestMapper.toResponse(patient)).thenReturn(patientResponse);
+
+        mockMvc.perform(get("/api/patients/first-name/{firstName}", "Juan"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$[0].id").value(1L))
+                .andExpect(jsonPath("$[0].firstName").value("Juan"))
+                .andExpect(jsonPath("$[0].lastName").value("Carlos"))
+                .andExpect(jsonPath("$[0].dni").value("12345678"));
+
+        verify(patientUseCase, times(1)).searchByFirstName("Juan");
+    }
+
+    @Test
+    void searchByFirstName_ShouldReturnNoContent_WhenNoMatches() throws Exception {
+        when(patientUseCase.searchByFirstName("NoExiste")).thenReturn(List.of());
+
+        mockMvc.perform(get("/api/patients/first-name/{firstName}", "NoExiste"))
+                .andExpect(status().isNoContent());
+
+        verify(patientUseCase, times(1)).searchByFirstName("NoExiste");
+    }
+
+    @Test
+    void searchByFirstName_ShouldHandleMultipleResults() throws Exception {
+        Patient patient2 = Patient.builder()
+                .id(2L)
+                .firstName("Juan")
+                .lastName("Pérez")
+                .build();
+
+        PatientResponse response2 = PatientResponse.builder()
+                .id(2L)
+                .firstName("Juan")
+                .lastName("Pérez")
+                .build();
+
+        when(patientUseCase.searchByFirstName("Juan"))
+                .thenReturn(List.of(patient, patient2));
+        when(patientRestMapper.toResponse(patient)).thenReturn(patientResponse);
+        when(patientRestMapper.toResponse(patient2)).thenReturn(response2);
+
+        mockMvc.perform(get("/api/patients/first-name/{firstName}", "Juan"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$.length()").value(2))
+                .andExpect(jsonPath("$[0].id").value(1L))
+                .andExpect(jsonPath("$[0].firstName").value("Juan"))
+                .andExpect(jsonPath("$[1].id").value(2L))
+                .andExpect(jsonPath("$[1].firstName").value("Juan"));
+
+        verify(patientUseCase, times(1)).searchByFirstName("Juan");
+    }
+
+    @Test
+    void searchByFirstName_ShouldHandleEmptyName() throws Exception {
+        mockMvc.perform(get("/api/patients/first-name/ "))
+                .andExpect(status().isNoContent());
+
+        verify(patientUseCase, times(1)).searchByFirstName(" ");
+    }
+
+    @Test
+    void searchByFirstName_ShouldHandleSpecialCharacters() throws Exception {
+        String nameWithSpecialChars = "Juán-Carlos";
+        when(patientUseCase.searchByFirstName(nameWithSpecialChars))
+                .thenReturn(List.of(patient));
+        when(patientRestMapper.toResponse(patient)).thenReturn(patientResponse);
+
+        mockMvc.perform(get("/api/patients/first-name/{firstName}", nameWithSpecialChars))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].firstName").value("Juan"));
+
+        verify(patientUseCase, times(1)).searchByFirstName(nameWithSpecialChars);
+    }
+
+    @Test
+    void searchByFirstName_ShouldPreserveAllFields() throws Exception {
+        when(patientUseCase.searchByFirstName("Juan")).thenReturn(List.of(patient));
+        when(patientRestMapper.toResponse(patient)).thenReturn(patientResponse);
+
+        mockMvc.perform(get("/api/patients/first-name/{firstName}", "Juan"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id").value(1L))
+                .andExpect(jsonPath("$[0].firstName").value("Juan"))
+                .andExpect(jsonPath("$[0].lastName").value("Carlos"))
+                .andExpect(jsonPath("$[0].dni").value("12345678"))
+                .andExpect(jsonPath("$[0].healthInsurance").value("OSDE"))
+                .andExpect(jsonPath("$[0].healthPlan").value("210"))
+                .andExpect(jsonPath("$[0].address").value("Calle 123"))
+                .andExpect(jsonPath("$[0].phoneNumber").value("1123456789"))
+                .andExpect(jsonPath("$[0].email").value("jc@mail.com"));
+
+        verify(patientUseCase, times(1)).searchByFirstName("Juan");
     }
 
     @Test
@@ -127,6 +267,8 @@ class PatientControllerTest {
         mockMvc.perform(get("/api/patients/1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1L));
+
+        verify(patientUseCase, times(1)).getById(1L);
     }
 
     @Test
@@ -138,6 +280,8 @@ class PatientControllerTest {
                         .param("healthInsurance", "OSDE"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].healthInsurance").value("OSDE"));
+
+        verify(patientUseCase, times(1)).searchByHealthInsurancePaginated("OSDE", 10, 0);
     }
 
     @Test
@@ -151,6 +295,8 @@ class PatientControllerTest {
                         .content(new ObjectMapper().writeValueAsString(patientRequest)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1L));
+
+        verify(patientUseCase, times(1)).update(eq(1L), any());
     }
 
     @Test
@@ -159,14 +305,20 @@ class PatientControllerTest {
 
         mockMvc.perform(delete("/api/patients/1"))
                 .andExpect(status().isNoContent());
+
+        verify(patientUseCase, times(1)).delete(1L);
     }
 
     @Test
     void activate_ShouldReturnOk() throws Exception {
-        doNothing().when(patientUseCase).activate(1L);
+        when(patientRestMapper.toDomain(patientRequest)).thenReturn(patient);
+        when(patientUseCase.activate(eq(1L))).thenReturn(patient);
+        when(patientRestMapper.toResponse(patient)).thenReturn(patientResponse);
 
         mockMvc.perform(patch("/api/patients/1/activate"))
                 .andExpect(status().isOk());
+
+        verify(patientUseCase, times(1)).activate(eq(1L));
     }
 
 }

@@ -1,4 +1,4 @@
-package com.tq.pacientes.unit.service;
+package com.tq.pacientes.unit.application.service;
 
 import com.tq.pacientes.application.domain.model.Patient;
 import com.tq.pacientes.application.domain.model.patientprocessing.PatientSaveFactory;
@@ -35,10 +35,8 @@ class PatientServiceTest {
     @Mock
     private PatientSaveTemplate saveTemplate;
 
-
     @InjectMocks
     private PatientService service;
-
 
     private Patient patient;
 
@@ -55,7 +53,6 @@ class PatientServiceTest {
 
     @Test
     void shouldCreatePatient_whenDniNotExists() {
-        // Configurar mocks
         when(repository.findByDni(patient.getDni())).thenReturn(Optional.empty());
         when(patientSaveFactory.getPatientSaveStrategy(eq(patient), any(PatientRepositoryPort.class)))
                 .thenReturn(saveTemplate);
@@ -66,8 +63,8 @@ class PatientServiceTest {
         assertEquals(patient.getDni(), saved.getDni());
         assertNotNull(saved.getCreationDate());
         assertNotNull(saved.getLastModifiedDate());
-        verify(patientSaveFactory).getPatientSaveStrategy(eq(patient), any(PatientRepositoryPort.class));
-        verify(saveTemplate).save(patient);
+        verify(patientSaveFactory, times(1)).getPatientSaveStrategy(eq(patient), any(PatientRepositoryPort.class));
+        verify(saveTemplate, times(1)).save(patient);
     }
 
 
@@ -76,6 +73,8 @@ class PatientServiceTest {
         when(repository.findByDni(patient.getDni())).thenReturn(Optional.of(patient));
 
         assertThrows(DuplicatePatientException.class, () -> service.create(patient));
+
+        verify(patientSaveFactory, never()).getPatientSaveStrategy(eq(patient), any(PatientRepositoryPort.class));
     }
 
     @Test
@@ -87,6 +86,8 @@ class PatientServiceTest {
 
         assertEquals(1, result.size());
         assertEquals("Juan", result.get(0).getFirstName());
+
+        verify(repository, times(1)).findAll();
     }
 
     @Test
@@ -97,6 +98,8 @@ class PatientServiceTest {
 
         assertTrue(result.isPresent());
         assertEquals("Juan", result.get().getFirstName());
+
+        verify(repository, times(1)).findById(1L);
     }
 
     @Test
@@ -104,6 +107,8 @@ class PatientServiceTest {
         when(repository.findByDni("99999999")).thenReturn(Optional.empty());
 
         assertThrows(PatientDniNotFoundException.class, () -> service.getByDni("99999999"));
+
+        verify(repository, times(1)).findByDni("99999999");
     }
 
     @Test
@@ -114,13 +119,19 @@ class PatientServiceTest {
 
         assertTrue(result.isPresent());
         assertEquals("Juan", result.get().getFirstName());
+
+        verify(repository, times(1)).findByDni("12345678");
     }
 
     @Test
     void shouldThrowException_whenPatientNotFound() {
         when(repository.findById(2L)).thenReturn(Optional.empty());
+
         Patient details = Patient.builder().dni("22222222").build();
+
         assertThrows(PatientNotFoundException.class, () -> service.update(2L, details));
+
+        verify(repository, times(1)).findById(2L);
     }
 
     @Test
@@ -131,6 +142,8 @@ class PatientServiceTest {
 
         assertEquals(1, result.size());
         assertEquals("Juan", result.get(0).getFirstName());
+
+        verify(repository, times(1)).searchByFirstName("Juan");
     }
 
     @Test
@@ -142,6 +155,8 @@ class PatientServiceTest {
 
         assertEquals(1, result.size());
         assertEquals("Juan", result.get(0).getFirstName());
+
+        verify(repository, times(1)).searchByHealthInsurancePaginated(eq("OSDE"), eq(10), eq(0));
     }
 
     @Test
@@ -156,6 +171,8 @@ class PatientServiceTest {
         Patient updated = service.update(1L, updates);
 
         assertEquals("Carlos", updated.getFirstName());
+
+        verify(repository, times(1)).update(any(Patient.class));
     }
 
     @Test
@@ -163,7 +180,7 @@ class PatientServiceTest {
         Patient updates = new Patient();
         updates.setFirstName("Carlos");
         updates.setLastName("Gómez");
-        updates.setDni("99999999"); // distinto al original
+        updates.setDni("99999999");
         updates.setHealthInsurance("OSDE");
         updates.setHealthPlan("310");
         updates.setAddress("Calle Falsa 123");
@@ -171,7 +188,7 @@ class PatientServiceTest {
         updates.setPhoneNumber("123456789");
 
         when(repository.findById(1L)).thenReturn(Optional.of(patient));
-        when(repository.findByDni("99999999")).thenReturn(Optional.empty()); // no es duplicado
+        when(repository.findByDni("99999999")).thenReturn(Optional.empty());
         when(repository.update(any())).thenAnswer(inv -> inv.getArgument(0));
 
         Patient updated = service.update(1L, updates);
@@ -184,23 +201,27 @@ class PatientServiceTest {
         assertEquals("Calle Falsa 123", updated.getAddress());
         assertEquals("carlos@example.com", updated.getEmail());
         assertEquals("123456789", updated.getPhoneNumber());
+
+        verify(repository, times(1)).findByDni("99999999");
     }
 
     @Test
     void shouldThrowExceptionWhenUpdatingToDuplicateDni() {
         Patient updates = new Patient();
-        updates.setDni("99999999"); // distinto
+        updates.setDni("99999999");
 
         when(repository.findById(1L)).thenReturn(Optional.of(patient));
-        when(repository.findByDni("99999999")).thenReturn(Optional.of(new Patient())); // ya existe
+        when(repository.findByDni("99999999")).thenReturn(Optional.of(new Patient()));
 
         assertThrows(DuplicatePatientException.class, () -> service.update(1L, updates));
+
+        verify(repository, times(1)).findByDni("99999999");
     }
 
     @Test
     void shouldNotCallFindByDniWhenDniIsTheSame() {
         Patient updates = new Patient();
-        updates.setDni("12345678"); // igual al actual
+        updates.setDni("12345678");
         updates.setFirstName("Mario");
 
         when(repository.findById(1L)).thenReturn(Optional.of(patient));
@@ -209,6 +230,7 @@ class PatientServiceTest {
         Patient updated = service.update(1L, updates);
 
         assertEquals("Mario", updated.getFirstName());
+
         verify(repository, never()).findByDni("12345678");
     }
 
@@ -218,6 +240,8 @@ class PatientServiceTest {
         when(repository.findById(999L)).thenReturn(Optional.empty());
 
         assertThrows(PatientNotFoundException.class, () -> service.update(999L, updates));
+
+        verify(repository, times(1)).findById(999L);
     }
 
     @Test
@@ -227,97 +251,29 @@ class PatientServiceTest {
         service.delete(1L);
 
         assertFalse(patient.getActive());
-        verify(repository).update(patient);
+
+        verify(repository, times(1)).update(patient);
     }
 
     @Test
     void shouldActivatePatient() {
         patient.setActive(false);
-        when(repository.findById(1L)).thenReturn(Optional.of(patient));
+        when(repository.findByIdIgnoringActive(1L)).thenReturn(Optional.of(patient));
 
         service.activate(1L);
 
         assertTrue(patient.getActive());
-        verify(repository).update(patient);
+
+        verify(repository, times(1)).update(patient);
     }
 
     @Test
     void shouldThrowException_whenActivatingAlreadyActivePatient() {
         patient.setActive(true);
-        when(repository.findById(1L)).thenReturn(Optional.of(patient));
+        when(repository.findByIdIgnoringActive(1L)).thenReturn(Optional.of(patient));
 
         assertThrows(PatientAlreadyActiveException.class, () -> service.activate(1L));
+
+        verify(repository, never()).update(patient);
     }
 }
-
-/*public class PatientServiceTest {
-
-    @Mock
-    private PatientRepositoryPort patientRepositoryPort;
-
-    @InjectMocks
-    private PatientService patientService;
-
-    @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this);
-    }
-
-    @Test
-    void testCreatePatient_Success() {
-        Patient patient = Patient.builder().dni("12345678").firstName("Juan").build();
-        when(patientRepositoryPort.findByDni("12345678")).thenReturn(Optional.empty());
-        when(patientRepositoryPort.save(any(Patient.class))).thenReturn(patient);
-
-        Patient saved = patientService.create(patient);
-        assertEquals("Juan", saved.getFirstName());
-        verify(patientRepositoryPort).save(any(Patient.class));
-    }
-
-    @Test
-    void testCreatePatient_Duplicate() {
-        Patient patient = Patient.builder().dni("12345678").build();
-        when(patientRepositoryPort.findByDni("12345678")).thenReturn(Optional.of(patient));
-        assertThrows(DuplicatePatientException.class, () -> patientService.create(patient));
-    }
-
-    @Test
-    void testGetByDni_NotFound() {
-        when(patientRepositoryPort.findByDni("99999999")).thenReturn(Optional.empty());
-        assertThrows(PatientDniNotFoundException.class, () -> patientService.getByDni("99999999"));
-    }
-
-    @Test
-    void testGetById_Found() {
-        Patient patient = Patient.builder().id(1L).dni("12345678").build();
-        when(patientRepositoryPort.findById(1L)).thenReturn(Optional.of(patient));
-        Optional<Patient> result = patientService.getById(1L);
-        assertTrue(result.isPresent());
-        assertEquals("12345678", result.get().getDni());
-    }
-
-    @Test
-    void testUpdatePatient_NotFound() {
-        when(patientRepositoryPort.findById(2L)).thenReturn(Optional.empty());
-        Patient details = Patient.builder().dni("22222222").build();
-        assertThrows(PatientNotFoundException.class, () -> patientService.update(2L, details));
-    }
-
-    @Test
-    void testDeletePatient_Success() {
-        Patient patient = Patient.builder().id(3L).active(true).build();
-        when(patientRepositoryPort.findById(3L)).thenReturn(Optional.of(patient));
-        when(patientRepositoryPort.update(any(Patient.class))).thenReturn(patient);
-        patientService.delete(3L);
-        verify(patientRepositoryPort).update(any(Patient.class));
-    }
-
-    @Test
-    void testGetAllPatients() {
-        Patient p1 = Patient.builder().dni("1").build();
-        Patient p2 = Patient.builder().dni("2").build();
-        when(patientRepositoryPort.findAll()).thenReturn(List.of(p1, p2));
-        List<Patient> patients = patientService.getAll();
-        assertEquals(2, patients.size());
-    }
-}*/
