@@ -33,7 +33,7 @@ class GlobalExceptionHandlerTest {
         request.setRequestURI("/pacientes/buscar-por-id/1234");
         PacienteNoEncontradoException exception = new PacienteNoEncontradoException();
 
-        ErrorResponse response = handler.handlerPacienteNoEncontrado(exception, request);
+        ErrorResponse response = handler.handlePacienteNoEncontrado(exception, request);
 
         assertThat(response.getStatus()).isEqualTo(404);
         assertThat(response.getMensaje()).isEqualTo("El paciente que se intenta buscar no existe.");
@@ -46,7 +46,7 @@ class GlobalExceptionHandlerTest {
         request.setRequestURI("/pacientes");
         Exception exception = new RuntimeException("Algo salió mal");
 
-        ErrorResponse response = handler.handlerExcepcionGenerica(exception, request);
+        ErrorResponse response = handler.handleExcepcionGenerica(exception, request);
 
         assertThat(response.getStatus()).isEqualTo(500);
         assertThat(response.getMensaje()).contains("Ocurrió un error inesperado: Algo salió mal");
@@ -65,7 +65,7 @@ class GlobalExceptionHandlerTest {
 
         MethodArgumentNotValidException exception = new MethodArgumentNotValidException(null, bindingResult);
 
-        ErrorResponse response = handler.handlerValidationsException(exception, request);
+        ErrorResponse response = handler.handleValidationsException(exception, request);
 
         assertThat(response.getStatus()).isEqualTo(400);
         assertThat(response.getMensaje()).isEqualTo("Errores de validacion");
@@ -79,11 +79,11 @@ class GlobalExceptionHandlerTest {
     }
 
     @Test
-    void shouldHandlerPacienteDuplicadoException() {
+    void shouldHandlePacienteDuplicadoException() {
         request.setRequestURI("/pacientes/nuevo-paciente");
         PacienteDuplicadoException exception = new PacienteDuplicadoException();
 
-        ErrorResponse response = handler.handlerPacienteDuplicado(exception, request);
+        ErrorResponse response = handler.handlePacienteDuplicado(exception, request);
 
         assertThat(response.getStatus()).isEqualTo(409);
         assertThat(response.getMensaje()).isEqualTo("Ya existe un paciente con ese DNI.");

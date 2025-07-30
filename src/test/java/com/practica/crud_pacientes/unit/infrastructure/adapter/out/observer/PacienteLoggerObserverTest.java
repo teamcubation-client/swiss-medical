@@ -9,22 +9,20 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.LoggerFactory;
 
+import static com.practica.crud_pacientes.utils.PacienteTestFactory.buildDomain;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class PacienteLoggerObserverTest {
 
     private PacienteLoggerObserver observer;
     private Paciente paciente;
-    private Logger logger = (Logger) LoggerFactory.getLogger("PACIENTE-LOGS");
+    private final Logger logger = (Logger) LoggerFactory.getLogger("PACIENTE-LOGS");
     private ListAppender<ILoggingEvent> listApprender;
 
     @BeforeEach
     void setUp() {
         observer = new PacienteLoggerObserver();
-        paciente = new Paciente();
-        paciente.setNombre("Jane");
-        paciente.setApellido("Doe");
-        paciente.setDni("12121212");
+        paciente = buildDomain();
 
         listApprender = new ListAppender<>();
         listApprender.start();

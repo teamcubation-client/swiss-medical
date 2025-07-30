@@ -9,9 +9,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.time.LocalDate;
 import java.util.List;
 
+import static com.practica.crud_pacientes.utils.PacienteTestFactory.buildDomain;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -29,15 +29,7 @@ class PacienteEventPublisherAdapterTest {
 
     @BeforeEach
     void setUp() {
-        paciente = new Paciente();
-        paciente.setNombre("Jane");
-        paciente.setApellido("Doe");
-        paciente.setDni("12121212");
-        paciente.setEmail("jane@gmail.com");
-        paciente.setTelefono("1122334455");
-        paciente.setDomicilio("Fake Street 123");
-        paciente.setFechaNacimiento(LocalDate.of(2000, 6, 20));
-        paciente.setEstadoCivil("Soltera");
+        paciente = buildDomain();
         publisher = new PacienteEventPublisherAdapter(List.of(observer1, observer2));
     }
 

@@ -2,7 +2,7 @@ package com.practica.crud_pacientes.unit.infrastructure.adapter.in.rest.controll
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.practica.crud_pacientes.application.domain.model.Paciente;
-import com.practica.crud_pacientes.application.domain.port.in.Mediator;
+import com.practica.crud_pacientes.application.domain.port.in.TrafficNotifier;
 import com.practica.crud_pacientes.application.domain.port.in.PacienteUseCase;
 import com.practica.crud_pacientes.infrastructure.adapter.in.rest.controller.PacienteController;
 import com.practica.crud_pacientes.infrastructure.adapter.in.rest.dto.PacienteRequest;
@@ -16,10 +16,11 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.practica.crud_pacientes.utils.PacienteTestFactory.*;
+import static com.practica.crud_pacientes.utils.TestConstants.ENDPOINT;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -42,12 +43,11 @@ class PacienteControllerTest {
     @MockitoBean
     private PacienteRestMapper mapper;
     @MockitoBean
-    private Mediator mediator;
+    private TrafficNotifier trafficNotifier;
 
     private PacienteResponse pacienteResponse;
     private PacienteRequest pacienteRequest;
     private Paciente paciente;
-    String endpoint;
     List<Paciente> pacientes;
     Paciente paciente1;
     Paciente paciente2;
@@ -56,37 +56,9 @@ class PacienteControllerTest {
 
     @BeforeEach
     void setUp() {
-        this.paciente = new Paciente();
-        paciente.setNombre("Jane");
-        paciente.setApellido("Doe");
-        paciente.setDni("12121212");
-        paciente.setEmail("jane@gmail.com");
-        paciente.setTelefono("1122334455");
-        paciente.setDomicilio("Fake Street 123");
-        paciente.setFechaNacimiento(LocalDate.of(2000, 6, 20));
-        paciente.setEstadoCivil("Soltera");
-
-        this.pacienteResponse = new PacienteResponse();
-        pacienteResponse.setNombre("Jane");
-        pacienteResponse.setApellido("Doe");
-        pacienteResponse.setDni("12121212");
-        pacienteResponse.setObraSocial("Swiss Medical");
-        pacienteResponse.setEmail("jane@gmail.com");
-        pacienteResponse.setTelefono("1122334455");
-        pacienteResponse.setDomicilio("Fake Street 123");
-        pacienteResponse.setFechaNacimiento(LocalDate.of(2000, 6, 20));
-        pacienteResponse.setEstadoCivil("Soltera");
-        this.pacienteRequest = new PacienteRequest();
-        pacienteRequest.setNombre("Jane");
-        pacienteRequest.setApellido("Doe");
-        pacienteRequest.setDni("12121212");
-        pacienteRequest.setObraSocial("Swiss Medical");
-        pacienteRequest.setEmail("jane@gmail.com");
-        pacienteRequest.setTelefono("1122334455");
-        pacienteRequest.setDomicilio("Fake Street 123");
-        pacienteRequest.setFechaNacimiento(LocalDate.of(2000, 6, 20));
-        pacienteRequest.setEstadoCivil("Soltera");
-        endpoint = "/pacientes";
+        paciente = buildDomain();
+        pacienteResponse = buildResponse();
+        pacienteRequest = buildRequest();
 
         pacientes = new ArrayList<>();
         paciente1 = new Paciente();
@@ -99,12 +71,12 @@ class PacienteControllerTest {
 
     @Test
     void shouldReturnAllPacientes() throws Exception {
-        doNothing().when(mediator).notifyTraffic(endpoint);
+        doNothing().when(trafficNotifier).notify(ENDPOINT);
         when(pacienteUseCase.getPacientes()).thenReturn(pacientes);
         when(mapper.domainToResponse(paciente1)).thenReturn(pacienteResponse1);
         when(mapper.domainToResponse(paciente2)).thenReturn(pacienteResponse2);
 
-        mockMvc.perform(get(endpoint))
+        mockMvc.perform(get(ENDPOINT))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.length()").value(2));
@@ -117,7 +89,7 @@ class PacienteControllerTest {
         when(pacienteUseCase.getPacienteById(id)).thenReturn(paciente);
         when(mapper.domainToResponse(paciente)).thenReturn(pacienteResponse);
 
-        mockMvc.perform(get(endpoint + "/buscar-por-id/" + id))
+        mockMvc.perform(get(ENDPOINT + "/" + id))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.nombre").value(pacienteResponse.getNombre()));
@@ -129,7 +101,7 @@ class PacienteControllerTest {
         when(pacienteUseCase.addPaciente(paciente)).thenReturn(paciente);
         when(mapper.domainToResponse(paciente)).thenReturn(pacienteResponse);
 
-        mockMvc.perform(post(endpoint + "/nuevo-paciente")
+        mockMvc.perform(post(ENDPOINT)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(pacienteRequest))
                 .accept(MediaType.APPLICATION_JSON))
@@ -146,7 +118,7 @@ class PacienteControllerTest {
         when(pacienteUseCase.updatePaciente(id, paciente)).thenReturn(paciente);
         when(mapper.domainToResponse(paciente)).thenReturn(pacienteResponse);
 
-        mockMvc.perform(put(endpoint + "/actualizar/" + id)
+        mockMvc.perform(put(ENDPOINT + "/" + id)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(pacienteRequest))
                 .accept(MediaType.APPLICATION_JSON))
@@ -158,17 +130,19 @@ class PacienteControllerTest {
         int id = 1;
         doNothing().when(pacienteUseCase).deletePaciente(id);
 
-        mockMvc.perform(delete(endpoint + "/eliminar/" + id))
-                .andExpect(status().isNoContent());
+        mockMvc.perform(delete(ENDPOINT + "/" + id))
+                .andExpect(status().isNoContent())
+                .andExpect(content().string(""));
+
     }
 
     @Test
     void shouldGetPacienteByDni() throws Exception {
         String dni = "12121212";
-        when(pacienteUseCase.getByDni(dni)).thenReturn(paciente);
+        when(pacienteUseCase.getPacienteByDni(dni)).thenReturn(paciente);
         when(mapper.domainToResponse(paciente)).thenReturn(pacienteResponse);
 
-        mockMvc.perform(get(endpoint + "/dni/" + dni))
+        mockMvc.perform(get(ENDPOINT + "/dni/" + dni))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.nombre").value(paciente.getNombre()));
@@ -177,11 +151,11 @@ class PacienteControllerTest {
     @Test
     void shouldGetPacientesByNombre() throws Exception {
         String nombre = "Jane";
-        when(pacienteUseCase.getPacientesbyName(nombre)).thenReturn(pacientes);
+        when(pacienteUseCase.getPacientesByName(nombre)).thenReturn(pacientes);
         when(mapper.domainToResponse(paciente1)).thenReturn(pacienteResponse1);
         when(mapper.domainToResponse(paciente2)).thenReturn(pacienteResponse2);
 
-        mockMvc.perform(get(endpoint + "/nombre/" + nombre))
+        mockMvc.perform(get(ENDPOINT + "/nombre/" + nombre))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.length()").value(2));
@@ -193,11 +167,11 @@ class PacienteControllerTest {
         int limite = 2;
         int off = 0;
 
-        when(pacienteUseCase.getPacietesbyObraSocial(obraSocial, limite, off)).thenReturn(pacientes);
+        when(pacienteUseCase.getPacientesByObraSocial(obraSocial, limite, off)).thenReturn(pacientes);
         when(mapper.domainToResponse(paciente1)).thenReturn(pacienteResponse1);
         when(mapper.domainToResponse(paciente2)).thenReturn(pacienteResponse2);
 
-        mockMvc.perform(get(endpoint + "/obra-social/" + obraSocial)
+        mockMvc.perform(get(ENDPOINT + "/obra-social/" + obraSocial)
                 .param("limite", String.valueOf(limite))
                 .param("off", String.valueOf(off)))
                 .andExpect(status().isOk())

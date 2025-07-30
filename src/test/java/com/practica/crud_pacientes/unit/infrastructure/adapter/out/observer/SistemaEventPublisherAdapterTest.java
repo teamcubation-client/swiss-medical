@@ -10,6 +10,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
 
+import static com.practica.crud_pacientes.utils.TestConstants.ENDPOINT;
+import static com.practica.crud_pacientes.utils.TestConstants.REQUEST_COUNT;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -30,11 +32,9 @@ class SistemaEventPublisherAdapterTest {
 
     @Test
     void shouldPublishOnAlertaGenerada() {
-        String event = "/pacientes";
-        int requestCount = 200;
-        publisher.publishAlertCreated(event, requestCount);
+        publisher.publishAlertCreated(ENDPOINT, REQUEST_COUNT);
 
-        verify(observer1, times(1)).onAlertaGenerada(event, requestCount);
-        verify(observer2, times(1)).onAlertaGenerada(event, requestCount);
+        verify(observer1, times(1)).onAlertaGenerada(ENDPOINT, REQUEST_COUNT);
+        verify(observer2, times(1)).onAlertaGenerada(ENDPOINT, REQUEST_COUNT);
     }
 }

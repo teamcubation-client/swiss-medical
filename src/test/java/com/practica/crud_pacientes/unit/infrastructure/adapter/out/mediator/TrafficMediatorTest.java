@@ -9,6 +9,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import static com.practica.crud_pacientes.utils.TestConstants.ENDPOINT;
+import static com.practica.crud_pacientes.utils.TestConstants.REQUEST_COUNT;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -25,29 +27,24 @@ class TrafficMediatorTest {
 
     @Test
     void shouldTriggerAndSendAnAlert() {
-        String event = "/pacientes";
-        int requestCount = 300;
         when(trafficMonitor.shouldTriggerAlert()).thenReturn(true);
-        when(trafficMonitor.getRequestCount()).thenReturn(requestCount);
+        when(trafficMonitor.getRequestCount()).thenReturn(REQUEST_COUNT);
 
-        trafficMediator.notifyTraffic(event);
+        trafficMediator.notify(ENDPOINT);
 
         verify(trafficMonitor, times(1)).shouldTriggerAlert();
         verify(trafficMonitor, times(1)).reset();
-        verify(alertService, times(1)).sendAlert(event, requestCount);
+        verify(alertService, times(1)).sendAlert(ENDPOINT, REQUEST_COUNT);
     }
 
     @Test
     void shouldNotTrigger() {
-        String event = "/pacientes";
-        int requestCount = 1;
-
         when(trafficMonitor.shouldTriggerAlert()).thenReturn(false);
 
-        trafficMediator.notifyTraffic(event);
+        trafficMediator.notify(ENDPOINT);
 
         verify(trafficMonitor, times(1)).shouldTriggerAlert();
         verify(trafficMonitor, never()).reset();
-        verify(alertService, never()).sendAlert(event, requestCount);
+        verify(alertService, never()).sendAlert(ENDPOINT, REQUEST_COUNT);
     }
 }

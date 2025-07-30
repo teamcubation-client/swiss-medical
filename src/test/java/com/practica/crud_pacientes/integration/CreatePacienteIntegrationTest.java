@@ -15,11 +15,12 @@ import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
+import static com.practica.crud_pacientes.utils.PacienteTestFactory.buildRequest;
+import static com.practica.crud_pacientes.utils.TestConstants.ENDPOINT;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.time.LocalDate;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -38,27 +39,18 @@ class CreatePacienteIntegrationTest {
     @Test
     @Transactional
     @Rollback
-    void shouldCreatePacienteSuccessfully() throws Exception {
-        PacienteRequest pacienteRequest = new PacienteRequest();
-        pacienteRequest.setNombre("Jane");
-        pacienteRequest.setApellido("Doe");
-        pacienteRequest.setDni("12121212");
-        pacienteRequest.setEmail("jane@gmail.com");
-        pacienteRequest.setObraSocial("Swiss Medical");
-        pacienteRequest.setTelefono("1122334455");
-        pacienteRequest.setDomicilio("Fake Street 123");
-        pacienteRequest.setFechaNacimiento(LocalDate.of(2000, 6, 20));
-        pacienteRequest.setEstadoCivil("Soltera");
+    void shouldReturn201WhenPacienteIsCreatedSuccessfully() throws Exception {
+        PacienteRequest pacienteRequest = buildRequest();
 
-        doReturn(null).when(pacienteRepositoryPort).getByDni("12121212");
+        doReturn(null).when(pacienteRepositoryPort).getPacienteByDni("12121212");
 
 
-        mockMvc.perform(post("/pacientes/nuevo-paciente")
+        mockMvc.perform(post(ENDPOINT)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(pacienteRequest)))
                 .andExpect(status().isCreated());
 
-        verify(pacienteRepositoryPort).getByDni("12121212");
+        verify(pacienteRepositoryPort).getPacienteByDni("12121212");
         verify(pacienteRepositoryPort).save(any(Paciente.class));
     }
 }

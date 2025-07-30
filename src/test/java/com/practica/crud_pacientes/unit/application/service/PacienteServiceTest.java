@@ -13,10 +13,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 
+import static com.practica.crud_pacientes.utils.PacienteTestFactory.buildDomain;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -31,27 +30,17 @@ class PacienteServiceTest {
     @InjectMocks
     private PacienteService pacienteService;
     private Paciente paciente;
+    private List<Paciente> pacientes;
 
     @BeforeEach
     void setUp() {
-        this.paciente = new Paciente();
-        paciente.setNombre("Jane");
-        paciente.setApellido("Doe");
-        paciente.setDni("12121212");
-        paciente.setEmail("jane@gmail.com");
-        paciente.setTelefono("1122334455");
-        paciente.setDomicilio("Fake Street 123");
-        paciente.setFechaNacimiento(LocalDate.of(2000, 6, 20));
-        paciente.setEstadoCivil("Soltera");
+        this.paciente = buildDomain();
+
+        pacientes = List.of(new Paciente(), new Paciente(), new Paciente());
     }
 
     @Test
     void shouldGetAllPacientes() {
-        List<Paciente> pacientes = new ArrayList<>();
-        pacientes.add(new Paciente());
-        pacientes.add(new Paciente());
-        pacientes.add(new Paciente());
-
         when(pacienteRepository.findAll()).thenReturn(pacientes);
 
         List<Paciente> returnedPacientes = pacienteService.getPacientes();
@@ -84,26 +73,26 @@ class PacienteServiceTest {
 
     @Test
     void shouldSavePaciente() {
-        when(pacienteRepository.getByDni(paciente.getDni())).thenReturn(null);
+        when(pacienteRepository.getPacienteByDni(paciente.getDni())).thenReturn(null);
         when(pacienteRepository.save(paciente)).thenReturn(paciente);
         doNothing().when(pacienteEventPublisher).publishPacienteCreado(paciente);
 
         Paciente newPaciente = pacienteService.addPaciente(paciente);
 
         assertEquals(paciente, newPaciente);
-        verify(pacienteRepository, times(1)).getByDni(paciente.getDni());
+        verify(pacienteRepository, times(1)).getPacienteByDni(paciente.getDni());
         verify(pacienteRepository, times(1)).save(paciente);
         verify(pacienteEventPublisher, times(1)).publishPacienteCreado(paciente);
     }
 
     @Test
-    void shouldThrowExceptionWhenSavedPacienteAlreadyExists() {
-        when(pacienteRepository.getByDni(paciente.getDni())).thenReturn(paciente);
+    void shouldThrowDuplicadoExceptionWhenSavedPacienteAlreadyExists() {
+        when(pacienteRepository.getPacienteByDni(paciente.getDni())).thenReturn(paciente);
 
         assertThrows(PacienteDuplicadoException.class, () -> {
             pacienteService.addPaciente(paciente);
         });
-        verify(pacienteRepository, times(1)).getByDni(paciente.getDni());
+        verify(pacienteRepository, times(1)).getPacienteByDni(paciente.getDni());
         verify(pacienteRepository, never()).save(paciente);
         verify(pacienteEventPublisher, never()).publishPacienteCreado(paciente);
     }
@@ -113,19 +102,19 @@ class PacienteServiceTest {
         String newEmail = "jDoe@gmail.com";
         paciente.setEmail(newEmail);
         when(pacienteRepository.findById(paciente.getId())).thenReturn(paciente);
-        when(pacienteRepository.getByDni(paciente.getDni())).thenReturn(paciente);
+        when(pacienteRepository.getPacienteByDni(paciente.getDni())).thenReturn(paciente);
         when(pacienteRepository.save(paciente)).thenReturn(paciente);
 
         Paciente updatedPaciente = pacienteService.updatePaciente(paciente.getId(), paciente);
 
         assertEquals(newEmail, updatedPaciente.getEmail());
         verify(pacienteRepository, times(1)).findById(paciente.getId());
-        verify(pacienteRepository, times(1)).getByDni(paciente.getDni());
+        verify(pacienteRepository, times(1)).getPacienteByDni(paciente.getDni());
         verify(pacienteRepository, times(1)).save(paciente);
     }
 
     @Test
-    void shouldThrowExceptionWhenIdNotFound() {
+    void shouldThrowNoEncontradoExceptionWhenIdNotFound() {
         int id = 23;
         when(pacienteRepository.findById(id)).thenThrow(new PacienteNoEncontradoException());
 
@@ -133,26 +122,26 @@ class PacienteServiceTest {
             pacienteService.updatePaciente(id, paciente);
         });
         verify(pacienteRepository, times(1)).findById(id);
-        verify(pacienteRepository, never()).getByDni(paciente.getDni());
+        verify(pacienteRepository, never()).getPacienteByDni(paciente.getDni());
         verify(pacienteRepository, never()).save(paciente);
     }
 
     @Test
-    void shouldThrowExceptionWhenDniDuplicated() {
+    void shouldThrowDuplicadoExceptionWhenDniDuplicated() {
         paciente.setId(1);
         paciente.setDni("12121212");
         Paciente pacienteExistenteConMismoDni = new Paciente();
         pacienteExistenteConMismoDni.setId(222);
         pacienteExistenteConMismoDni.setDni("12121212");
         when(pacienteRepository.findById(paciente.getId())).thenReturn(paciente);
-        when(pacienteRepository.getByDni(paciente.getDni())).thenReturn(pacienteExistenteConMismoDni);
+        when(pacienteRepository.getPacienteByDni(paciente.getDni())).thenReturn(pacienteExistenteConMismoDni);
 
         assertThrows(PacienteDuplicadoException.class, () -> {
             pacienteService.updatePaciente(1, paciente);
         });
         assertNotEquals(paciente.getId(), pacienteExistenteConMismoDni.getId());
         verify(pacienteRepository, times(1)).findById(paciente.getId());
-        verify(pacienteRepository, times(1)).getByDni(paciente.getDni());
+        verify(pacienteRepository, times(1)).getPacienteByDni(paciente.getDni());
         verify(pacienteRepository, never()).save(paciente);
     }
 
@@ -170,7 +159,7 @@ class PacienteServiceTest {
     }
 
     @Test
-    void shouldThrowExceptionWhenPacienteNotFoundAndNotDelete() {
+    void shouldThrowNoEncontradoExceptionWhenPacienteNotFoundAndNotDelete() {
         int id = 22;
         when(pacienteRepository.findById(id)).thenReturn(null);
 
@@ -185,36 +174,32 @@ class PacienteServiceTest {
     @Test
     void shouldGetPacienteByDni() {
         String dni = "12121212";
-        when(pacienteRepository.getByDni(dni)).thenReturn(paciente);
+        when(pacienteRepository.getPacienteByDni(dni)).thenReturn(paciente);
 
-        Paciente foundPaciente = pacienteService.getByDni(dni);
+        Paciente foundPaciente = pacienteService.getPacienteByDni(dni);
 
         assertEquals(paciente, foundPaciente);
-        verify(pacienteRepository, times(1)).getByDni(dni);
+        verify(pacienteRepository, times(1)).getPacienteByDni(dni);
     }
 
     @Test
-    void shouldThrowExceptionWhenPacienteNotFoundWithDni() {
+    void shouldThrowNoEncontradoExceptionWhenPacienteNotFoundWithDni() {
         String incorrectDni = "11111111";
-        when(pacienteRepository.getByDni(incorrectDni)).thenReturn(null);
+        when(pacienteRepository.getPacienteByDni(incorrectDni)).thenReturn(null);
 
         assertThrows(PacienteNoEncontradoException.class, () -> {
-            pacienteService.getByDni(incorrectDni);
+            pacienteService.getPacienteByDni(incorrectDni);
         });
-        verify(pacienteRepository, times(1)).getByDni(incorrectDni);
+        verify(pacienteRepository, times(1)).getPacienteByDni(incorrectDni);
     }
 
     @Test
     void shouldGetPacientesByNombre() {
-        List<Paciente> pacientes = new ArrayList<>();
-        pacientes.add(new Paciente());
-        pacientes.add(new Paciente());
-        pacientes.add(new Paciente());
         String nombre = "Jane";
 
         when(pacienteRepository.getPacientesByNombre(nombre.toLowerCase())).thenReturn(pacientes);
 
-        List<Paciente> foundPacientes = pacienteService.getPacientesbyName(nombre);
+        List<Paciente> foundPacientes = pacienteService.getPacientesByName(nombre);
 
         assertEquals(pacientes.size(), foundPacientes.size());
         verify(pacienteRepository, times(1)).getPacientesByNombre(nombre.toLowerCase());
@@ -222,19 +207,15 @@ class PacienteServiceTest {
 
     @Test
     void shouldGetPacientesByObraSocial() {
-        List<Paciente> pacientes = new ArrayList<>();
-        pacientes.add(new Paciente());
-        pacientes.add(new Paciente());
-        pacientes.add(new Paciente());
         String obraSocial = "Swiss Medical";
         int limite = 3;
         int off = 0;
 
-        when(pacienteRepository.getPacietesbyObraSocial(obraSocial, limite, off)).thenReturn(pacientes);
+        when(pacienteRepository.getPacientesByObraSocial(obraSocial, limite, off)).thenReturn(pacientes);
 
-        List<Paciente> foundPacientes = pacienteService.getPacietesbyObraSocial(obraSocial, limite, off);
+        List<Paciente> foundPacientes = pacienteService.getPacientesByObraSocial(obraSocial, limite, off);
 
         assertEquals(pacientes.size(), foundPacientes.size());
-        verify(pacienteRepository, times(1)).getPacietesbyObraSocial(obraSocial, limite, off);
+        verify(pacienteRepository, times(1)).getPacientesByObraSocial(obraSocial, limite, off);
     }
 }

@@ -5,6 +5,7 @@ import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
 import com.practica.crud_pacientes.infrastructure.adapter.out.mediator.TrafficMonitor;
 import com.practica.crud_pacientes.infrastructure.adapter.out.observer.SistemaLoggerObserver;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.LoggerFactory;
@@ -14,6 +15,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static com.practica.crud_pacientes.utils.TestConstants.ENDPOINT;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -41,23 +43,28 @@ class TrafficAlertIntegrationTest {
         logger.addAppender(listApprender);
     }
 
+    @AfterEach
+    void tearDown() {
+        logger.detachAppender(listApprender);
+        listApprender.stop();
+    }
+
     @Test
     void shouldTriggerAlertWhenTrafficExceedsThreshold() throws Exception {
-        String endpoint = "/pacientes";
         int threshold = trafficMonitor.getTHRESHOLD();
 
         for (int i = 0; i < threshold; i++) {
-            mockMvc.perform(get(endpoint))
+            mockMvc.perform(get(ENDPOINT))
                     .andExpect(status().isOk());
         }
-        mockMvc.perform(get(endpoint))
+        mockMvc.perform(get(ENDPOINT))
                 .andExpect(status().isOk());
 
         assertThat(listApprender.list)
                 .hasSize(1)
                 .anySatisfy(logEvent -> {
                     assertThat(logEvent.getLevel().toString()).hasToString("WARN");
-                    assertThat(logEvent.getFormattedMessage()).contains("High traffic detected", endpoint, String.valueOf(threshold + 1));
+                    assertThat(logEvent.getFormattedMessage()).contains("High traffic detected", ENDPOINT, String.valueOf(threshold + 1));
                 });
     }
 }

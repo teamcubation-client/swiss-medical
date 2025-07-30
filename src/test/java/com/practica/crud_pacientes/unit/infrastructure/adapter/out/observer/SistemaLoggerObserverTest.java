@@ -8,6 +8,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.LoggerFactory;
 
+import static com.practica.crud_pacientes.utils.TestConstants.ENDPOINT;
+import static com.practica.crud_pacientes.utils.TestConstants.REQUEST_COUNT;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class SistemaLoggerObserverTest {
@@ -26,15 +28,13 @@ class SistemaLoggerObserverTest {
 
     @Test
     void shouldLogAlert() {
-        String event = "/pacientes";
-        int requestCount = 200;
-        observer.onAlertaGenerada(event, requestCount);
+        observer.onAlertaGenerada(ENDPOINT, REQUEST_COUNT);
 
         assertThat(listApprender.list)
                 .hasSize(1)
                 .anySatisfy(logEvent -> {
                     assertThat(logEvent.getLevel().toString()).hasToString("WARN");
-                    assertThat(logEvent.getFormattedMessage()).contains("High traffic detected", "/pacientes", "200");
+                    assertThat(logEvent.getFormattedMessage()).contains("High traffic detected", "/pacientes", String.valueOf(REQUEST_COUNT));
                 });
     }
 }

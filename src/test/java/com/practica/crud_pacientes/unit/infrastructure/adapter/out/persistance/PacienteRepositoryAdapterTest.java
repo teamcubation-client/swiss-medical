@@ -13,11 +13,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static com.practica.crud_pacientes.utils.PacienteTestFactory.buildDomain;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -34,15 +34,7 @@ class PacienteRepositoryAdapterTest {
 
     @BeforeEach
     void setUp() {
-        this.paciente = new Paciente();
-        paciente.setNombre("Jane");
-        paciente.setApellido("Doe");
-        paciente.setDni("12121212");
-        paciente.setEmail("jane@gmail.com");
-        paciente.setTelefono("1122334455");
-        paciente.setDomicilio("Fake Street 123");
-        paciente.setFechaNacimiento(LocalDate.of(2000, 6, 20));
-        paciente.setEstadoCivil("Soltera");
+        this.paciente = buildDomain();
 
         this.pacienteEntity = new PacienteEntity();
     }
@@ -112,7 +104,7 @@ class PacienteRepositoryAdapterTest {
         when(jpaRepository.getByDni(pacienteEntity.getDni())).thenReturn(pacienteEntity);
         when(mapper.entityToDomain(pacienteEntity)).thenReturn(paciente);
 
-        Paciente foundPaciente = pacienteRepositoryAdapter.getByDni(pacienteEntity.getDni());
+        Paciente foundPaciente = pacienteRepositoryAdapter.getPacienteByDni(pacienteEntity.getDni());
 
         assertEquals(paciente, foundPaciente);
         verify(jpaRepository, times(1)).getByDni(pacienteEntity.getDni());
@@ -125,7 +117,7 @@ class PacienteRepositoryAdapterTest {
         when(jpaRepository.getByDni(dni)).thenReturn(null);
         when(mapper.entityToDomain(null)).thenReturn(null);
 
-        Paciente foundPaciente = pacienteRepositoryAdapter.getByDni(dni);
+        Paciente foundPaciente = pacienteRepositoryAdapter.getPacienteByDni(dni);
 
         assertNull(foundPaciente);
         verify(jpaRepository, times(1)).getByDni(dni);
@@ -174,7 +166,7 @@ class PacienteRepositoryAdapterTest {
         when(mapper.entityToDomain(pacienteEntity1)).thenReturn(paciente1);
         when(mapper.entityToDomain(pacienteEntity2)).thenReturn(paciente2);
 
-        List<Paciente> pacientes = pacienteRepositoryAdapter.getPacietesbyObraSocial(obraSocial, limite, off);
+        List<Paciente> pacientes = pacienteRepositoryAdapter.getPacientesByObraSocial(obraSocial, limite, off);
 
         assertEquals(2, pacientes.size());
         verify(jpaRepository, times(1)).getPacietesbyObraSocial(obraSocial, limite, off);

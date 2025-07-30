@@ -8,6 +8,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import static com.practica.crud_pacientes.utils.TestConstants.ENDPOINT;
+import static com.practica.crud_pacientes.utils.TestConstants.REQUEST_COUNT;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -22,11 +24,8 @@ class AlertServiceTest {
 
     @Test
     void shouldSendAlert() {
-        String event = "/pacientes";
-        int requestCount = 10;
+        alertService.sendAlert(ENDPOINT, REQUEST_COUNT);
 
-        alertService.sendAlert(event, requestCount);
-
-        verify(publisher, times(1)).publishAlertCreated(event, requestCount);
+        verify(publisher, times(1)).publishAlertCreated(ENDPOINT, REQUEST_COUNT);
     }
 }
