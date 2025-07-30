@@ -46,7 +46,7 @@ class PatientServiceTest {
     private PatientExporterPortOut patientExporter;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         this.patientService = new PatientService(this.patientRepository, exporterFactoryProvider);
     }
 

@@ -10,6 +10,9 @@ import com.teamcubation.api.pacientes.shared.exception.PatientDniAlreadyInUseExc
 import com.teamcubation.api.pacientes.shared.exception.PatientNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,7 +44,7 @@ class PatientControllerTest {
     private String baseURL;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         MockitoAnnotations.openMocks(this);
         this.objectMapper = new ObjectMapper();
         this.baseURL = "/v1/pacientes";
@@ -188,36 +191,12 @@ class PatientControllerTest {
                 .andExpect(status().isBadRequest());
     }
 
-    @Test
-    void createPatientWithMissingDni_ShouldReturn400() throws Exception {
+    @ParameterizedTest
+    @NullSource
+    @ValueSource(strings = {"12AB5678", "1267"})
+    void createPatientWithInvalidDni_ShouldReturn400(String invalidDni) throws Exception {
         PatientRequest request = new PatientRequestBuilder()
-                .withDni(null)
-                .build();
-
-        mockMvc.perform(post(baseURL)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request))
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    void createPatientWithInvalidDniLetters_ShouldReturn400() throws Exception {
-        PatientRequest request = new PatientRequestBuilder()
-                .withDni("12AB5678")
-                .build();
-
-        mockMvc.perform(post(baseURL)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request))
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    void createPatientWithInvalidDniLength_ShouldReturn400() throws Exception {
-        PatientRequest request = new PatientRequestBuilder()
-                .withDni("1267")
+                .withDni(invalidDni)
                 .build();
 
         mockMvc.perform(post(baseURL)
@@ -481,30 +460,9 @@ class PatientControllerTest {
                 .andExpect(jsonPath("$.data[0].name").value(nameFilter));
     }
 
-    @Test
-    void getAllWithInvalidDniFilter_ShouldReturn400() throws Exception {
-        String invalidDni = "12AB5678";
-
-        mockMvc.perform(get(baseURL)
-                        .param("dni", invalidDni)
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    void getAllWithInvalidDniFilterLength_ShouldReturn400() throws Exception {
-        String invalidDni = "123456";
-
-        mockMvc.perform(get(baseURL)
-                        .param("dni", invalidDni)
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    void getAllWithInvalidDniEmptyFilter_ShouldReturn400() throws Exception {
-        String invalidDni = "";
-
+    @ParameterizedTest
+    @ValueSource(strings = {"12AB5678", "123456", ""})
+    void getAllWithInvalidDniFilter_ShouldReturn400(String invalidDni) throws Exception {
         mockMvc.perform(get(baseURL)
                         .param("dni", invalidDni)
                         .accept(MediaType.APPLICATION_JSON))

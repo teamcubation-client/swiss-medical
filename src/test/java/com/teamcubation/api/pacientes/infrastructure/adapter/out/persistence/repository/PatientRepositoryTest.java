@@ -5,6 +5,8 @@ import com.teamcubation.api.pacientes.infrastructure.adapter.out.persistence.ent
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.ActiveProfiles;
@@ -166,7 +168,6 @@ class PatientRepositoryTest {
         verify(this.jpaRepositoryMock).findByHealthInsuranceProvider(provider, limit, offset);
     }
 
-
     @Test
     void findByHealthInsuranceProvider_ShouldReturnEmptyList() {
         String provider = "NO_EXISTE";
@@ -181,11 +182,13 @@ class PatientRepositoryTest {
         verify(this.jpaRepositoryMock).findByHealthInsuranceProvider(provider, limit, offset);
     }
 
-    @Test
-    void findByNonExistentHealthInsuranceProvider_ShouldReturnEmptyList() {
-        String provider = "NoExiste";
-        int limit = 5, offset = 0;
-
+    @ParameterizedTest
+    @CsvSource({
+            "NoExiste, 5, 0",
+            "OSDE, 5, 999",
+            "OSDE, 0, 0"
+    })
+    void findByHealthInsuranceProvider_ShouldReturnEmptyList(String provider, int limit, int offset) {
         when(this.jpaRepositoryMock.findByHealthInsuranceProvider(provider, limit, offset))
                 .thenReturn(Collections.emptyList());
 
@@ -224,32 +227,6 @@ class PatientRepositoryTest {
                 .thenReturn(Collections.emptyList());
 
         List<Patient> result = this.patientRepository.findByHealthInsuranceProvider("", 5, 0);
-
-        assertTrue(result.isEmpty());
-    }
-
-    @Test
-    void findByHealthInsuranceProvider_OffsetBeyondRange_ShouldReturnEmptyList() {
-        String provider = "OSDE";
-        int limit = 5, offset = 999;
-
-        when(this.jpaRepositoryMock.findByHealthInsuranceProvider(provider, limit, offset))
-                .thenReturn(Collections.emptyList());
-
-        List<Patient> result = this.patientRepository.findByHealthInsuranceProvider(provider, limit, offset);
-
-        assertTrue(result.isEmpty());
-    }
-
-    @Test
-    void findByHealthInsuranceProvider_LimitZero_ShouldReturnEmptyList() {
-        String provider = "OSDE";
-        int limit = 0, offset = 0;
-
-        when(this.jpaRepositoryMock.findByHealthInsuranceProvider(provider, limit, offset))
-                .thenReturn(Collections.emptyList());
-
-        List<Patient> result = this.patientRepository.findByHealthInsuranceProvider(provider, limit, offset);
 
         assertTrue(result.isEmpty());
     }
