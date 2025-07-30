@@ -55,7 +55,6 @@ class PatientControllerIntegrationTest {
                 creationResult.getResponse().getContentAsString(),
                 PatientResponse.class
         );
-
         Long idPatient = createdPatient.getId();
 
         mockMvc.perform(get("/api/patients/dni/{dni}", "87654321"))
@@ -124,22 +123,22 @@ class PatientControllerIntegrationTest {
                 .andExpect(status().isNoContent());
     }
 
-    private void createTestPatient(String firstName, String lastName, String dni) throws Exception {
-        PatientRequest patient = PatientRequest.builder()
-                .firstName(firstName)
-                .lastName(lastName)
+    private void createTestPatient(String nombre, String apellido, String dni) throws Exception {
+        PatientRequest paciente = PatientRequest.builder()
+                .firstName(nombre)
+                .lastName(apellido)
                 .dni(dni)
                 .birthDate(LocalDate.of(1990, 1, 1))
                 .healthInsurance("SWISS")
                 .healthPlan("Basico")
                 .address("Calle 123")
                 .phoneNumber("1122334455")
-                .email(firstName.toLowerCase() + "@mail.com")
+                .email(nombre.toLowerCase() + "@mail.com")
                 .build();
 
         mockMvc.perform(post("/api/patients")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(patient)))
+                        .content(objectMapper.writeValueAsString(paciente)))
                 .andExpect(status().isCreated());
     }
 }

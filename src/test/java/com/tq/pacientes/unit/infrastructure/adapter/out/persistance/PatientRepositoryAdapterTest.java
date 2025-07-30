@@ -13,6 +13,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Deque;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
@@ -139,11 +141,11 @@ class PatientRepositoryAdapterTest {
         when(repositoryJpa.findByFirstNameContainingIgnoreCase("Juan"))
                 .thenReturn(entities);
 
-        List<Patient> patients = adapter.searchByFirstName("Juan");
+        Deque<Patient> patients = new LinkedList<>(adapter.searchByFirstName("Juan"));
 
         assertAll(
                 () -> assertFalse(patients.isEmpty()),
-                () -> assertEquals("Juan", patients.get(0).getFirstName()),
+                () -> assertEquals("Juan", patients.getFirst().getFirstName()),
                 () -> verify(repositoryJpa, times(1)).findByFirstNameContainingIgnoreCase("Juan")
         );
     }
@@ -154,11 +156,11 @@ class PatientRepositoryAdapterTest {
         when(repositoryJpa.findByHealthInsurancePaginated("OSDE", 10, 0))
                 .thenReturn(entities);
 
-        List<Patient> patients = adapter.searchByHealthInsurancePaginated("OSDE", 10, 0);
+        Deque<Patient> patients = new LinkedList<>(adapter.searchByHealthInsurancePaginated("OSDE", 10, 0));
 
         assertAll(
                 () -> assertFalse(patients.isEmpty()),
-                () -> assertEquals("OSDE", patients.get(0).getHealthInsurance()),
+                () -> assertEquals("OSDE", patients.getFirst().getHealthInsurance()),
                 () -> verify(repositoryJpa, times(1)).findByHealthInsurancePaginated("OSDE", 10, 0)
         );
     }

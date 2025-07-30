@@ -13,7 +13,8 @@ import org.springframework.test.context.jdbc.Sql;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.Deque;
+import java.util.LinkedList;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -57,17 +58,18 @@ class PatientPersistenceAdapterIntegrationTest {
 
     @Test
     void findByFirstNameContainingIgnoreCase_ShouldReturnMatchingPatients() {
-        List<PatientEntity> results = patientRepository.findByFirstNameContainingIgnoreCase("ju");
+        Deque<PatientEntity> expected = new LinkedList<>(patientRepository.findByFirstNameContainingIgnoreCase("ju"));
 
-        assertThat(results).isNotEmpty();
-        assertThat(results.get(0).getFirstName()).containsIgnoringCase("ju");
+        assertThat(expected).isNotEmpty();
+        assertThat(expected.getFirst().getFirstName()).containsIgnoringCase("ju");
     }
 
     @Test
     void findByHealthInsurancePaginated_ShouldReturnPaginatedResults() {
-        List<PatientEntity> results = patientRepository.findByHealthInsurancePaginated("SWISS", 10, 0);
 
-        assertThat(results).isNotEmpty();
-        assertThat(results.get(0).getHealthInsurance()).isEqualTo("SWISS");
+        Deque<PatientEntity> expected = new LinkedList<>(patientRepository.findByHealthInsurancePaginated("SWISS", 10, 0));
+
+        assertThat(expected).isNotEmpty();
+        assertThat(expected.getFirst().getHealthInsurance()).isEqualTo("SWISS");
     }
 }

@@ -16,6 +16,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.Deque;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
@@ -82,10 +84,10 @@ class PatientServiceTest {
         List<Patient> patients = List.of(patient);
         when(repository.findAll()).thenReturn(patients);
 
-        List<Patient> result = service.getAll();
+        Deque<Patient> patientsDeque = new LinkedList<>(service.getAll());
 
-        assertEquals(1, result.size());
-        assertEquals("Juan", result.get(0).getFirstName());
+        assertEquals(1, patientsDeque.size());
+        assertEquals("Juan", patientsDeque.getFirst().getFirstName());
 
         verify(repository, times(1)).findAll();
     }
@@ -138,10 +140,10 @@ class PatientServiceTest {
     void shouldReturnPatientsByFirstName() {
         when(repository.searchByFirstName("Juan")).thenReturn(List.of(patient));
 
-        List<Patient> result = service.searchByFirstName("Juan");
+        Deque<Patient> patients = new LinkedList<>(service.searchByFirstName("Juan"));
 
-        assertEquals(1, result.size());
-        assertEquals("Juan", result.get(0).getFirstName());
+        assertEquals(1, patients.size());
+        assertEquals("Juan", patients.getFirst().getFirstName());
 
         verify(repository, times(1)).searchByFirstName("Juan");
     }
@@ -151,10 +153,10 @@ class PatientServiceTest {
         when(repository.searchByHealthInsurancePaginated(eq("OSDE"), eq(10), eq(0)))
                 .thenReturn(List.of(patient));
 
-        List<Patient> result = service.searchByHealthInsurancePaginated("OSDE", 10, 0);
+        Deque<Patient> deque = new LinkedList<>(service.searchByHealthInsurancePaginated("OSDE", 10, 0));
 
-        assertEquals(1, result.size());
-        assertEquals("Juan", result.get(0).getFirstName());
+        assertEquals(1, deque.size());
+        assertEquals("Juan", deque.getFirst().getFirstName());
 
         verify(repository, times(1)).searchByHealthInsurancePaginated(eq("OSDE"), eq(10), eq(0));
     }
@@ -166,7 +168,7 @@ class PatientServiceTest {
         updates.setDni("12345678");
 
         when(repository.findById(1L)).thenReturn(Optional.of(patient));
-        when(repository.update(any(Patient.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(repository.update(any(Patient.class))).thenReturn(updates);
 
         Patient updated = service.update(1L, updates);
 
@@ -184,12 +186,12 @@ class PatientServiceTest {
         updates.setHealthInsurance("OSDE");
         updates.setHealthPlan("310");
         updates.setAddress("Calle Falsa 123");
-        updates.setEmail("carlos@example.com");
+        updates.setEmail("carlos@mail.com");
         updates.setPhoneNumber("123456789");
 
         when(repository.findById(1L)).thenReturn(Optional.of(patient));
         when(repository.findByDni("99999999")).thenReturn(Optional.empty());
-        when(repository.update(any())).thenAnswer(inv -> inv.getArgument(0));
+        when(repository.update(any(Patient.class))).thenReturn(updates);
 
         Patient updated = service.update(1L, updates);
 
@@ -199,7 +201,7 @@ class PatientServiceTest {
         assertEquals("OSDE", updated.getHealthInsurance());
         assertEquals("310", updated.getHealthPlan());
         assertEquals("Calle Falsa 123", updated.getAddress());
-        assertEquals("carlos@example.com", updated.getEmail());
+        assertEquals("carlos@mail.com", updated.getEmail());
         assertEquals("123456789", updated.getPhoneNumber());
 
         verify(repository, times(1)).findByDni("99999999");
@@ -225,7 +227,7 @@ class PatientServiceTest {
         updates.setFirstName("Mario");
 
         when(repository.findById(1L)).thenReturn(Optional.of(patient));
-        when(repository.update(any())).thenAnswer(inv -> inv.getArgument(0));
+        when(repository.update(any())).thenReturn(updates);
 
         Patient updated = service.update(1L, updates);
 
@@ -249,7 +251,6 @@ class PatientServiceTest {
         when(repository.findById(1L)).thenReturn(Optional.of(patient));
 
         service.delete(1L);
-
         assertFalse(patient.getActive());
 
         verify(repository, times(1)).update(patient);
