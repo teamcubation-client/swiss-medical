@@ -32,7 +32,7 @@ class PacienteUpdaterImplTest {
     private PacienteUpdaterImpl pacienteUpdater;
 
     @Test
-    void updateValidPaciente() {
+    void shouldUpdatePaciente_whenUpdateValidPaciente() {
         UpdatePacienteCommand command = new UpdatePacienteCommand("Agustin", "Gonzalez", "Swiss Medical", "agus@gmail.com", "123123123");
         Paciente paciente = new Paciente("12345678", "Juan", "Perez", "OSDE", "juan.perez@gmail.com", "123456789");
 
@@ -48,7 +48,7 @@ class PacienteUpdaterImplTest {
     }
 
     @Test
-    void updateInvalidPaciente() {
+    void shouldThrowException_whenUpdateInvalidPaciente() {
         UpdatePacienteCommand command = new UpdatePacienteCommand("J1an", "Pere3z", "OSDE", "juan.perezgmailcom", "123123123456789");
         Paciente paciente = new Paciente("12345678", "Juan", "Perez", "OSDE", "juan.perez@gmail.com", "123456789");
         doThrow(new PacienteArgumentoInvalido("Argumento inválido")).when(pacienteValidator).validate(paciente);

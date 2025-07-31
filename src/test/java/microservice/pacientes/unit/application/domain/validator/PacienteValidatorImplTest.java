@@ -44,7 +44,7 @@ class PacienteValidatorImplTest {
 
     @Test
     @DisplayName("Debería validar exitosamente cuando todas las reglas pasan")
-    void validateValidPaciente() {
+    void shouldValidateSuccessfully_whenAllRulesPass() {
         doNothing().when(rule1).validate(paciente);
         doNothing().when(rule2).validate(paciente);
         doNothing().when(rule3).validate(paciente);
@@ -58,7 +58,7 @@ class PacienteValidatorImplTest {
 
     @Test
     @DisplayName("Debería lanzar excepción cuando la primera regla falla")
-    void validateInvalidPacienteRule1() {
+    void shouldThrowException_whenFirstRuleFails() {
         PacienteArgumentoInvalido exception = new PacienteArgumentoInvalido("Argumento invalido en regla 1");
         doThrow(exception).when(rule1).validate(paciente);
 
@@ -75,7 +75,7 @@ class PacienteValidatorImplTest {
 
     @Test
     @DisplayName("Debería lanzar excepción cuando la segunda regla falla")
-    void validateInvalidPacienteRule2() {
+    void shouldThrowException_whenSecondRuleFails() {
         doNothing().when(rule1).validate(paciente);
         PacienteArgumentoInvalido exception = new PacienteArgumentoInvalido("Argumento invalido en regla 2");
         doThrow(exception).when(rule2).validate(paciente);
@@ -93,7 +93,7 @@ class PacienteValidatorImplTest {
 
     @Test
     @DisplayName("Debería lanzar excepción cuando la última regla falla")
-    void validateInvalidPacienteRule3() {
+    void shouldThrowException_whenLastRuleFails() {
         doNothing().when(rule1).validate(paciente);
         doNothing().when(rule2).validate(paciente);
         PacienteArgumentoInvalido exception = new PacienteArgumentoInvalido("Argumento invalido en regla 3");
@@ -112,7 +112,7 @@ class PacienteValidatorImplTest {
 
     @Test
     @DisplayName("Debería manejar correctamente una lista vacía de reglas")
-    void validateValidPacienteWithoutRules() {
+    void shouldHandleEmptyRuleList_whenValidateValidPacienteWithoutRules() {
         PacienteValidatorImpl emptyValidator = new PacienteValidatorImpl(Collections.emptyList());
 
         assertDoesNotThrow(() -> emptyValidator.validate(paciente));

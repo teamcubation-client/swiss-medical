@@ -72,7 +72,7 @@ public class PacienteControllerTest {
 
     @Test
     @DisplayName("Debería obtener correctamente una lista de pacientes")
-    void getAll() throws Exception {
+    void shouldReturnListOfPacientes_whenGetAll() throws Exception {
         Paciente paciente = createPacienteValid();
 
         when(findPacienteUseCase.getAll()).thenReturn(List.of(paciente));
@@ -88,7 +88,7 @@ public class PacienteControllerTest {
 
     @Test
     @DisplayName("Debería obtener correctamente una lista de pacientes con nombre")
-    void getAllWithNombre() throws Exception {
+    void shouldReturnListOfPacientesWithNombre_whenGetAllWithNombre() throws Exception {
         Paciente paciente = createPacienteValid();
         when(findPacienteUseCase.getByNombreContainingIgnoreCase(NOMBRE_VALID)).thenReturn(List.of(paciente));
 
@@ -103,7 +103,7 @@ public class PacienteControllerTest {
 
     @Test
     @DisplayName("Debería obtener correctamente un paciente")
-    void getByDniValid() throws Exception {
+    void shouldReturnPaciente_whenGetByDniValid() throws Exception {
         Paciente paciente = createPacienteValid();
 
         when(findPacienteUseCase.getByDni(DNI_VALID)).thenReturn(paciente);
@@ -119,7 +119,7 @@ public class PacienteControllerTest {
 
     @Test
     @DisplayName("Debería lanzar una excepción al intentar obtener un paciente inexistente")
-    void getByDniInvalid() throws Exception {
+    void shouldThrowException_whenGetByDniInvalid() throws Exception {
 
         when(findPacienteUseCase.getByDni(DNI_NO_VALID)).thenThrow(new PacienteNoEncontradoException());
 
@@ -132,7 +132,7 @@ public class PacienteControllerTest {
 
     @Test
     @DisplayName("Debería obtener correctamente un paciente")
-    void createValidPaciente() throws Exception {
+    void shouldCreateValidPaciente_whenCreateValidPaciente() throws Exception {
         String jsonBody = String.format(
                 "{\"dni\": \"%s\", \"nombre\": \"%s\", \"apellido\": \"%s\", \"obraSocial\": \"%s\"}",
                 DNI_VALID, NOMBRE_VALID, APELLIDO_VALID, OBRA_SOCIAL
@@ -156,7 +156,7 @@ public class PacienteControllerTest {
     @ParameterizedTest
     @MethodSource("invalidPacienteProvider")
     @DisplayName("Debería lanzar una excepción al intentar crear un paciente con datos inválidos")
-    void createInvalidPaciente(String pacienteDTO) throws Exception {
+    void shouldThrowException_whenCreateInvalidPaciente(String pacienteDTO) throws Exception {
         mockMvc.perform(post("/pacientes")
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(pacienteDTO))
@@ -175,7 +175,7 @@ public class PacienteControllerTest {
 
     @Test
     @DisplayName("Debería lanzar excepción cuando intenta crear un paciente existente")
-    void createExistsPaciente() throws Exception {
+    void shouldThrowException_whenCreateExistsPaciente() throws Exception {
         String jsonBody = String.format(
                 "{\"dni\": \"%s\", \"nombre\": \"%s\", \"apellido\": \"%s\", \"obraSocial\": \"%s\"}",
                 DNI_VALID, NOMBRE_VALID, APELLIDO_VALID, OBRA_SOCIAL
@@ -193,7 +193,7 @@ public class PacienteControllerTest {
 
     @Test
     @DisplayName("Debería actualizar correctamente un paciente")
-    void updateValidPaciente() throws Exception {
+    void shouldUpdateValidPaciente_whenUpdateValidPaciente() throws Exception {
         String jsonBody = String.format(
                 "{\"nombre\": \"%s\", \"apellido\": \"%s\", \"obraSocial\": \"%s\"}",
                 UPDATE_NOMBRE_VALID, UPDATE_APELLIDO_VALID, UPDATE_OBRA_SOCIAL_VALID
@@ -216,7 +216,7 @@ public class PacienteControllerTest {
 
     @Test
     @DisplayName("Debería lanzar una excepción al intentar actualizar un paciente con datos inválidos")
-    void updateInvalidPaciente() throws Exception {
+    void shouldThrowException_whenUpdateInvalidPaciente() throws Exception {
         String jsonBody = String.format(
                 "{\"nombre\": \"%s\", \"apellido\": \"%s\"}",
                 NOMBRE_NO_VALID, APELLIDO_NO_VALID
@@ -232,7 +232,7 @@ public class PacienteControllerTest {
 
     @Test
     @DisplayName("Debería lanzar una excepción al intentar actualizar un paciente inexistente")
-    void updateNoExistsPaciente() throws Exception {
+    void shouldThrowException_whenUpdateNoExistsPaciente() throws Exception {
         String jsonBody = String.format(
                 "{\"nombre\": \"%s\", \"apellido\": \"%s\", \"obraSocial\": \"%s\"}",
                 UPDATE_NOMBRE_VALID, UPDATE_APELLIDO_VALID, UPDATE_OBRA_SOCIAL_VALID
@@ -251,7 +251,7 @@ public class PacienteControllerTest {
 
     @Test
     @DisplayName("Debería eliminar correctamente un paciente")
-    void deleteExistsPaciente() throws Exception {
+    void shouldDeletePaciente_whenDeleteExistsPaciente() throws Exception {
         mockMvc.perform(delete(BASE_URL+"/"+DNI_VALID))
                 .andExpect(status().isNoContent());
         verify(deletePacienteUseCase, times(1)).delete(DNI_VALID);
@@ -259,7 +259,7 @@ public class PacienteControllerTest {
 
     @Test
     @DisplayName("Debería lanzar una excepción al intentar eliminar un paciente inexistente")
-    void deleteNoExistsPaciente() throws Exception {
+    void shouldThrowException_whenDeleteNoExistsPaciente() throws Exception {
         doThrow(new PacienteNoEncontradoException()).when(deletePacienteUseCase).delete(DNI_VALID);
 
         mockMvc.perform(delete(BASE_URL+"/"+DNI_VALID))
@@ -271,7 +271,7 @@ public class PacienteControllerTest {
 
     @Test
     @DisplayName("Debería obtener correctamente un paciente por dni con SP")
-    void getByDniSPValid() throws Exception {
+    void shouldReturnPacienteByDni_whenGetByDniSPValid() throws Exception {
         Paciente paciente = createPacienteValid();
 
         when(findPacienteUseCase.getByDni(DNI_VALID)).thenReturn(paciente);
@@ -287,7 +287,7 @@ public class PacienteControllerTest {
 
     @Test
     @DisplayName("Debería lanzar una excepción al intentar obtener un paciente inexistente por dni con SP")
-    void getByDniSPInvalid() throws Exception {
+    void shouldThrowException_whenGetByDniSPInvalid() throws Exception {
         when(findPacienteUseCase.getByDni(DNI_VALID)).thenThrow(new PacienteNoEncontradoException());
 
         mockMvc.perform(get(BASE_URL+"/dni/"+DNI_VALID))
@@ -299,7 +299,7 @@ public class PacienteControllerTest {
 
     @Test
     @DisplayName("Debería obtener correctamente un paciente por nombre con SP")
-    void getByNombreValid() throws Exception {
+    void shouldReturnPacienteByNombre_whenGetByNombreValid() throws Exception {
         Paciente paciente = createPacienteValid();
 
         when(findPacienteUseCase.getByNombre(NOMBRE_VALID)).thenReturn(paciente);
@@ -315,7 +315,7 @@ public class PacienteControllerTest {
 
     @Test
     @DisplayName("Debería lanzar una excepción al intentar obtener un paciente inexistente por nombre con SP")
-    void getByNombreInvalid() throws Exception {
+    void shouldThrowException_whenGetByNombreInvalid() throws Exception {
         when(findPacienteUseCase.getByNombre(NOMBRE_VALID)).thenThrow(new PacienteNoEncontradoException());
 
         mockMvc.perform(get(BASE_URL+"/nombre/"+NOMBRE_VALID))
@@ -327,7 +327,7 @@ public class PacienteControllerTest {
 
     @Test
     @DisplayName("Debería obtener correctamente una lista de pacientes por obra social con SP")
-    void getByObraSocialValid() throws Exception {
+    void shouldReturnListOfPacientesByObraSocial_whenGetByObraSocialValid() throws Exception {
         Paciente paciente = createPacienteValid();
 
         when(findPacienteUseCase.getByObraSocial(OBRA_SOCIAL, 10, 0)).thenReturn(List.of(paciente));
@@ -343,7 +343,7 @@ public class PacienteControllerTest {
 
     @Test
     @DisplayName("Debería devolver una lista vacía al buscar pacientes por obra social con SP y no encontrar ninguno")
-    void getByObraSocialNoExists() throws Exception {
+    void shouldReturnEmptyList_whenSearchByObraSocialAndFindNone() throws Exception {
         when(findPacienteUseCase.getByObraSocial(OBRA_SOCIAL, 10, 0)).thenReturn(List.of());
 
         mockMvc.perform(get(BASE_URL+"/obra_social?obraSocial="+OBRA_SOCIAL+"&page=1&size=10"))

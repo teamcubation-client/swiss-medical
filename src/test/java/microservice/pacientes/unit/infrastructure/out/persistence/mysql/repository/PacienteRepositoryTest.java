@@ -49,7 +49,7 @@ public class PacienteRepositoryTest {
 
     @Test
     @DisplayName("Debería devolver todos los pacientes")
-    void getAll() {
+    void shouldReturnAllPacientes_whenGetAll() {
         when(jpaPacienteRepository.findAll()).thenReturn(List.of(pacienteEntity));
         when(pacienteEntityMapper.toDomain(anyList())).thenReturn(List.of(paciente));
 
@@ -63,7 +63,7 @@ public class PacienteRepositoryTest {
 
     @Test
     @DisplayName("Debería devolver un paciente por DNI si existe")
-    void getByDniExists() {
+    void shouldReturnPaciente_whenGetByDniExists() {
         when(jpaPacienteRepository.findByDni("12345678")).thenReturn(Optional.of(pacienteEntity));
         when(pacienteEntityMapper.toDomain(pacienteEntity)).thenReturn(paciente);
 
@@ -76,7 +76,7 @@ public class PacienteRepositoryTest {
 
     @Test
     @DisplayName("Debería devolver un Optional vacío si el paciente con el DNI dado no existe")
-    void getByDniNoExists() {
+    void shouldReturnEmptyOptional_whenGetByDniNoExists() {
         when(jpaPacienteRepository.findByDni("12345678")).thenReturn(Optional.empty());
 
         Optional<Paciente> result = pacienteRepository.getByDni("12345678");
@@ -87,7 +87,7 @@ public class PacienteRepositoryTest {
 
     @Test
     @DisplayName("Debería devolver una lista de pacientes por nombre")
-    void getByNombreContainingIgnoreCase() {
+    void shouldReturnPacientes_whenGetByNombreContainingIgnoreCase() {
         when(jpaPacienteRepository.findByNombreContainingIgnoreCase("John")).thenReturn(List.of(pacienteEntity));
         when(pacienteEntityMapper.toDomain(anyList())).thenReturn(List.of(paciente));
 
@@ -100,7 +100,7 @@ public class PacienteRepositoryTest {
 
     @Test
     @DisplayName("Debería guardar un paciente")
-    void save() {
+    void shouldSavePaciente_whenSave() {
         when(pacienteEntityMapper.toEntity(paciente)).thenReturn(pacienteEntity);
 
         Paciente result = pacienteRepository.save(paciente);
@@ -111,7 +111,7 @@ public class PacienteRepositoryTest {
 
     @Test
     @DisplayName("Debería eliminar un paciente")
-    void delete() {
+    void shouldDeletePaciente_whenDelete() {
         when(pacienteEntityMapper.toEntity(paciente)).thenReturn(pacienteEntity);
 
         pacienteRepository.delete(paciente);
@@ -121,7 +121,7 @@ public class PacienteRepositoryTest {
 
     @Test
     @DisplayName("Debería devolver un paciente por nombre con SP si existe")
-    void getByNombreExists() {
+    void shouldReturnPaciente_whenGetByNombreExists() {
         when(jpaPacienteRepository.findByNombreSP("John")).thenReturn(Optional.of(pacienteEntity));
         when(pacienteEntityMapper.toDomain(pacienteEntity)).thenReturn(paciente);
 
@@ -134,7 +134,7 @@ public class PacienteRepositoryTest {
 
     @Test
     @DisplayName("Debería devolver un Optional vacío si el paciente con el nombre dado no existe con SP")
-    void getByNombreNoExists() {
+    void shouldReturnEmptyOptional_whenGetByNombreNoExists() {
         when(jpaPacienteRepository.findByNombreSP("John")).thenReturn(Optional.empty());
 
         Optional<Paciente> result = pacienteRepository.getByNombre("John");
@@ -145,7 +145,7 @@ public class PacienteRepositoryTest {
 
     @Test
     @DisplayName("Debería devolver una lista de pacientes por obra social con SP")
-    void getByObraSocial() {
+    void shouldReturnPacientes_whenGetByObraSocial() {
         when(jpaPacienteRepository.findByObraSocialSP("Some OS", 10, 0)).thenReturn(List.of(pacienteEntity));
         when(pacienteEntityMapper.toDomain(anyList())).thenReturn(List.of(paciente));
 
@@ -158,7 +158,7 @@ public class PacienteRepositoryTest {
 
     @Test
     @DisplayName("Debería devolver verdadero si el paciente con el DNI dado existe")
-    void existsByDni() {
+    void shouldReturnTrue_whenExistsByDni() {
         when(jpaPacienteRepository.existsByDni("12345678")).thenReturn(true);
 
         boolean result = pacienteRepository.existsByDni("12345678");
@@ -169,7 +169,7 @@ public class PacienteRepositoryTest {
 
     @Test
     @DisplayName("Debería devolver falso si el paciente con el DNI dado no existe")
-    void notExistsByDni() {
+    void shouldReturnFalse_whenNotExistsByDni() {
         when(jpaPacienteRepository.existsByDni("12345678")).thenReturn(false);
 
         boolean result = pacienteRepository.existsByDni("12345678");

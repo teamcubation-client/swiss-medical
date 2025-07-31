@@ -32,7 +32,7 @@ public class PacienteFactoryImplTest {
     @ParameterizedTest
     @MethodSource("validPacientesProvider")
     @DisplayName("Debería crear un paciente válido")
-    void createValidPaciente(String dni, String nombre, String apellido, String obraSocial, String email, String telefono) {
+    void shouldCreateValidPaciente_whenCreateValidPaciente(String dni, String nombre, String apellido, String obraSocial, String email, String telefono) {
         Paciente paciente = pacienteFactory.create(dni, nombre, apellido, obraSocial, email, telefono);
 
         assertEquals(dni, paciente.getDni());
@@ -52,7 +52,7 @@ public class PacienteFactoryImplTest {
 
     @ParameterizedTest
     @MethodSource("invalidPacienteArgumentsProvider")
-    void createPacienteInvalidCases(
+    void shouldThrowException_whenCreatePacienteWithInvalidArguments(
             String dni,
             String nombre,
             String apellido,

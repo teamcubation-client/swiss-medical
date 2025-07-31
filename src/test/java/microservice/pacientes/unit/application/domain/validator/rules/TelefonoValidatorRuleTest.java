@@ -26,7 +26,7 @@ public class TelefonoValidatorRuleTest {
 
     @Test
     @DisplayName("Debería validar un teléfono válido de 9 dígitos")
-    void validateValidTelefono() {
+    void shouldValidateSuccessfully_whenTelefonoIsValid() {
         Paciente paciente = Paciente.builder().telefono("123456789").build();
         assertDoesNotThrow(() -> telefonoValidatorRule.validate(paciente));
     }
@@ -46,7 +46,7 @@ public class TelefonoValidatorRuleTest {
 
     })
     @DisplayName("Debería lanzar excepción para teléfono inválido")
-    void validateTelefonoWithLessThan9Digits(String invalidTelefono) {
+    void shouldThrowException_whenTelefonoIsInvalid(String invalidTelefono) {
         Paciente paciente = Paciente.builder().telefono(invalidTelefono).build();
         PacienteArgumentoInvalido exception = assertThrows(PacienteArgumentoInvalido.class, () -> telefonoValidatorRule.validate(paciente));
         assertEquals("El teléfono del paciente es inválido", exception.getMessage());
@@ -55,7 +55,7 @@ public class TelefonoValidatorRuleTest {
 
     @Test
     @DisplayName("Debería lanzar excepción para teléfono nulo")
-    void validateNullTelefono() {
+    void shouldThrowException_whenTelefonoIsNull() {
         Paciente paciente = Paciente.builder().telefono(null).build();
         assertThrows(NullPointerException.class, () -> telefonoValidatorRule.validate(paciente));
     }

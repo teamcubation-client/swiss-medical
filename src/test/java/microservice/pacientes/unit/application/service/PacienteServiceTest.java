@@ -46,7 +46,7 @@ public class PacienteServiceTest {
 
     @Test
     @DisplayName("Debería crear correctamente un paciente")
-    void createValidPaciente() {
+    void shouldCreatePacienteSuccessfully_whenCreateValidPaciente() {
         CreatePacienteCommand createPacienteCommand = new CreatePacienteCommand("12345678", "Juan", "Perez", "Obra social", "email@test.com", "123456789");
         Paciente paciente = new Paciente("12345678", "Juan", "Perez", "Obra social", "email@test.com", "123456789");
         when(createPacienteMapper.toEntity(createPacienteCommand)).thenReturn(paciente);
@@ -63,7 +63,7 @@ public class PacienteServiceTest {
 
     @Test
     @DisplayName("Debería lanzar una excepción al intentar crear un paciente duplicado")
-    void createExistsPaciente() {
+    void shouldThrowException_whenCreateExistsPaciente() {
         String dni = "12345678";
         CreatePacienteCommand createPacienteCommand = new CreatePacienteCommand(dni, "Juan", "Perez", "Obra social", "email@test.com", "123456789");
         Paciente paciente = new Paciente(dni, "Juan", "Perez", "Obra social", "email@test.com", "123456789");
@@ -78,7 +78,7 @@ public class PacienteServiceTest {
     @ParameterizedTest
     @MethodSource("invalidCreatePacienteCommands")
     @DisplayName("Debería lanzar una excepción al intentar crear un paciente con datos inválidos")
-    void createInvalidPaciente(CreatePacienteCommand createPacienteCommand) {
+    void shouldThrowException_whenCreateInvalidPaciente(CreatePacienteCommand createPacienteCommand) {
         doThrow(new PacienteArgumentoInvalido(""))
                 .when(createPacienteMapper).toEntity(createPacienteCommand);
 
@@ -99,7 +99,7 @@ public class PacienteServiceTest {
 
     @Test
     @DisplayName("Debería eliminar correctamente un paciente")
-    void deleteExistsPaciente() {
+    void shouldDeletePacienteSuccessfully_whenDeleteExistsPaciente() {
         String dni = "12345678";
         Paciente paciente = new Paciente(dni, "Juan", "Perez", "Obra social", "email@test.com", "123456789");
         when(pacientePortOut.getByDni(dni)).thenReturn(Optional.of(paciente));
@@ -112,7 +112,7 @@ public class PacienteServiceTest {
 
     @Test
     @DisplayName("Debería lanzar una excepción al intentar eliminar un paciente inexistente")
-    void deleteNoExistsPaciente() {
+    void shouldThrowException_whenDeleteNoExistsPaciente() {
         String dni = "12345678";
         when(pacientePortOut.getByDni(dni)).thenReturn(Optional.empty());
 
@@ -122,7 +122,7 @@ public class PacienteServiceTest {
 
     @Test
     @DisplayName("Debería obtener correctamente un paciente")
-    void getAll() {
+    void shouldReturnAllPacientes_whenGetAll() {
         List<Paciente> pacientes = new ArrayList<>();
         pacientes.add(new Paciente("12345678", "Juan", "Perez", "Obra social", "email@test.com", "123456789"));
         pacientes.add(new Paciente("12345679", "Juan", "Perez", "Obra social", "email@test.com", "123456789"));
@@ -136,7 +136,7 @@ public class PacienteServiceTest {
 
     @Test
     @DisplayName("Debería obtener correctamente una lista vacía de pacientes")
-    void getAllEmpty() {
+    void shouldReturnEmptyList_whenGetAllEmpty() {
         List<Paciente> pacientes = new ArrayList<>();
         when(pacientePortOut.getAll()).thenReturn(pacientes);
 
@@ -148,7 +148,7 @@ public class PacienteServiceTest {
 
     @Test
     @DisplayName("Debería obtener correctamente un paciente")
-    void getByNombreContainingIgnoreCase() {
+    void shouldReturnFilteredPacientes_whenGetByNombreContainingIgnoreCase() {
         List<Paciente> pacientes = new ArrayList<>();
         pacientes.add(new Paciente("12345679", "Juan", "Perez", "Obra social", "email@test.com", "123456789"));
         pacientes.add(new Paciente("12345679", "Juana", "Perez", "Obra social", "email@test.com", "123456789"));
@@ -162,7 +162,7 @@ public class PacienteServiceTest {
 
     @Test
     @DisplayName("Debería obtener correctamente una lista vacía de pacientes")
-    void getByNombreContainingIgnoreCaseEmpty() {
+    void shouldReturnEmptyList_whenGetByNombreContainingIgnoreCaseEmpty() {
         List<Paciente> pacientes = new ArrayList<>();
         when(pacientePortOut.getByNombreContainingIgnoreCase("Juan")).thenReturn(pacientes);
 
@@ -174,7 +174,7 @@ public class PacienteServiceTest {
 
     @Test
     @DisplayName("Debería obtener una lista vacía si no coincide el nombre con los pacientes")
-    void getByNombreContainingIgnoreCaseNoCoincide() {
+    void shouldReturnEmptyList_whenGetByNombreContainingIgnoreCaseNoMatch() {
         List<Paciente> pacientes = new ArrayList<>();
         pacientes.add(new Paciente("12345678", "Juan", "Perez", "Obra social", "email@test.com", "123456789"));
         when(pacientePortOut.getByNombreContainingIgnoreCase("Agustin")).thenReturn(List.of());
@@ -187,7 +187,7 @@ public class PacienteServiceTest {
 
     @Test
     @DisplayName("Debería obtener correctamente un paciente")
-    void getByDni() {
+    void shouldReturnPaciente_whenGetByDni() {
         String dni = "12345678";
         Paciente paciente = new Paciente(dni, "Juan", "Perez", "Obra social", "email@test.com", "123456789");
         when(pacientePortOut.getByDni(dni)).thenReturn(Optional.of(paciente));
@@ -200,7 +200,7 @@ public class PacienteServiceTest {
 
     @Test
     @DisplayName("Debería lanzar una excepción al intentar obtener un paciente inexistente")
-    void getByNoExistsDni() {
+    void shouldThrowException_whenGetByNoExistsDni() {
         String dni = "12345678";
         when(pacientePortOut.getByDni(dni)).thenReturn(Optional.empty());
 
@@ -210,7 +210,7 @@ public class PacienteServiceTest {
 
     @Test
     @DisplayName("Debería obtener correctamente un paciente")
-    void getByNombre() {
+    void shouldReturnPaciente_whenGetByNombre() {
         Paciente paciente = new Paciente("12345678", "Juan", "Perez", "Obra social", "email@test.com", "123456789");
         when(pacientePortOut.getByNombre("Juan")).thenReturn(Optional.of(paciente));
 
@@ -222,7 +222,7 @@ public class PacienteServiceTest {
 
     @Test
     @DisplayName("Debería lanzar una excepción al intentar obtener un paciente inexistente")
-    void getByNoExistsNombre() {
+    void shouldThrowException_whenGetByNoExistsNombre() {
         when(pacientePortOut.getByNombre("Juan")).thenReturn(Optional.empty());
 
         assertThrows(PacienteNoEncontradoException.class, () -> pacienteService.getByNombre("Juan"));
@@ -231,7 +231,7 @@ public class PacienteServiceTest {
 
     @Test
     @DisplayName("Debería obtener correctamente los pacientes segun la obra social")
-    void getByObraSocial() {
+    void shouldReturnPacientesByObraSocial_whenGetByObraSocial() {
         List<Paciente> pacientes = new ArrayList<>();
         pacientes.add(new Paciente("12345678", "Juan", "Perez", "OSDE", "email@test.com", "123456789"));
         pacientes.add(new Paciente("12345680", "Agustina", "Perez", "OSDE", "email@test.com", "123456789"));
@@ -245,7 +245,7 @@ public class PacienteServiceTest {
 
     @Test
     @DisplayName("Debería obtener una lista vacía cuando no haya pacientes con dicha obra social")
-    void getByNoExistsObraSocial() {
+    void shouldReturnEmptyList_whenGetByNoExistsObraSocial() {
         List<Paciente> pacientes = new ArrayList<>();
         pacientes.add(new Paciente("12345679", "Agustin", "Perez", "SWISS MEDICAL", "email@test.com", "123456789"));
         when(pacientePortOut.getByObraSocial("OSDE", 10, 0)).thenReturn(List.of());
@@ -258,7 +258,7 @@ public class PacienteServiceTest {
 
     @Test
     @DisplayName("Debería actualizar correctamente un paciente")
-    void updateValidPaciente() {
+    void shouldUpdatePacienteSuccessfully_whenUpdateValidPaciente() {
         String dni = "12345678";
         UpdatePacienteCommand command = new UpdatePacienteCommand("Agustin", "Perez", "OSDE", "agustin.perez@gmail.com", "123456789");
         Paciente pacienteExistente = new Paciente(dni, "Juan", "Antiguo", "Medife", "viejo@email.com", "000000000");
@@ -289,7 +289,7 @@ public class PacienteServiceTest {
 
     @Test
     @DisplayName("Debería lanzar una excepción al intentar actualizar un paciente inexistente")
-    void updateNoExistsPaciente() {
+    void shouldThrowException_whenUpdateNoExistsPaciente() {
         String dni = "12345678";
         UpdatePacienteCommand command = new UpdatePacienteCommand("Juan", "Perez", "OSDE", "juan.perez@gmail.com", "123456789");
         when(pacientePortOut.getByDni(dni)).thenReturn(Optional.empty());
@@ -301,7 +301,7 @@ public class PacienteServiceTest {
     @ParameterizedTest
     @MethodSource("invalidUpdatePacienteCommands")
     @DisplayName("Debería lanzar una excepción al intentar actualizar un paciente con argumentos inválidos")
-    void updateInvalidPaciente(UpdatePacienteCommand command) {
+    void shouldThrowException_whenUpdateInvalidPaciente(UpdatePacienteCommand command) {
         String dni = "12345678";
         Paciente pacienteExistente = new Paciente(dni, "Juan", "Antiguo", "Medife", "viejo@email.com", "000000000");
         when(pacientePortOut.getByDni(dni)).thenReturn(Optional.of(pacienteExistente));

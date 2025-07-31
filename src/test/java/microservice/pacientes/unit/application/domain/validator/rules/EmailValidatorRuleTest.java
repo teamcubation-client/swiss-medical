@@ -26,7 +26,7 @@ public class EmailValidatorRuleTest {
 
     @Test
     @DisplayName("Debería validar un email válido")
-    void validateValidEmail() {
+    void shouldValidateSuccessfully_whenEmailIsValid() {
         Paciente paciente = Paciente.builder().email("test@example.com").build();
         assertDoesNotThrow(() -> emailValidatorRule.validate(paciente));
     }
@@ -49,7 +49,7 @@ public class EmailValidatorRuleTest {
             ""
     })
     @DisplayName("Debería lanzar excepción para emails inválidos")
-    void validateInvalidEmailFormat(String invalidEmail) {
+    void shouldThrowException_whenEmailHasInvalidFormat(String invalidEmail) {
         Paciente paciente = Paciente.builder().email(invalidEmail).build();
         PacienteArgumentoInvalido exception = assertThrows(PacienteArgumentoInvalido.class, () -> emailValidatorRule.validate(paciente));
         assertEquals("El email del paciente es inválido", exception.getMessage());
@@ -57,7 +57,7 @@ public class EmailValidatorRuleTest {
 
     @Test
     @DisplayName("Debería lanzar excepción para email nulo")
-    void validateNullEmail() {
+    void shouldThrowException_whenEmailIsNull() {
         Paciente paciente = Paciente.builder().email(null).build();
         assertThrows(NullPointerException.class, () -> emailValidatorRule.validate(paciente));
     }

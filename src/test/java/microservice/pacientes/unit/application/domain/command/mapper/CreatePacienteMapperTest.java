@@ -34,7 +34,7 @@ public class CreatePacienteMapperTest {
     @ParameterizedTest
     @MethodSource("pacientesProvider")
     @DisplayName("Debería mapear correctamente el paciente con distintos datos")
-    void mapValidPaciente(CreatePacienteCommand command, Paciente expectedPaciente) {
+    void shouldMapPacienteCorrectly_whenMapValidPaciente(CreatePacienteCommand command, Paciente expectedPaciente) {
         when(pacienteFactory.create(
                 command.getDni(),
                 command.getNombre(),
@@ -71,7 +71,7 @@ public class CreatePacienteMapperTest {
     @ParameterizedTest
     @MethodSource("invalidPacientesProvider")
     @DisplayName("Debería lanzar una excepción si el paciente es inválido")
-    void mapInvalidPaciente(CreatePacienteCommand command) {
+    void shouldThrowException_whenMapInvalidPaciente(CreatePacienteCommand command) {
         when(pacienteFactory.create(
                 command.getDni(),
                 command.getNombre(),

@@ -39,14 +39,14 @@ public class DniValidatorRuleTest {
             "        "
     })
     @DisplayName("Debería lanzar excepción para DNI inválidos")
-    void validateDniWithLetters(String dni) {
+    void shouldThrowException_whenDniIsInvalid(String dni) {
         Paciente paciente = Paciente.builder().dni(dni).build();
         assertThrows(PacienteArgumentoInvalido.class, () -> dniValidatorRule.validate(paciente));
     }
 
     @Test
     @DisplayName("Debería lanzar excepción para DNI nulo")
-    void validateNullDni() {
+    void shouldThrowException_whenDniIsNull() {
         String dni = null;
         Paciente paciente = Paciente.builder().dni(dni).build();
         assertThrows(NullPointerException.class, () -> dniValidatorRule.validate(paciente));
@@ -54,7 +54,7 @@ public class DniValidatorRuleTest {
 
     @Test
     @DisplayName("Debería validar un DNI válido")
-    void validateValidDni() {
+    void shouldValidateSuccessfully_whenDniIsValid() {
         String dni = "12345678";
         Paciente paciente = Paciente.builder().dni(dni).build();
         assertDoesNotThrow(() -> dniValidatorRule.validate(paciente));

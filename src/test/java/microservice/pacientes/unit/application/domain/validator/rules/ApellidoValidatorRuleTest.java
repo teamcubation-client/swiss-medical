@@ -25,7 +25,7 @@ public class ApellidoValidatorRuleTest {
 
     @Test
     @DisplayName("Debería validar un apellido válido")
-    void validateValidApellido() {
+    void shouldValidateSuccessfully_whenApellidoIsValid() {
         Paciente paciente = Paciente.builder().apellido("Perez").build();
         assertDoesNotThrow(() -> apellidoValidatorRule.validate(paciente));
     }
@@ -44,7 +44,7 @@ public class ApellidoValidatorRuleTest {
             " "
     })
     @DisplayName("Debería lanzar excepción para un apellido inválido")
-    void validateApellidoWithSpecialCharacters(String invalidApellido) {
+    void shouldThrowException_whenApellidoHasSpecialCharacters(String invalidApellido) {
         Paciente paciente = Paciente.builder().apellido(invalidApellido).build();
         PacienteArgumentoInvalido exception = assertThrows(PacienteArgumentoInvalido.class, () -> apellidoValidatorRule.validate(paciente));
         assertEquals("El apellido del paciente es inválido", exception.getMessage());
@@ -52,7 +52,7 @@ public class ApellidoValidatorRuleTest {
 
     @Test
     @DisplayName("Debería lanzar excepción para apellido nulo")
-    void validateNullApellido() {
+    void shouldThrowException_whenApellidoIsNull() {
         Paciente paciente = Paciente.builder().apellido(null).build();
         assertThrows(NullPointerException.class, () -> apellidoValidatorRule.validate(paciente));
     }

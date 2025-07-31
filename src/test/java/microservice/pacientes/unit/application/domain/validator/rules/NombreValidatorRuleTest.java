@@ -33,7 +33,7 @@ public class NombreValidatorRuleTest {
             "ana"
     })
     @DisplayName("Debería validar un nombre válido")
-    void validateValidNombre(String validNombre) {
+    void shouldValidateSuccessfully_whenNombreIsValid(String validNombre) {
         Paciente paciente = Paciente.builder().nombre(validNombre).build();
         assertDoesNotThrow(() -> nombreValidatorRule.validate(paciente));
     }
@@ -58,7 +58,7 @@ public class NombreValidatorRuleTest {
             "111"
     })
     @DisplayName("Debería lanzar excepción para nombres inválidos")
-    void validateInvalidNombre(String invalidNombre) {
+    void shouldThrowException_whenNombreIsInvalid(String invalidNombre) {
         Paciente paciente = Paciente.builder().nombre(invalidNombre).build();
         PacienteArgumentoInvalido exception = assertThrows(PacienteArgumentoInvalido.class, () -> nombreValidatorRule.validate(paciente));
         assertEquals("El nombre del paciente es inválido", exception.getMessage());
@@ -67,7 +67,7 @@ public class NombreValidatorRuleTest {
 
     @Test
     @DisplayName("Debería lanzar excepción para nombre nulo")
-    void validateNullNombre() {
+    void shouldThrowException_whenNombreIsNull() {
         Paciente paciente = Paciente.builder().nombre(null).build();
         assertThrows(NullPointerException.class, () -> nombreValidatorRule.validate(paciente));
     }
