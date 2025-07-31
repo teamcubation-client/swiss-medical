@@ -2,16 +2,18 @@ package microservice.pacientes.infrastructure.adapter.in.controller;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.PastOrPresent;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Data Transfer Object para transferir informacion de pacientes entre capas de la aplicacion
  * Incluye datos personales, de contacto y la obra social del paciente
  */
 @AllArgsConstructor
-@Builder
+@Builder(toBuilder = true)
 @Getter
 @Setter
 public class PacienteDTO {

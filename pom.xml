@@ -24,6 +24,9 @@
         <lombok.version>1.18.32</lombok.version>
         <mysql.version>8.0.33</mysql.version>
         <dotenv.version>5.2.2</dotenv.version>
+        <maven.version>3.10.1</maven.version>
+        <jacoco.version>0.8.10</jacoco.version>
+        <surefire.version>3.1.2</surefire.version>
     </properties>
 
     <dependencies>
@@ -65,11 +68,6 @@
             <version>${mysql.version}</version>
         </dependency>
         <dependency>
-            <groupId>io.github.cdimascio</groupId>
-            <artifactId>java-dotenv</artifactId>
-            <version>${dotenv.version}</version>
-        </dependency>
-        <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
             <scope>test</scope>
@@ -83,7 +81,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.10.1</version>
+                <version>${maven.version}</version>
                 <configuration>
                     <source>11</source>
                     <target>11</target>
@@ -99,7 +97,7 @@
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.8.10</version>
+                <version>${jacoco.version}</version>
                 <executions>
                     <execution>
                         <goals>
@@ -138,7 +136,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.1.2</version>
+                <version>${surefire.version}</version>
                 <configuration>
                     <includes>
                         <include>/*Test.java</include>

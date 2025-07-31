@@ -96,8 +96,12 @@ public class PacienteServiceTest {
     void crearPaciente_FallarSiDniDuplicado(){
         when(portOutRead.buscarByDni("12345678")).thenReturn(Optional.of(paciente));
 
+        Paciente nuevoPaciente = Paciente.builder()
+                .dni("12345678")
+                .build();
+
         assertThrows(PacienteDuplicadoException.class,
-                () -> service.crearPaciente(paciente));
+                () -> service.crearPaciente(nuevoPaciente));
 
         verify(portOutRead).buscarByDni("12345678");
         verify(portOutWrite, never()).save(any());
@@ -383,6 +387,8 @@ public class PacienteServiceTest {
     void actualizarPaciente_ActualizarExitoso(){
         when(portOutRead.findById(1L))
                 .thenReturn(Optional.of(paciente));
+        when(portOutRead.buscarByDni("12345678"))
+                .thenReturn(Optional.of(paciente));
 
         Paciente actualizado = Paciente.builder()
                 .nombre("Ana Actualizada")
@@ -417,8 +423,13 @@ public class PacienteServiceTest {
         when(portOutRead.findById(1L))
                 .thenReturn(Optional.of(paciente));
 
+        Paciente pacienteConMismoDni = Paciente.builder()
+                        .id(3L)
+                        .dni("12345678")
+                        .build();
+
         when(portOutRead.buscarByDni("12345678"))
-                .thenReturn(Optional.of(paciente));
+                .thenReturn(Optional.of(pacienteConMismoDni));
 
         assertThrows(PacienteDuplicadoException.class,
                 () -> service.actualizarPaciente(1L, paciente));

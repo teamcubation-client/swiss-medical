@@ -24,6 +24,8 @@ public class DniDuplicadoValidatorTest {
     @InjectMocks
     private DniDuplicadoValidator validator;
     private Paciente paciente;
+    private Paciente mismoPaciente;
+    private Paciente otroPaciente;
 
     @BeforeEach
     void setUp() {
@@ -33,35 +35,58 @@ public class DniDuplicadoValidatorTest {
                 .dni("12345678")
                 .nombre("Ana")
                 .apellido("Lopez")
+                .estado(false)
                 .build();
+
+        mismoPaciente = Paciente.builder()
+                .id(1L)
+                .dni("12345678")
+                .nombre("Ana")
+                .apellido("Lopez")
+                .estado(true)
+                .build();
+
+        otroPaciente = Paciente.builder()
+                .id(2L)
+                .dni("12345678")
+                .nombre("Bruno")
+                .apellido("Gómez")
+                .build();
+
     }
 
+    @Test
+    void validador_NoExisteDni_NoLanzaException() {
+        when(portOutRead.buscarByDni("12345678"))
+                .thenReturn(Optional.empty());
 
+        assertDoesNotThrow(() -> validator.validate(paciente));
+        verify(portOutRead).buscarByDni("12345678");
+    }
 
     @Test
-    void validador_ExisteDni() {
+    void validador_MismoDni_NoLanzaException() {
         when(portOutRead.buscarByDni("12345678"))
-                .thenReturn(Optional.of(paciente));
+                .thenReturn(Optional.of(mismoPaciente));
+
+        assertDoesNotThrow(() -> validator.validate(paciente));
+        verify(portOutRead).buscarByDni("12345678");
+    }
+
+    @Test
+    void validador_OtroPacienteSameDni_LanzaDuplicado() {
+        when(portOutRead.buscarByDni("12345678"))
+                .thenReturn(Optional.of(otroPaciente));
 
         PacienteDuplicadoException ex = assertThrows(
                 PacienteDuplicadoException.class,
                 () -> validator.validate(paciente)
         );
-
         assertTrue(ex.getMessage().contains("12345678"));
-
         verify(portOutRead).buscarByDni("12345678");
     }
 
-    @Test
-    void validador_NoExisteDni() {
-        when(portOutRead.buscarByDni("12345678"))
-                .thenReturn(Optional.empty());
 
-        assertDoesNotThrow(() -> validator.validate(paciente));
-
-        verify(portOutRead).buscarByDni("12345678");
-    }
 
     @Test
     void validador_DelegarSiguienteCadena() {

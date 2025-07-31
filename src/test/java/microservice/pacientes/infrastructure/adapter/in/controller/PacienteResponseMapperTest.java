@@ -14,7 +14,6 @@ public class PacienteResponseMapperTest {
     @Test
     void PacienteResponseMapper_DTO_Model() {
         Paciente model = Paciente.builder()
-                .id(1L)
                 .dni("12345678")
                 .nombre("Ana")
                 .apellido("Lopez")

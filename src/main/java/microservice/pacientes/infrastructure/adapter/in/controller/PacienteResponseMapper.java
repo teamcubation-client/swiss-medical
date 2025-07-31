@@ -36,7 +36,7 @@ public final class PacienteResponseMapper {
             throw new PacienteNullException();
         }
         return Paciente.builder()
-                .id(pacienteDTO.getId())
+                //.id(pacienteDTO.getId())
                 .nombre(pacienteDTO.getNombre())
                 .apellido(pacienteDTO.getApellido())
                 .dni(pacienteDTO.getDni())
