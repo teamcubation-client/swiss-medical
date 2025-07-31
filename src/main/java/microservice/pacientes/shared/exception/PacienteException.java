@@ -6,9 +6,9 @@ import lombok.Setter;
 @Getter
 @Setter
 public abstract class PacienteException extends RuntimeException {
-    private String message;
+    private final String message;
 
-    public PacienteException(String message) {
+    protected PacienteException(String message) {
         this.message = message;
     }
 }

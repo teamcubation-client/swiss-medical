@@ -2,7 +2,6 @@ package microservice.pacientes.infrastructure.adapter.in.rest.advice;
 
 import microservice.pacientes.shared.exception.PacienteArgumentoInvalido;
 import microservice.pacientes.shared.exception.PacienteDuplicadoException;
-import microservice.pacientes.shared.exception.PacienteException;
 import microservice.pacientes.shared.exception.PacienteNoEncontradoException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

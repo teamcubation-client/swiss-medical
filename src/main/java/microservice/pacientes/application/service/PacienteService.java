@@ -45,28 +45,24 @@ public class PacienteService implements FindPacienteUseCase, CreatePacienteUseCa
 
     @Override
     public List<Paciente> getByNombreContainingIgnoreCase(String nombre) {
-        List<Paciente> pacientes = pacientePortOut.getByNombreContainingIgnoreCase(nombre);
-        return pacientes;
+        return pacientePortOut.getByNombreContainingIgnoreCase(nombre);
     }
 
     @Override
     public Paciente getByDni(String dni) throws PacienteNoEncontradoException {
-        Paciente paciente = pacientePortOut.getByDni(dni)
+        return pacientePortOut.getByDni(dni)
                 .orElseThrow(PacienteNoEncontradoException::new);
-        return paciente;
     }
 
     @Override
     public Paciente getByNombre(String nombre) throws PacienteNoEncontradoException {
-        Paciente paciente = pacientePortOut.getByNombre(nombre)
+        return pacientePortOut.getByNombre(nombre)
                 .orElseThrow(PacienteNoEncontradoException::new);
-        return paciente;
     }
 
     @Override
     public List<Paciente> getByObraSocial(String obraSocial, int limit, int offset) throws PacienteNoEncontradoException {
-        List<Paciente> pacientes = pacientePortOut.getByObraSocial(obraSocial, limit, offset);
-        return pacientes;
+        return pacientePortOut.getByObraSocial(obraSocial, limit, offset);
     }
 
     @Override
