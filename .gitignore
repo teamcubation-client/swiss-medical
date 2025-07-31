@@ -38,3 +38,6 @@ db_data
 
 ### Environment Variables ###
 .env
+
+### Test ###
+.run
