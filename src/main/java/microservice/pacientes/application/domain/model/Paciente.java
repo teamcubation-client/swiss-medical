@@ -3,10 +3,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.Builder;
 import lombok.AllArgsConstructor;
-/**
- * Modelo que representa a un paciente
- * Contiene informacion personal y de contacto, ademas de la obra social al que pertenece el paciente
- */
+
 @Setter
 @Getter
 @Builder

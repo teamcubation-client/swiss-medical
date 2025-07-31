@@ -7,15 +7,18 @@ import microservice.pacientes.application.validation.PacienteValidator;
 import microservice.pacientes.shared.PacienteDuplicadoException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+
+@ExtendWith(MockitoExtension.class)
 public class DniDuplicadoValidatorTest {
 
     @Mock
@@ -29,7 +32,6 @@ public class DniDuplicadoValidatorTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
         paciente = Paciente.builder()
                 .id(1L)
                 .dni("12345678")
@@ -52,11 +54,10 @@ public class DniDuplicadoValidatorTest {
                 .nombre("Bruno")
                 .apellido("Gómez")
                 .build();
-
     }
 
     @Test
-    void validador_NoExisteDni_NoLanzaException() {
+    void validate_givenDniNotExists_doesNotThrow() {
         when(portOutRead.buscarByDni("12345678"))
                 .thenReturn(Optional.empty());
 
@@ -65,7 +66,7 @@ public class DniDuplicadoValidatorTest {
     }
 
     @Test
-    void validador_MismoDni_NoLanzaException() {
+    void validate_givenSamePaciente_doesNotThrow() {
         when(portOutRead.buscarByDni("12345678"))
                 .thenReturn(Optional.of(mismoPaciente));
 
@@ -74,7 +75,7 @@ public class DniDuplicadoValidatorTest {
     }
 
     @Test
-    void validador_OtroPacienteSameDni_LanzaDuplicado() {
+    void  validate_givenDifferentPacienteSameDni_throwsPacienteDuplicadoException(){
         when(portOutRead.buscarByDni("12345678"))
                 .thenReturn(Optional.of(otroPaciente));
 
@@ -89,8 +90,7 @@ public class DniDuplicadoValidatorTest {
 
 
     @Test
-    void validador_DelegarSiguienteCadena() {
-
+    void validate_withNextValidator_delegatesToNext(){
         PacienteValidator nextValidator = mock(PacienteValidator.class);
 
         validator.setNext(nextValidator);

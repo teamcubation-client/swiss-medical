@@ -1,14 +1,15 @@
 package microservice.pacientes.infrastructure.adapter.out.persistence;
 
 
-import lombok.*;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
 
-/**
- * Entidad que representa a un paciente
- * Contiene informacion personal y de contacto, ademas de la obra social al que pertenece el paciente
- */
 @Getter
 @Setter
 @Entity
@@ -20,7 +21,7 @@ public class PacienteEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
 
-    private long id;
+    private Long id;
     private String nombre;
     private String apellido;
     private String dni;

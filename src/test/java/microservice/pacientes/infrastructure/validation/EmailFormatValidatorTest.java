@@ -5,13 +5,16 @@ import microservice.pacientes.application.validation.PacienteValidator;
 import microservice.pacientes.shared.InvalidEmailFormatException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
+
+@ExtendWith(MockitoExtension.class)
 public class EmailFormatValidatorTest {
 
 
@@ -21,8 +24,6 @@ public class EmailFormatValidatorTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
-
         paciente = Paciente.builder()
                 .id(1L)
                 .dni("12345678")
@@ -33,14 +34,14 @@ public class EmailFormatValidatorTest {
     }
 
     @Test
-    void validador_EmailValido(){
+    void validate_givenValidEmail_doesNotThrow(){
         paciente.setEmail("usuario@dominio.com");
 
         assertDoesNotThrow(()-> validator.validate(paciente));
     }
 
     @Test
-    void validador_EmailInvalido(){
+    void validate_givenInvalidEmail_throwsInvalidEmailFormatException(){
         paciente.setEmail("sin-arroba");
 
         InvalidEmailFormatException ex = assertThrows(
@@ -52,7 +53,7 @@ public class EmailFormatValidatorTest {
     }
 
     @Test
-    void validador_EmailNulo() {
+    void  validate_givenNullEmail_throwsInvalidEmailFormatException()  {
 
         paciente.setEmail(null);
 
@@ -65,7 +66,7 @@ public class EmailFormatValidatorTest {
     }
 
     @Test
-    void validador_DelegarSiguienteCadena() {
+    void validate_withNextValidator_delegatesToNext() {
         paciente.setEmail("usuario@dominio.com");
         PacienteValidator nextValidator = mock(PacienteValidator.class);
         validator.setNext(nextValidator);

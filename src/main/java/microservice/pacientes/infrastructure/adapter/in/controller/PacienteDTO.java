@@ -34,5 +34,6 @@ public class PacienteDTO {
     private String tipoPlanObraSocial;
     @NotNull(message = "La fecha de alta es obligatorio")
     private java.time.LocalDate fechaAlta;
+    @NotNull(message = "El estado es obligatorio")
     private Boolean estado;
 }

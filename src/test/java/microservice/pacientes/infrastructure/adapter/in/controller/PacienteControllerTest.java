@@ -40,6 +40,7 @@ public class PacienteControllerTest {
 
     private Paciente pacienteActivo;
     private Paciente pacienteInactivo;
+    private static final LocalDate FIXED_DATE = LocalDate.of(2025, 7, 30);
 
     @BeforeEach
     void setup() {
@@ -52,7 +53,7 @@ public class PacienteControllerTest {
                 .email("ana@mail.com")
                 .telefono("112233456")
                 .tipoPlanObraSocial("PlanA")
-                .fechaAlta(LocalDate.now().minusDays(1))
+                .fechaAlta(FIXED_DATE.minusDays(1))
                 .estado(true)
                 .build();
 
@@ -65,7 +66,7 @@ public class PacienteControllerTest {
                 .email("carlos@mail.com")
                 .telefono("22334455")
                 .tipoPlanObraSocial("PlanB")
-                .fechaAlta(LocalDate.now().minusDays(1))
+                .fechaAlta(FIXED_DATE.minusDays(1))
                 .estado(false)
                 .build();
     }
@@ -75,7 +76,7 @@ public class PacienteControllerTest {
     }
 
     @Test
-    void listarPacientes() throws Exception {
+    void listarPacientes_CuandoExistenPacientes_Retorna200() throws Exception {
         when(portInRead.listarPacientes()).thenReturn(List.of(pacienteActivo, pacienteInactivo));
 
         mvc.perform(get("/api/pacientes"))
@@ -92,7 +93,7 @@ public class PacienteControllerTest {
 
 
     @Test
-    void crearPaciente() throws Exception {
+    void crearPaciente_CuandoRequestValido_Retorna201() throws Exception {
         var request = PacienteDTO.builder()
                 .id(1L)
                 .dni(pacienteActivo.getDni())
@@ -121,7 +122,7 @@ public class PacienteControllerTest {
     }
 
     @Test
-    void crearPaciente_DatosInvalidos_400() throws Exception {
+    void crearPaciente_CuandoDatosInvalidos_Retorna400() throws Exception {
         var request = PacienteDTO.builder()
                 .id(1L)
                 .apellido(pacienteActivo.getApellido())
@@ -143,7 +144,7 @@ public class PacienteControllerTest {
     }
 
     @Test
-    void obtenerPaciente_encontrado() throws Exception {
+    void obtenerPaciente_CuandoExiste_Retorna200() throws Exception {
         when(portInRead.obtenerPacientePorId(1L)).thenReturn(pacienteActivo);
 
         mvc.perform(get("/api/pacientes/1"))
@@ -156,7 +157,7 @@ public class PacienteControllerTest {
     }
 
     @Test
-    void obtenerPaciente_noEncontrado() throws Exception {
+    void obtenerPaciente_CuandoNoExiste_Retorna404() throws Exception {
         when(portInRead.obtenerPacientePorId(9L)).thenReturn(null);
 
         mvc.perform(get("/api/pacientes/9"))
@@ -167,7 +168,7 @@ public class PacienteControllerTest {
     }
 
     @Test
-    void eliminarPaciente() throws Exception {
+    void eliminarPaciente_CuandoIdExiste_Retorna204() throws Exception {
         mvc.perform(delete("/api/pacientes/1"))
                 .andExpect(status().isNoContent());
 
@@ -176,7 +177,7 @@ public class PacienteControllerTest {
     }
 
     @Test
-    void buscarPorNombre() throws Exception {
+    void buscarPacientesPorNombre_CuandoParametroValido_Retorna200() throws Exception {
         when(portInRead.buscarPorNombreParcial("An")).thenReturn(List.of(pacienteActivo));
 
         mvc.perform(get("/api/pacientes/buscar/nombre")
@@ -189,7 +190,7 @@ public class PacienteControllerTest {
     }
 
     @Test
-    void buscarPorNombre_sinParametroNombre_devuelve400() throws Exception {
+    void buscarPorNombre_SinParametroNombre_Retorna400() throws Exception {
         mvc.perform(get("/api/pacientes/buscar/nombre"))
                 .andExpect(status().isBadRequest());
 
@@ -197,7 +198,7 @@ public class PacienteControllerTest {
     }
 
     @Test
-    void actualizarPaciente() throws Exception {
+    void actualizarPaciente_CuandoExiste_Retorna200() throws Exception {
         Paciente pacienteActualizar = Paciente.builder()
                 .id(1L)
                 .dni(pacienteActivo.getDni())
@@ -240,7 +241,7 @@ public class PacienteControllerTest {
     }
 
     @Test
-    void actualizarPaciente_inexistente_404() throws Exception {
+    void actualizarPaciente_CuandoNoExiste_Retorna404() throws Exception {
         PacienteDTO dtoRequest = PacienteDTO.builder()
                 .id(999L)
                 .dni("11111111")
@@ -250,7 +251,7 @@ public class PacienteControllerTest {
                 .email("noexisto@inexistente.com")
                 .telefono("11111111")
                 .tipoPlanObraSocial("PlanX")
-                .fechaAlta(LocalDate.now())
+                .fechaAlta(FIXED_DATE)
                 .estado(true)
                 .build();
 
@@ -268,7 +269,7 @@ public class PacienteControllerTest {
 
 
     @Test
-    void activarPaciente() throws Exception {
+    void activarPaciente_CuandoInactivo_Retorna200() throws Exception {
         Paciente pacienteActivado = Paciente.builder()
                 .id(pacienteInactivo.getId())
                 .dni(pacienteInactivo.getDni())
@@ -295,7 +296,7 @@ public class PacienteControllerTest {
 
 
     @Test
-    void desactivarPaciente() throws Exception {
+    void desactivarPaciente_CuandoActivo_Retorna200() throws Exception {
         Paciente pacienteDesactivado = Paciente.builder()
                 .id(pacienteActivo.getId())
                 .dni(pacienteActivo.getDni())
@@ -321,7 +322,7 @@ public class PacienteControllerTest {
     }
 
     @Test
-    void listarPacientesActivos() throws Exception {
+    void listarPacientesActivos_CuandoHayActivos_Retorna200() throws Exception {
         when(portInRead.listarPacientes()).thenReturn(List.of(pacienteActivo, pacienteInactivo));
 
         mvc.perform(get("/api/pacientes/activos"))
@@ -335,7 +336,7 @@ public class PacienteControllerTest {
     }
 
     @Test
-    void listarPacientesInactivos() throws Exception {
+    void listarPacientesInactivos_CuandoHayInactivos_Retorna200() throws Exception {
         when(portInRead.listarPacientes()).thenReturn(List.of(pacienteActivo, pacienteInactivo));
 
         mvc.perform(get("/api/pacientes/inactivos"))
@@ -349,7 +350,7 @@ public class PacienteControllerTest {
     }
 
     @Test
-    void buscarByDni() throws Exception {
+    void buscarPacientePorDni_CuandoExiste_Retorna200() throws Exception {
         when(portInRead.buscarByDni("12345678")).thenReturn(pacienteActivo);
 
         mvc.perform(get("/api/pacientes/sp/buscar/dni/12345678"))
@@ -362,7 +363,7 @@ public class PacienteControllerTest {
     }
 
     @Test
-    void buscarByNombre() throws Exception {
+    void buscarPacientesPorNombreExacto_CuandoExisten_Retorna200() throws Exception {
         when(portInRead.buscarByNombre("Ana")).thenReturn(List.of(pacienteActivo, pacienteActivo));
 
         mvc.perform(get("/api/pacientes/sp/buscar/nombre/Ana"))
@@ -376,7 +377,7 @@ public class PacienteControllerTest {
     }
 
     @Test
-    void buscarPorObraSocialPaginado_sp() throws Exception {
+    void buscarPacientesPorObraSocialPaginado_CuandoParametrosValidos_Retorna200() throws Exception {
         when(portInRead.buscarPorObraSocialPaginado("OSDE", 5, 2))
                 .thenReturn(List.of(pacienteActivo, pacienteInactivo));
 

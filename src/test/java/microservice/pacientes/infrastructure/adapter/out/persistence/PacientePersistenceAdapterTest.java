@@ -30,7 +30,7 @@ public class PacientePersistenceAdapterTest {
 
     private PacienteEntity entidadActivo, entidadInactivo;
     private Paciente pacienteActivo, pacienteInactivo;
-
+    private static final LocalDate FIXED_DATE = LocalDate.of(2025, 7, 30);
 
     @BeforeEach
     void setUp() {
@@ -43,7 +43,7 @@ public class PacientePersistenceAdapterTest {
                 .email("ana@mail.com")
                 .telefono("112233456")
                 .tipoPlanObraSocial("PlanA")
-                .fechaAlta(LocalDate.now().minusDays(1))
+                .fechaAlta(FIXED_DATE.minusDays(1))
                 .estado(true)
                 .build();
 
@@ -56,7 +56,7 @@ public class PacientePersistenceAdapterTest {
                 .email("carlos@mail.com")
                 .telefono("22334455")
                 .tipoPlanObraSocial("PlanB")
-                .fechaAlta(LocalDate.now().minusDays(1))
+                .fechaAlta(FIXED_DATE.minusDays(1))
                 .estado(false)
                 .build();
 
@@ -173,7 +173,7 @@ public class PacientePersistenceAdapterTest {
                 .email("maria@dimaria.com")
                 .telefono("33113213")
                 .tipoPlanObraSocial("Premium")
-                .fechaAlta(LocalDate.now())
+                .fechaAlta(FIXED_DATE)
                 .estado(true)
                 .build();
 
@@ -232,7 +232,7 @@ public class PacientePersistenceAdapterTest {
                 .email("neo@matrix.com")
                 .telefono("9999")
                 .tipoPlanObraSocial("Premium")
-                .fechaAlta(LocalDate.now())
+                .fechaAlta(FIXED_DATE)
                 .estado(false)
                 .build();
 

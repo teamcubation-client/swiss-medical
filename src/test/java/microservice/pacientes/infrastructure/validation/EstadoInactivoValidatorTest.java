@@ -5,13 +5,16 @@ import microservice.pacientes.application.validation.PacienteValidator;
 import microservice.pacientes.shared.PacienteActivoException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
+
+@ExtendWith(MockitoExtension.class)
 public class EstadoInactivoValidatorTest {
 
     @InjectMocks
@@ -20,8 +23,6 @@ public class EstadoInactivoValidatorTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
-
         paciente = Paciente.builder()
                 .id(1L)
                 .dni("12345678")
@@ -33,7 +34,7 @@ public class EstadoInactivoValidatorTest {
     }
 
     @Test
-    void validador_EstadoActivo(){
+    void validate_givenActiveEstado_throwsPacienteActivoException(){
         paciente.setEstado(true);
 
         PacienteActivoException ex = assertThrows(
@@ -45,14 +46,14 @@ public class EstadoInactivoValidatorTest {
     }
 
     @Test
-    void validador_EstadoInactivo() {
+    void validate_givenInactiveEstado_doesNotThrow(){
         paciente.setEstado(false);
 
         assertDoesNotThrow(() -> validator.validate(paciente));
     }
 
     @Test
-    void validador_DelegarSiguienteCadena() {
+    void validate_withNextValidator_delegatesToNext() {
         paciente.setEstado(false);
         PacienteValidator nextValidator = mock(PacienteValidator.class);
         validator.setNext(nextValidator);

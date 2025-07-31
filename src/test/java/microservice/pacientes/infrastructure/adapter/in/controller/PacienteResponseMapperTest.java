@@ -12,8 +12,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class PacienteResponseMapperTest {
 
     @Test
-    void PacienteResponseMapper_DTO_Model() {
+    void toDTO_givenValidPaciente_returnsPacienteDTOWithSameFields() {
+        LocalDate fecha = LocalDate.of(2025, 7, 30);
         Paciente model = Paciente.builder()
+                .id(1L)
                 .dni("12345678")
                 .nombre("Ana")
                 .apellido("Lopez")
@@ -21,14 +23,15 @@ public class PacienteResponseMapperTest {
                 .email("ana@mail.com")
                 .telefono("112233456")
                 .tipoPlanObraSocial("PlanA")
-                .fechaAlta(LocalDate.now())
+                .fechaAlta(fecha)
                 .estado(true)
                 .build();
 
-        // Modelo → DTO
         PacienteDTO dto = PacienteResponseMapper.toDTO(model);
+
         assertNotNull(dto);
         assertEquals(model.getId(), dto.getId());
+        assertEquals(model.getDni(), dto.getDni());
         assertEquals(model.getNombre(), dto.getNombre());
         assertEquals(model.getApellido(), dto.getApellido());
         assertEquals(model.getObraSocial(), dto.getObraSocial());
@@ -37,23 +40,49 @@ public class PacienteResponseMapperTest {
         assertEquals(model.getTipoPlanObraSocial(), dto.getTipoPlanObraSocial());
         assertEquals(model.getFechaAlta(), dto.getFechaAlta());
         assertTrue(dto.getEstado());
-
-        // DTO → Modelo
-        Paciente model2 = PacienteResponseMapper.toModel(dto);
-        assertNotNull(model2);
-        assertThat(model2)
-                .usingRecursiveComparison()
-                .isEqualTo(model);
     }
 
     @Test
-    void toDTO_nullThrows() {
+    void toModel_givenValidDTO_returnsPacienteWithSameFields() {
+        LocalDate fecha = LocalDate.of(2025, 7, 30);
+        PacienteDTO dto = PacienteDTO.builder()
+                .dni("12345678")
+                .nombre("Ana")
+                .apellido("Lopez")
+                .obraSocial("OSDE")
+                .email("ana@mail.com")
+                .telefono("112233456")
+                .tipoPlanObraSocial("PlanA")
+                .fechaAlta(fecha)
+                .estado(true)
+                .build();
+
+        Paciente model = PacienteResponseMapper.toModel(dto);
+
+        assertNotNull(model);
+        assertThat(model)
+                .usingRecursiveComparison()
+                .isEqualTo(Paciente.builder()
+                        .dni(dto.getDni())
+                        .nombre(dto.getNombre())
+                        .apellido(dto.getApellido())
+                        .obraSocial(dto.getObraSocial())
+                        .email(dto.getEmail())
+                        .telefono(dto.getTelefono())
+                        .tipoPlanObraSocial(dto.getTipoPlanObraSocial())
+                        .fechaAlta(dto.getFechaAlta())
+                        .estado(dto.getEstado())
+                        .build());
+    }
+
+    @Test
+    void toDTO_givenNull_throwsPacienteNullException(){
         assertThrows(PacienteNullException.class,
                 () -> PacienteResponseMapper.toDTO(null));
     }
 
     @Test
-    void toModel_nullThrows() {
+    void toModel_givenNull_throwsPacienteNullException() {
         assertThrows(PacienteNullException.class,
                 () -> PacienteResponseMapper.toModel(null));
     }

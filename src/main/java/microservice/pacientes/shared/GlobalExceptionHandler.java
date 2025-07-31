@@ -2,57 +2,82 @@ package microservice.pacientes.shared;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+import java.time.LocalDateTime;
+
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
+
+    public static final String VALIDATION_ERROR_MESSAGE = "Datos de entrada invalidos";
+    public static final String PARAMETER_ERROR_MESSAGE = "El parametro es obligatorio";
+    public static final String UNEXPECTED_ERROR_MESSAGE="Ha ocurrido un error inesperado: ";
+
+
+
+
     @ExceptionHandler(PacienteNotFoundException.class)
-    public ResponseEntity<String> handlePacienteNotFound(PacienteNotFoundException ex) {
-        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
+    public ResponseEntity<ErrorResponse> handlePacienteNotFound(PacienteNotFoundException ex) {
+        ErrorResponse body = new ErrorResponse(
+                HttpStatus.NOT_FOUND.value(),
+                ex.getMessage(),
+                LocalDateTime.now()
+        );
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
     }
 
-    @ExceptionHandler(PacienteDuplicadoException.class)
-    public ResponseEntity<String> handlePacienteDuplicado(PacienteDuplicadoException ex) {
-        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
-    }
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<String> handleGlobalException(Exception ex) {
-        return new ResponseEntity<>("Ha ocurrido un error inesperado: " + ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-
-    @ExceptionHandler(PacienteNullException.class)
-    public ResponseEntity<String> handlePacienteNull(PacienteNullException ex) {
-        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler(InvalidEmailFormatException.class)
-    public ResponseEntity<String> handleEmailFormat(InvalidEmailFormatException ex) {
-        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler(InvalidFechaAltaException.class)
-    public ResponseEntity<String> handleFechaAlta(InvalidFechaAltaException ex) {
-        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler(PacienteActivoException.class)
-    public ResponseEntity<String> handlePacienteActivo(PacienteActivoException ex) {
-        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+    @ExceptionHandler({
+            PacienteDuplicadoException.class,
+            PacienteNullException.class,
+            InvalidEmailFormatException.class,
+            InvalidFechaAltaException.class,
+            PacienteActivoException.class
+    })
+    public ResponseEntity<ErrorResponse> handleBadRequest(RuntimeException ex) {
+        ErrorResponse body = new ErrorResponse(
+                HttpStatus.BAD_REQUEST.value(),
+                ex.getMessage(),
+                LocalDateTime.now()
+        );
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(body);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<String> handleValidationErrors(MethodArgumentNotValidException ex) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Datos de entrada invalidos");
+    public ResponseEntity<ErrorResponse> handleValidationErrors(MethodArgumentNotValidException ex) {
+        ErrorResponse body = new ErrorResponse(
+                HttpStatus.BAD_REQUEST.value(),
+                VALIDATION_ERROR_MESSAGE,
+                LocalDateTime.now()
+        );
+        return ResponseEntity.badRequest().body(body);
     }
 
     @ExceptionHandler(MissingServletRequestParameterException.class)
-    public ResponseEntity<String> handleMissingParams(MissingServletRequestParameterException ex) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("El parametro es obligatorio");
+    public ResponseEntity<ErrorResponse> handleMissingParams(MissingServletRequestParameterException ex) {
+        ErrorResponse body = new ErrorResponse(
+                HttpStatus.BAD_REQUEST.value(),
+                PARAMETER_ERROR_MESSAGE,
+                LocalDateTime.now()
+        );
+        return ResponseEntity.badRequest().body(body);
     }
 
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorResponse> handleGlobalException(Exception ex) {
+        ErrorResponse body = new ErrorResponse(
+                HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                UNEXPECTED_ERROR_MESSAGE + ex.getMessage(),
+                LocalDateTime.now()
+        );
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(body);
+    }
 } 

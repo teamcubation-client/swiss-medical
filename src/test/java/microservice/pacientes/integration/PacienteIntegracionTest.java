@@ -13,9 +13,12 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+
+import static microservice.pacientes.shared.GlobalExceptionHandler.VALIDATION_ERROR_MESSAGE;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -87,7 +90,7 @@ class PacienteIntegracionTest {
     //Crear Pacientes
     @Test
     @Transactional
-    void crearPaciente_Exitoso201() throws Exception {
+    void crearPaciente_CuandoRequestValido_Retorna201() throws Exception {
         String dni = pacienteEntity.getDni();
         mockMvc.perform(post("/api/pacientes")
                         .contentType(APPLICATION_JSON)
@@ -102,7 +105,7 @@ class PacienteIntegracionTest {
 
 
     @Test
-    void crearPaciente_DatosInvalidos400() throws Exception {
+    void crearPaciente_CuandoRequestInvalido_Retorna400() throws Exception {
         PacienteDTO pacienteInvalido = pacienteDTO.toBuilder()
                 .nombre("")
                 .email("bad-email-format")
@@ -113,12 +116,15 @@ class PacienteIntegracionTest {
         mockMvc.perform(post("/api/pacientes")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(pacienteInvalido)))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(jsonPath("$.mensaje").value(VALIDATION_ERROR_MESSAGE))
+                .andExpect(jsonPath("$.timestamp").exists());;
     }
 
     @Test
     @Transactional
-    void crearPaciente_DuplicadoDni400() throws Exception {
+    void crearPaciente_CuandoDniDuplicado_Retorna400() throws Exception {
         repository.save(pacienteEntity);
         PacienteDTO pacienteDuplicado = pacienteDTO.toBuilder()
                 .dni("12345678")
@@ -129,11 +135,13 @@ class PacienteIntegracionTest {
                         .contentType(APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(pacienteDuplicado)))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().string(expectedMsg));
+                .andExpect(jsonPath("$.status").value(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(jsonPath("$.mensaje").value(expectedMsg))
+                .andExpect(jsonPath("$.timestamp").exists());
     }
 
     @Test
-    void crearPaciente_EmailInvalido400() throws Exception {
+    void crearPaciente_CuandoEmailInvalido_Retorna400() throws Exception {
         PacienteDTO pacienteMailInvalido = pacienteDTO.toBuilder()
                 .email("correo-invalido")
                 .build();
@@ -143,11 +151,13 @@ class PacienteIntegracionTest {
                         .contentType(APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(pacienteMailInvalido)))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().string(expectedMsg));
+                .andExpect(jsonPath("$.status").value(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(jsonPath("$.mensaje").value(expectedMsg))
+                .andExpect(jsonPath("$.timestamp").exists());
     }
 
     @Test
-    void crearPaciente_FechaAltaFutura400() throws Exception {
+    void crearPaciente_CuandoFechaAltaFutura_Retorna400() throws Exception {
         PacienteDTO pacienteFechaFutura = pacienteDTO.toBuilder()
                 .fechaAlta(LocalDate.now().plusDays(1))
                 .build();
@@ -157,12 +167,14 @@ class PacienteIntegracionTest {
                         .contentType(APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(pacienteFechaFutura)))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().string(expectedMsg));
+                .andExpect(jsonPath("$.status").value(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(jsonPath("$.mensaje").value(expectedMsg))
+                .andExpect(jsonPath("$.timestamp").exists());
     }
 
     //Listar y Obtener Pacientes
     @Test
-    void listarPacientes_Vacio200() throws Exception {
+    void listarPacientes_CuandoNoHayPacientes_Retorna200() throws Exception {
         mockMvc.perform(get("/api/pacientes")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -171,7 +183,7 @@ class PacienteIntegracionTest {
 
     @Test
     @Transactional
-    void listarPacientes_ConDatos200() throws Exception {
+    void listarPacientes_CuandoExistenPacientes_Retorna200() throws Exception {
         PacienteEntity pacienteEntity2 = new PacienteEntity();
         pacienteEntity2.setDni("22222222");
         pacienteEntity2.setNombre("Maria");
@@ -202,7 +214,7 @@ class PacienteIntegracionTest {
 
     @Test
     @Transactional
-    void listarActivos_ConDatos200() throws Exception {
+    void listarPacientesActivos_CuandoExistenActivos_Retorna200() throws Exception {
         pacienteEntity.setEstado(true);
         repository.save(pacienteEntity);
 
@@ -215,7 +227,7 @@ class PacienteIntegracionTest {
     }
 
     @Test
-    void listarActivos_SinDatos200() throws Exception {
+    void listarPacientesActivos_CuandoNoHayActivos_Retorna200() throws Exception {
         mockMvc.perform(get("/api/pacientes/activos")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -224,7 +236,7 @@ class PacienteIntegracionTest {
 
     @Test
     @Transactional
-    void listarInactivos_ConDatos200() throws Exception {
+    void listarPacientesInactivos_CuandoExistenInactivos_Retorna200() throws Exception {
         pacienteEntity.setEstado(false);
         repository.save(pacienteEntity);
 
@@ -237,7 +249,7 @@ class PacienteIntegracionTest {
     }
 
     @Test
-    void listarInactivos_SinDatos200() throws Exception {
+    void listarPacientesInactivos_CuandoNoHayInactivos_Retorna200() throws Exception {
         mockMvc.perform(get("/api/pacientes/inactivos")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -245,7 +257,7 @@ class PacienteIntegracionTest {
     }
 
     @Test
-    void obtenerPaciente_Exitoso200() throws Exception {
+    void obtenerPaciente_CuandoExiste_Retorna200() throws Exception {
         pacienteEntity = repository.save(pacienteEntity);
         mockMvc.perform(get("/api/pacientes/{id}", pacienteEntity.getId())
                         .accept(MediaType.APPLICATION_JSON))
@@ -255,7 +267,7 @@ class PacienteIntegracionTest {
     }
 
     @Test
-    void obtenerPaciente_NoExistente404() throws Exception {
+    void obtenerPaciente_CuandoNoExiste_Retorna404() throws Exception {
         pacienteEntity = repository.save(pacienteEntity);
         Long idTest = pacienteEntity.getId()+1;
         mockMvc.perform(get("/api/pacientes/{id}", idTest)
@@ -268,7 +280,7 @@ class PacienteIntegracionTest {
     //Eliminar Paciente
     @Test
     @Transactional
-    void eliminarPacienteDesactivado_Exitoso204() throws Exception {
+    void eliminarPaciente_CuandoInactivo_Retorna204() throws Exception {
         pacienteEntity.setEstado(false);
         pacienteEntity= repository.save(pacienteEntity);
         mockMvc.perform(delete("/api/pacientes/{id}", pacienteEntity.getId()))
@@ -279,7 +291,7 @@ class PacienteIntegracionTest {
 
     @Test
     @Transactional
-    void eliminarPacienteActivado_Exitoso204() throws Exception {
+    void eliminarPaciente_CuandoActivoYSeDesactiva_Retorna204() throws Exception {
         pacienteEntity.setEstado(true);
         pacienteEntity= repository.save(pacienteEntity);
 
@@ -293,7 +305,7 @@ class PacienteIntegracionTest {
 
     @Test
     @Transactional
-    void eliminarPacienteActivo_SinDesactivar400() throws Exception {
+    void eliminarPaciente_CuandoActivoSinDesactivar_Retorna400() throws Exception {
         pacienteEntity.setEstado(true);
         pacienteEntity= repository.save(pacienteEntity);
 
@@ -301,13 +313,15 @@ class PacienteIntegracionTest {
 
         mockMvc.perform(delete("/api/pacientes/{id}", pacienteEntity.getId()))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().string(expectedMsg));
+                .andExpect(jsonPath("$.status").value(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(jsonPath("$.mensaje").value(expectedMsg))
+                .andExpect(jsonPath("$.timestamp").exists());
     }
 
     //Buscar pacientes
     @Test
     @Transactional
-    void buscarPorNombreParcial_Exitoso200() throws Exception {
+    void buscarPacientesPorNombreParcial_CuandoExistenResultados_Retorna200() throws Exception {
         repository.save(pacienteEntity);
         mockMvc.perform(get("/api/pacientes/buscar/nombre").param("nombre", nombrePacienteParcial))
                 .andExpect(status().isOk())
@@ -315,7 +329,7 @@ class PacienteIntegracionTest {
     }
 
     @Test
-    void buscarPorNombreParcial_SinCoincidencias200() throws Exception {
+    void buscarPacientesPorNombreParcial_CuandoNoExistenResultados_Retorna200() throws Exception {
         mockMvc.perform(get("/api/pacientes/buscar/nombre").param("nombre", nombrePacienteInexistente))
                 .andExpect(status().isOk())
                 .andExpect(content().json("[]"));
@@ -323,7 +337,7 @@ class PacienteIntegracionTest {
 
     @Test
     @Transactional
-    void buscarByDni_Exitoso200() throws Exception {
+    void uscarPacientePorDni_CuandoExiste_Retorna200() throws Exception {
         repository.save(pacienteEntity);
         mockMvc.perform(get("/api/pacientes/sp/buscar/dni/{dni}",pacienteEntity.getDni()))
                 .andExpect(status().isOk())
@@ -331,16 +345,18 @@ class PacienteIntegracionTest {
     }
 
     @Test
-    void buscarByDni_NoExistente404() throws Exception {
+    void buscarPacientePorDni_CuandoNoExiste_Retorna404() throws Exception {
         String expectedMsg = PacienteNotFoundException.porDni(pacienteEntity.getDni()).getMessage();
         mockMvc.perform(get("/api/pacientes/sp/buscar/dni/{dni}", pacienteEntity.getDni()))
                 .andExpect(status().isNotFound())
-                .andExpect(content().string(expectedMsg));
+                .andExpect(jsonPath("$.status").value(HttpStatus.NOT_FOUND.value()))
+                .andExpect(jsonPath("$.mensaje").value(expectedMsg))
+                .andExpect(jsonPath("$.timestamp").exists());
     }
 
     @Test
     @Transactional
-    void buscarByNombre_Exitoso200() throws Exception {
+    void buscarPacientesPorNombreExacto_CuandoExisten_Retorna200() throws Exception {
         repository.save(pacienteEntity);
         mockMvc.perform(get("/api/pacientes/sp/buscar/nombre/{nombre}", nombrePacienteParcial))
                 .andExpect(status().isOk())
@@ -349,16 +365,18 @@ class PacienteIntegracionTest {
     }
 
     @Test
-    void buscarByNombre_NoExistente404() throws Exception {
+    void buscarPacientesPorNombreExacto_CuandoNoExisten_Retorna404() throws Exception {
         String expectedMsg = PacienteNotFoundException.porNombre(nombrePacienteInexistente).getMessage();
         mockMvc.perform(get("/api/pacientes/sp/buscar/nombre/{nombre}", nombrePacienteInexistente))
                 .andExpect(status().isNotFound())
-                .andExpect(content().string(expectedMsg));
+                .andExpect(jsonPath("$.status").value(HttpStatus.NOT_FOUND.value()))
+                .andExpect(jsonPath("$.mensaje").value(expectedMsg))
+                .andExpect(jsonPath("$.timestamp").exists());
     }
 
     @Test
     @Transactional
-    void buscarPorObraSocialPaginado_Exitoso200() throws Exception {
+    void buscarPacientesPorObraSocialPaginado_CuandoExisten_Retorna200() throws Exception {
         repository.save(pacienteEntity);
         mockMvc.perform(get("/api/pacientes/sp/buscar/obra-social")
                         .param("obraSocial", pacienteEntity.getObraSocial())
@@ -369,7 +387,7 @@ class PacienteIntegracionTest {
     }
 
     @Test
-    void buscarPorObraSocialPaginado_NoResultados404() throws Exception {
+    void buscarPacientesPorObraSocialPaginado_CuandoNoExisten_Retorna404() throws Exception {
         String obraSocial = "Sin-obra-social";
         String expectedMsg = PacienteNotFoundException.porObraSocial(obraSocial).getMessage();
 
@@ -378,13 +396,15 @@ class PacienteIntegracionTest {
                         .param("limit", "5")
                         .param("offset", "0"))
                 .andExpect(status().isNotFound())
-                .andExpect(content().string(expectedMsg));
+                .andExpect(jsonPath("$.status").value(HttpStatus.NOT_FOUND.value()))
+                .andExpect(jsonPath("$.mensaje").value(expectedMsg))
+                .andExpect(jsonPath("$.timestamp").exists());
     }
 
     //Actualizar Paciente
     @Test
     @Transactional
-    void actualizarPaciente_Exitoso200() throws Exception {
+    void actualizarPaciente_CuandoExiste_Retorna200() throws Exception {
         pacienteEntity = repository.save(pacienteEntity);
 
         PacienteDTO pacienteActualizado = pacienteDTO.toBuilder()
@@ -410,7 +430,7 @@ class PacienteIntegracionTest {
 
     @Test
     @Transactional
-    void actualizarPaciente_NoExistente404() throws Exception {
+    void actualizarPaciente_CuandoNoExiste_Retorna404() throws Exception {
         pacienteEntity = repository.save(pacienteEntity);
         Long idTest = pacienteEntity.getId()+1;
         mockMvc.perform(put("/api/pacientes/{id}", idTest)
@@ -423,7 +443,7 @@ class PacienteIntegracionTest {
 
     @Test
     @Transactional
-    void actualizarPaciente_DniDuplicado400() throws Exception {
+    void actualizarPaciente_CuandoDniDuplicado_Retorna400() throws Exception {
         PacienteEntity pacientePrueba = new PacienteEntity();
         pacientePrueba.setDni("88888888");
         pacientePrueba.setNombre("A");
@@ -448,13 +468,14 @@ class PacienteIntegracionTest {
         mockMvc.perform(put("/api/pacientes/{id}", pacienteEntity.getId())
                         .contentType(APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(invalidDto)))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().string(expectedMsg));
+                .andExpect(jsonPath("$.status").value(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(jsonPath("$.mensaje").value(expectedMsg))
+                .andExpect(jsonPath("$.timestamp").exists());
     }
 
     @Test
     @Transactional
-    void actualizarPaciente_EmailInvalido400() throws Exception {
+    void actualizarPaciente_CuandoEmailInvalido_Retorna400() throws Exception {
 
         pacienteEntity = repository.save(pacienteEntity);
 
@@ -468,12 +489,14 @@ class PacienteIntegracionTest {
                         .contentType(APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(invalidDto)))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().string(expectedMsg));
+                .andExpect(jsonPath("$.status").value(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(jsonPath("$.mensaje").value(expectedMsg))
+                .andExpect(jsonPath("$.timestamp").exists());
     }
 
     @Test
     @Transactional
-    void actualizarPaciente_FechaAltaFutura400() throws Exception {
+    void actualizarPaciente_CuandoFechaAltaFutura_Retorna400() throws Exception {
         pacienteEntity = repository.save(pacienteEntity);
 
         PacienteDTO invalidDto = pacienteDTO.toBuilder()
@@ -486,12 +509,14 @@ class PacienteIntegracionTest {
                         .contentType(APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(invalidDto)))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().string(expectedMsg));
+                .andExpect(jsonPath("$.status").value(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(jsonPath("$.mensaje").value(expectedMsg))
+                .andExpect(jsonPath("$.timestamp").exists());
     }
 
     @Test
     @Transactional
-    void activarPaciente_Exitoso200() throws Exception {
+    void activarPaciente_CuandoInactivo_Retorna200() throws Exception {
         pacienteEntity.setEstado(false);
         repository.save(pacienteEntity);
 
@@ -506,7 +531,7 @@ class PacienteIntegracionTest {
 
     @Test
     @Transactional
-    void desactivarPaciente_Exitoso200() throws Exception {
+    void desactivarPaciente_CuandoActivo_Retorna200() throws Exception {
         pacienteEntity.setEstado(true);
         pacienteEntity = repository.save(pacienteEntity);
 
@@ -520,20 +545,24 @@ class PacienteIntegracionTest {
     }
 
     @Test
-    void activarPaciente_NoExistente404() throws Exception {
+    void activarPaciente_CuandoNoExiste_Retorna404() throws Exception {
         pacienteEntity = repository.save(pacienteEntity);
         long idTest = pacienteEntity.getId()+1;
         mockMvc.perform(patch("/api/pacientes/{id}/activar", idTest))
                 .andExpect(status().isNotFound())
-                .andExpect(content().string(PacienteNotFoundException.porId(idTest).getMessage()));
+                .andExpect(jsonPath("$.status").value(HttpStatus.NOT_FOUND.value()))
+                .andExpect(jsonPath("$.mensaje").value(PacienteNotFoundException.porId(idTest).getMessage()))
+                .andExpect(jsonPath("$.timestamp").exists());
     }
 
     @Test
-    void desactivarPaciente_NoExistente404() throws Exception {
+    void desactivarPaciente_CuandoNoExiste_Retorna404() throws Exception {
         pacienteEntity = repository.save(pacienteEntity);
         long idTest = pacienteEntity.getId()+1;
         mockMvc.perform(patch("/api/pacientes/{id}/desactivar", idTest))
                 .andExpect(status().isNotFound())
-                .andExpect(content().string(PacienteNotFoundException.porId(idTest).getMessage()));
+                .andExpect(jsonPath("$.status").value(HttpStatus.NOT_FOUND.value()))
+                .andExpect(jsonPath("$.mensaje").value(PacienteNotFoundException.porId(idTest).getMessage()))
+                .andExpect(jsonPath("$.timestamp").exists());
     }
 }

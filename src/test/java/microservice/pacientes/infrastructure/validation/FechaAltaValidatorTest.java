@@ -5,8 +5,9 @@ import microservice.pacientes.application.validation.PacienteValidator;
 import microservice.pacientes.shared.InvalidFechaAltaException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
 
@@ -14,40 +15,41 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
+
+@ExtendWith(MockitoExtension.class)
 public class FechaAltaValidatorTest {
 
     @InjectMocks
     private FechaAltaValidator validator;
     private Paciente paciente;
-
+    private static final LocalDate FIXED_DATE = LocalDate.of(2025, 7, 30);
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
         paciente = Paciente.builder()
                 .id(1L)
                 .build();
     }
 
     @Test
-    void validador_FechaAltaNull() {
+    void validate_givenNullFechaAlta_doesNotThrow() {
         paciente.setFechaAlta(null);
 
         assertDoesNotThrow(() -> validator.validate(paciente));
     }
 
     @Test
-    void validador_FechaAltaCorrecta() {
-        paciente.setFechaAlta(LocalDate.now().minusDays(1));
+    void validate_givenPastOrTodayFechaAlta_doesNotThrow(){
+        paciente.setFechaAlta(FIXED_DATE.minusDays(1));
         assertDoesNotThrow(() -> validator.validate(paciente));
 
-        paciente.setFechaAlta(LocalDate.now());
+        paciente.setFechaAlta(FIXED_DATE);
         assertDoesNotThrow(() -> validator.validate(paciente));
     }
 
     @Test
-    void validador_FechaAltaFutura() {
-        LocalDate fechaFutura = LocalDate.now().plusDays(2);
+    void  validate_givenFutureFechaAlta_throwsInvalidFechaAltaException(){
+        LocalDate fechaFutura = FIXED_DATE.plusDays(2);
         paciente.setFechaAlta(fechaFutura);
 
         InvalidFechaAltaException ex = assertThrows(
@@ -62,8 +64,8 @@ public class FechaAltaValidatorTest {
     }
 
     @Test
-    void validador_DelegarSiguienteCadena() {
-        paciente.setFechaAlta(LocalDate.now());
+    void  validate_withNextValidator_delegatesToNext() {
+        paciente.setFechaAlta(FIXED_DATE);
 
         PacienteValidator nextValidator = mock(PacienteValidator.class);
         validator.setNext(nextValidator);
