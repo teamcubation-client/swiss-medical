@@ -1,20 +1,20 @@
 package microservice.pacientes.infrastructure.adapter.in.rest.advice;
 
 public class ApiError {
-    private String mensaje;
+    private String message;
     private int status;
 
-    public ApiError(String mensaje, int status) {
-        this.mensaje = mensaje;
+    public ApiError(String message, int status) {
+        this.message = message;
         this.status = status;
     }
 
-    public String getMensaje() {
-        return mensaje;
+    public String getMessage() {
+        return message;
     }
 
-    public void setMensaje(String mensaje) {
-        this.mensaje = mensaje;
+    public void setMessage(String mensaje) {
+        this.message = mensaje;
     }
 
     public int getStatus() {

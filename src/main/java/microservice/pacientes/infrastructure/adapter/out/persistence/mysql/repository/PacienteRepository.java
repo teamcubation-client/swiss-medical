@@ -19,22 +19,19 @@ public class PacienteRepository implements PacientePortOut {
     @Override
     public List<Paciente> getAll() {
         List<PacienteEntity> pacientesEntity = jpaPacienteRepository.findAll();
-        List<Paciente> pacientes = pacienteEntityMapper.toDomain(pacientesEntity);
-        return pacientes;
+        return pacienteEntityMapper.toDomain(pacientesEntity);
     }
 
     @Override
     public Optional<Paciente> getByDni(String dni) {
         Optional<PacienteEntity> pacienteEntity = jpaPacienteRepository.findByDni(dni);
-        Optional<Paciente> paciente = pacienteEntity.map(pacienteEntityMapper::toDomain);
-        return paciente;
+        return pacienteEntity.map(pacienteEntityMapper::toDomain);
     }
 
     @Override
     public List<Paciente> getByNombreContainingIgnoreCase(String nombre) {
         List<PacienteEntity> pacientesEntity = jpaPacienteRepository.findByNombreContainingIgnoreCase(nombre);
-        List<Paciente> pacientes = pacienteEntityMapper.toDomain(pacientesEntity);
-        return pacientes;
+        return pacienteEntityMapper.toDomain(pacientesEntity);
     }
 
     @Override
@@ -53,21 +50,18 @@ public class PacienteRepository implements PacientePortOut {
     @Transactional
     public Optional<Paciente> getByNombre(String nombre) {
         Optional<PacienteEntity> pacienteEntity = jpaPacienteRepository.findByNombreSP(nombre);
-        Optional<Paciente> paciente = pacienteEntity.map(pacienteEntityMapper::toDomain);
-        return paciente;
+        return pacienteEntity.map(pacienteEntityMapper::toDomain);
     }
 
     @Override
     @Transactional
     public List<Paciente> getByObraSocial(String obraSocial, int limit, int offset) {
         List<PacienteEntity> pacientesEntity = jpaPacienteRepository.findByObraSocialSP(obraSocial, limit, offset);
-        List<Paciente> pacientes = pacienteEntityMapper.toDomain(pacientesEntity);
-        return pacientes;
+        return pacienteEntityMapper.toDomain(pacientesEntity);
     }
 
     @Override
     public boolean existsByDni(String dni) {
-        boolean exists = jpaPacienteRepository.existsByDni(dni);
-        return exists;
+        return jpaPacienteRepository.existsByDni(dni);
     }
 }

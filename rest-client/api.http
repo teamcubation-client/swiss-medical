@@ -7,8 +7,8 @@ POST http://localhost:8080/pacientes
 Content-Type: application/json
 
 {
-    "dni": "86754321",
-    "nombre": "Nicolas",
+    "dni": "13546738",
+    "nombre": "Agustin",
     "apellido": "Berti",
     "obraSocial": "OSDE",
     "email": "nicolas.berti@teamcubation.com",
@@ -32,9 +32,9 @@ PUT http://localhost:8080/pacientes/86754321
 Content-Type: application/json
 
 {
-    "nombre": "Martin",
-    "apellido": "Girolamo",
-    "email": "nicolas.berti69@gmail.com"
+    "nombre": "prueba",
+    "apellido": "berti",
+    "email": "nicolas.berti69"
 }
 
 ### GET paciente by 111111

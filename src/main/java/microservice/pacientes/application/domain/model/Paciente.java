@@ -1,11 +1,15 @@
 package microservice.pacientes.application.domain.model;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.AllArgsConstructor;
 
-@Data
+@Setter
+@Getter
 @Builder
+@NoArgsConstructor
 @AllArgsConstructor
 public class Paciente {
     private String dni;
