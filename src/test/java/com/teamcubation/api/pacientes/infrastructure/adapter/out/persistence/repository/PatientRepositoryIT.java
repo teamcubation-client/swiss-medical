@@ -67,9 +67,7 @@ class PatientRepositoryIT {
                     .withName(null)
                     .build();
 
-            assertThrows(DataIntegrityViolationException.class, () -> {
-                patientRepository.save(patient);
-            });
+            assertThrows(DataIntegrityViolationException.class, () -> patientRepository.save(patient));
         }
 
         @Test
@@ -78,9 +76,7 @@ class PatientRepositoryIT {
                     .withLastName(null)
                     .build();
 
-            assertThrows(DataIntegrityViolationException.class, () -> {
-                patientRepository.save(patient);
-            });
+            assertThrows(DataIntegrityViolationException.class, () -> patientRepository.save(patient));
         }
 
         @Test
@@ -89,9 +85,7 @@ class PatientRepositoryIT {
                     .withDni(null)
                     .build();
 
-            assertThrows(DataIntegrityViolationException.class, () -> {
-                patientRepository.save(patient);
-            });
+            assertThrows(DataIntegrityViolationException.class, () -> patientRepository.save(patient));
         }
 
         @Test
@@ -121,9 +115,7 @@ class PatientRepositoryIT {
                     .withDni(dniInUse)
                     .build();
 
-            assertThrows(DataIntegrityViolationException.class, () -> {
-                patientRepository.save(patient2);
-            });
+            assertThrows(DataIntegrityViolationException.class, () -> patientRepository.save(patient2));
         }
 
         @Test
@@ -134,9 +126,7 @@ class PatientRepositoryIT {
                     .withLastName(veryLongName)
                     .build();
 
-            assertThrows(DataIntegrityViolationException.class, () -> {
-                patientRepository.save(patient);
-            });
+            assertThrows(DataIntegrityViolationException.class, () -> patientRepository.save(patient));
         }
 
         @Test
@@ -306,9 +296,7 @@ class PatientRepositoryIT {
         void updateByIdWithMissingRequiredFields_ShouldThrowException() {
             Patient incomplete = new TestPatientBuilder().withDni(null).build();
 
-            assertThrows(DataIntegrityViolationException.class, () -> {
-                patientRepository.updateById(incomplete);
-            });
+            assertThrows(DataIntegrityViolationException.class, () -> patientRepository.updateById(incomplete));
         }
     }
 
