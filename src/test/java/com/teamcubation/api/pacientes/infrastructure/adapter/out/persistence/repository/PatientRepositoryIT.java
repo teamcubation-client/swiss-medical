@@ -1,7 +1,7 @@
 package com.teamcubation.api.pacientes.infrastructure.adapter.out.persistence.repository;
 
 import com.teamcubation.api.pacientes.application.domain.model.Patient;
-import org.junit.jupiter.api.AfterEach;
+import com.teamcubation.api.pacientes.shared.TestPatientBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -34,73 +34,11 @@ class PatientRepositoryIT {
         this.patientRepository = new PatientRepository(jpaRepository);
     }
 
-    @AfterEach
-    void cleanUp() {
-        jpaRepository.deleteAll();
-    }
-
-    static class PatientBuilder {
-        private Long id = 1L;
-        private String name = "Fabian";
-        private String lastName = "Gonzáles";
-        private String dni = "35784627";
-        private String insurance = null;
-        private String email = null;
-        private String phone = null;
-
-        PatientRepositoryIT.PatientBuilder withId(Long id) {
-            this.id = id;
-            return this;
-        }
-
-        PatientRepositoryIT.PatientBuilder withName(String name) {
-            this.name = name;
-            return this;
-        }
-
-        PatientRepositoryIT.PatientBuilder withLastName(String lastName) {
-            this.lastName = lastName;
-            return this;
-        }
-
-        PatientRepositoryIT.PatientBuilder withDni(String dni) {
-            this.dni = dni;
-            return this;
-        }
-
-        PatientRepositoryIT.PatientBuilder withInsurance() {
-            this.insurance = "Swiss Medical";
-            return this;
-        }
-
-        PatientRepositoryIT.PatientBuilder withEmail(String email) {
-            this.email = email;
-            return this;
-        }
-
-        PatientRepositoryIT.PatientBuilder withPhone() {
-            this.phone = "+5491199867532";
-            return this;
-        }
-
-        Patient build() {
-            Patient p = new Patient();
-            p.setId(id);
-            p.setName(name);
-            p.setLastName(lastName);
-            p.setDni(dni);
-            p.setHealthInsuranceProvider(insurance);
-            p.setEmail(email);
-            p.setPhoneNumber(phone);
-            return p;
-        }
-    }
-
     @Nested
     class Save {
         @Test
         void savePatientWithRequiredFields_ShouldSavePatientSuccessfully() {
-            Patient patient = new PatientBuilder().build();
+            Patient patient = new TestPatientBuilder().build();
             Patient saved = patientRepository.save(patient);
 
             assertNotNull(saved.getId());
@@ -111,7 +49,7 @@ class PatientRepositoryIT {
 
         @Test
         void savePatientWithAllFields_ShouldSavePatientSuccessfully() {
-            Patient patient = new PatientBuilder().withInsurance().withEmail("mail@example.com").withPhone().build();
+            Patient patient = new TestPatientBuilder().withInsurance("Swiss Medical").withEmail("mail@example.com").withPhone("+5491147657812").build();
             Patient saved = patientRepository.save(patient);
 
             assertNotNull(saved.getId());
@@ -125,7 +63,7 @@ class PatientRepositoryIT {
 
         @Test
         void savePatientWithNullName_ShouldThrowException() {
-            Patient patient = new PatientBuilder()
+            Patient patient = new TestPatientBuilder()
                     .withName(null)
                     .build();
 
@@ -136,7 +74,7 @@ class PatientRepositoryIT {
 
         @Test
         void savePatientWithNullLastName_ShouldThrowException() {
-            Patient patient = new PatientBuilder()
+            Patient patient = new TestPatientBuilder()
                     .withLastName(null)
                     .build();
 
@@ -147,7 +85,7 @@ class PatientRepositoryIT {
 
         @Test
         void savePatientWithNullDni_ShouldThrowException() {
-            Patient patient = new PatientBuilder()
+            Patient patient = new TestPatientBuilder()
                     .withDni(null)
                     .build();
 
@@ -158,9 +96,9 @@ class PatientRepositoryIT {
 
         @Test
         void saveTwoPatientsWithSameNameAndDifferentDni_ShouldSaveBothSuccessfully() {
-            Patient patient1 = new PatientBuilder().build();
+            Patient patient1 = new TestPatientBuilder().build();
 
-            Patient patient2 = new PatientBuilder().withDni("35778654").build();
+            Patient patient2 = new TestPatientBuilder().withDni("35778654").build();
 
             Patient saved1 = patientRepository.save(patient1);
             Patient saved2 = patientRepository.save(patient2);
@@ -173,11 +111,11 @@ class PatientRepositoryIT {
 
         @Test
         void savePatientWithDuplicateDni_ShouldThrowDataIntegrityViolationException() {
-            Patient patient1 = new PatientBuilder().build();
+            Patient patient1 = new TestPatientBuilder().build();
             String dniInUse = patient1.getDni();
             patientRepository.save(patient1);
 
-            Patient patient2 = new PatientBuilder()
+            Patient patient2 = new TestPatientBuilder()
                     .withName("Otro")
                     .withLastName("Paciente")
                     .withDni(dniInUse)
@@ -191,7 +129,7 @@ class PatientRepositoryIT {
         @Test
         void savePatientWithVeryLongFields_ShouldThrowException() {
             String veryLongName = "a".repeat(110);
-            Patient patient = new PatientBuilder()
+            Patient patient = new TestPatientBuilder()
                     .withName(veryLongName)
                     .withLastName(veryLongName)
                     .build();
@@ -203,7 +141,7 @@ class PatientRepositoryIT {
 
         @Test
         void savePatientWithEmptyButNotNullFields_ShouldSaveSuccessfully() {
-            Patient patient = new PatientBuilder()
+            Patient patient = new TestPatientBuilder()
                     .withName("")
                     .withLastName("")
                     .withDni("")
@@ -221,8 +159,8 @@ class PatientRepositoryIT {
     class Find {
         @Test
         void findAllWithNullParams_ShouldReturnAllPatients() {
-            Patient patient = new PatientBuilder().build();
-            Patient patient2 = new PatientBuilder().withName("Test").withDni("87654321").build();
+            Patient patient = new TestPatientBuilder().build();
+            Patient patient2 = new TestPatientBuilder().withName("Test").withDni("87654321").build();
             patientRepository.save(patient);
             patientRepository.save(patient2);
             List<Patient> patients = patientRepository.findAll(null, null);
@@ -239,9 +177,9 @@ class PatientRepositoryIT {
 
         @Test
         void findAllWithPartialName_ShouldReturnMatchingPatients() {
-            Patient patient = new PatientBuilder().withName("Joel").build();
-            Patient patient2 = new PatientBuilder().withName("Jonathan").withDni("12345678").build();
-            Patient patient3 = new PatientBuilder().withName("María").withDni("23456789").build();
+            Patient patient = new TestPatientBuilder().withName("Joel").build();
+            Patient patient2 = new TestPatientBuilder().withName("Jonathan").withDni("12345678").build();
+            Patient patient3 = new TestPatientBuilder().withName("María").withDni("23456789").build();
             patientRepository.save(patient);
             patientRepository.save(patient2);
             patientRepository.save(patient3);
@@ -252,7 +190,7 @@ class PatientRepositoryIT {
 
         @Test
         void findAllWithNameNotMatching_ShouldReturnEmptyList() {
-            Patient patient = new PatientBuilder().build();
+            Patient patient = new TestPatientBuilder().build();
             patientRepository.save(patient);
 
             List<Patient> patients = patientRepository.findAll(null, "Test");
@@ -262,8 +200,8 @@ class PatientRepositoryIT {
 
         @Test
         void findAllWithExactDni_ShouldReturnSinglePatient() {
-            Patient patient = new PatientBuilder().build();
-            Patient patient2 = new PatientBuilder().withDni("47857635").build();
+            Patient patient = new TestPatientBuilder().build();
+            Patient patient2 = new TestPatientBuilder().withDni("47857635").build();
             patientRepository.save(patient);
             patientRepository.save(patient2);
 
@@ -275,7 +213,7 @@ class PatientRepositoryIT {
 
         @Test
         void findAllWithNonMatchingDni_ShouldReturnEmptyList() {
-            Patient patient = new PatientBuilder().build();
+            Patient patient = new TestPatientBuilder().build();
             patientRepository.save(patient);
             List<Patient> patients = patientRepository.findAll("99999999", null);
 
@@ -284,7 +222,7 @@ class PatientRepositoryIT {
 
         @Test
         void findAllWithMatchingDniAndName_ShouldReturnPatient() {
-            Patient patient = new PatientBuilder().build();
+            Patient patient = new TestPatientBuilder().build();
             String dni = patient.getDni();
             String name = patient.getName();
             patientRepository.save(patient);
@@ -296,7 +234,7 @@ class PatientRepositoryIT {
 
         @Test
         void findAllWithDniMatchingButNotName_ShouldReturnEmptyList() {
-            Patient patient = new PatientBuilder().build();
+            Patient patient = new TestPatientBuilder().build();
             String matchingDni = patient.getDni();
             patientRepository.save(patient);
             List<Patient> patients = patientRepository.findAll(matchingDni, "Test");
@@ -306,7 +244,7 @@ class PatientRepositoryIT {
 
         @Test
         void findAllWithDniNotMatchingButNameMatching_ShouldReturnEmptyList() {
-            Patient patient = new PatientBuilder().build();
+            Patient patient = new TestPatientBuilder().build();
             String matchingName = patient.getName();
             patientRepository.save(patient);
             List<Patient> patients = patientRepository.findAll("99999999", matchingName);
@@ -319,7 +257,7 @@ class PatientRepositoryIT {
     class FindById {
         @Test
         void findByExistentId_ShouldReturnPatient() {
-            Patient patient = new PatientBuilder().build();
+            Patient patient = new TestPatientBuilder().build();
 
             Patient saved = patientRepository.save(patient);
             Optional<Patient> result = patientRepository.findById(saved.getId());
@@ -343,7 +281,7 @@ class PatientRepositoryIT {
         @Test
         void updateByExistentId_ShouldUpdatePatient() {
             Patient patient = patientRepository.save(
-                    new PatientBuilder().withEmail("original@email.com").build()
+                    new TestPatientBuilder().withEmail("original@email.com").build()
             );
             patient.setName("Modificado");
             patient.setEmail("nuevo@email.com");
@@ -356,7 +294,7 @@ class PatientRepositoryIT {
 
         @Test
         void updateByNonExistentId_ShouldInsertNewPatient() {
-            Patient newPatient = new PatientBuilder().build();
+            Patient newPatient = new TestPatientBuilder().build();
 
             Patient saved = patientRepository.updateById(newPatient);
 
@@ -366,7 +304,7 @@ class PatientRepositoryIT {
 
         @Test
         void updateByIdWithMissingRequiredFields_ShouldThrowException() {
-            Patient incomplete = new PatientBuilder().withDni(null).build();
+            Patient incomplete = new TestPatientBuilder().withDni(null).build();
 
             assertThrows(DataIntegrityViolationException.class, () -> {
                 patientRepository.updateById(incomplete);
@@ -378,7 +316,7 @@ class PatientRepositoryIT {
     class DeleteById {
         @Test
         void deleteByExistentId_ShouldRemovePatient() {
-            Patient patient = new PatientBuilder().build();
+            Patient patient = new TestPatientBuilder().build();
 
             Patient saved = patientRepository.save(patient);
             patientRepository.deleteById(saved.getId());
