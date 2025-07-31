@@ -23,7 +23,6 @@ public class CsvPatientExporter implements PatientExporterPortOut {
                         patient.getPhoneNumber()))
                 .collect(Collectors.joining("\n"));
 
-        System.out.println(header + body);
         return header + body + "\n";
     }
 }

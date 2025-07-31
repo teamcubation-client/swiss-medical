@@ -4,7 +4,8 @@ import com.teamcubation.api.pacientes.application.domain.port.out.PatientExporte
 import com.teamcubation.api.pacientes.infrastructure.adapter.in.exporter.impl.JsonPatientExporter;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class JsonExporterFactoryTest {
     @Test
@@ -14,6 +15,6 @@ class JsonExporterFactoryTest {
         PatientExporterPortOut exporter = factory.createPatientExporter();
 
         assertNotNull(exporter);
-        assertTrue(exporter instanceof JsonPatientExporter);
+        assertInstanceOf(JsonPatientExporter.class, exporter);
     }
 }

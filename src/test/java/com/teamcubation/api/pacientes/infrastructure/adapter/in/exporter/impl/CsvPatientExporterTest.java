@@ -6,14 +6,18 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class CsvPatientExporterTest {
 
+    private CsvPatientExporter csvPatientExporter;
     private Patient patient;
     private Patient patient2;
+
     @BeforeEach
     void setUp() {
+        this.csvPatientExporter = new CsvPatientExporter();
         this.patient = new Patient();
         patient.setId(1L);
         patient.setName("Ana");
@@ -35,10 +39,9 @@ class CsvPatientExporterTest {
 
     @Test
     void export_shouldReturnCsvString() {
-        CsvPatientExporter exporter = new CsvPatientExporter();
         List<Patient> patients = List.of(patient, patient2);
 
-        String csv = exporter.export(patients);
+        String csv = this.csvPatientExporter.export(patients);
 
         String expectedHeader = "id,nombre,apellido,dni,obra_social,email,telefono\n";
 
@@ -50,9 +53,7 @@ class CsvPatientExporterTest {
 
     @Test
     void export_emptyList_shouldReturnOnlyHeader() {
-        CsvPatientExporter exporter = new CsvPatientExporter();
-
-        String csv = exporter.export(List.of());
+        String csv = this.csvPatientExporter.export(List.of());
 
         String expectedHeader = "id,nombre,apellido,dni,obra_social,email,telefono\n";
 

@@ -20,6 +20,7 @@ class ExporterFactoryProviderTest {
 
         assertNotNull(factory);
         assertTrue(factory instanceof CsvExporterFactory);
+        assertInstanceOf(JsonExporterFactory.class, factory);
     }
 
     @Test
@@ -27,7 +28,7 @@ class ExporterFactoryProviderTest {
         ExporterFactory factory = factoryProvider.getFactory("json");
 
         assertNotNull(factory);
-        assertTrue(factory instanceof JsonExporterFactory);
+        assertInstanceOf(JsonExporterFactory.class, factory);
     }
 
     @Test
