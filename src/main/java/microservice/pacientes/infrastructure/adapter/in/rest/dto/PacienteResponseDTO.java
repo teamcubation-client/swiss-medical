@@ -1,10 +1,10 @@
 package microservice.pacientes.infrastructure.adapter.in.rest.dto;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
 
 @AllArgsConstructor
-@NoArgsConstructor
-@Setter
 @Getter
 @Builder
 public class PacienteResponseDTO {

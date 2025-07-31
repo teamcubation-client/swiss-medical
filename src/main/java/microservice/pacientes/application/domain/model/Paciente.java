@@ -1,6 +1,10 @@
 package microservice.pacientes.application.domain.model;
 
-import lombok.*;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.AllArgsConstructor;
 
 @Setter
 @Getter

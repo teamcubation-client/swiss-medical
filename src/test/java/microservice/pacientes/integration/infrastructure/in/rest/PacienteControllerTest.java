@@ -4,7 +4,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import microservice.pacientes.application.domain.model.Paciente;
 import microservice.pacientes.infrastructure.adapter.in.rest.dto.PacienteRequestDTO;
 import microservice.pacientes.infrastructure.adapter.out.persistence.mysql.repository.PacienteRepository;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -37,6 +40,24 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test")
 public class PacienteControllerTest {
 
+    private static final String DNI_VALID = "12345678";
+    private static final String DNI_NO_VALID = "12345678";
+    private static final String EMAIL_VALID = "ana@mail.com";
+    private static final String EMAIL_NO_VALID = "ana";
+    private static final String NOMBRE_VALID = "Ana";
+    private static final String NOMBRE_NO_VALID = "12s";
+    private static final String APELLIDO_VALID = "Perez";
+    private static final String APELLIDO_NO_VALID = "as2";
+    private static final String OBRA_SOCIAL = "Obra social";
+    private static final String TELEFONO_VALID = "123456789";
+    private static final String TELEFONO_NO_VALID = "1";
+    private static final String BASE_URL = "/pacientes";
+    private static final String UPDATE_NOMBRE_VALID = "Juana";
+    private static final String UPDATE_APELLIDO_VALID = "Rodriguez";
+    private static final String UPDATE_OBRA_SOCIAL_VALID = "OSDE";
+    private static final String UPDATE_EMAIL_VALID = "jc@mail.com";
+    private static final String DNI_NO_EXISTS = "87654321";
+
     @Autowired
     private MockMvc mockMvc;
 
@@ -62,45 +83,60 @@ public class PacienteControllerTest {
         System.setProperty("spring.datasource.password", mysqlContainer.getPassword());
     }
 */
+
+    private Paciente createPacienteValid() {
+        return new Paciente(DNI_VALID, NOMBRE_VALID, APELLIDO_VALID, OBRA_SOCIAL, EMAIL_VALID, TELEFONO_VALID);
+    }
+
+    private Paciente createUpdatePacienteValid() {
+        return new Paciente(DNI_VALID, UPDATE_NOMBRE_VALID, UPDATE_APELLIDO_VALID, UPDATE_OBRA_SOCIAL_VALID, EMAIL_VALID, TELEFONO_VALID);
+    }
+
+    private void limpiarPacientes() {
+        pacienteRepository.getAll().forEach(pacienteRepository::delete);
+    }
+
     @BeforeEach
     void setUp() {
-        for (Paciente paciente : pacienteRepository.getAll())
-            pacienteRepository.delete(paciente);
-        paciente = new Paciente("12345678", "Juan", "Perez", "OSDE", "juan@mail.com", "123456789");
+        limpiarPacientes();
+        paciente = createPacienteValid();
     }
 
     @AfterEach
     void tearDown() {
-        for (Paciente paciente : pacienteRepository.getAll())
-            pacienteRepository.delete(paciente);
+        limpiarPacientes();
     }
 
     @Test
     @DisplayName("Debe crear un paciente y guardarlo en la DB")
     void crearPacienteExitosamente() throws Exception {
-        String pacienteJson = objectMapper.writeValueAsString(new PacienteRequestDTO("12345678", "Ana", "Perez", "OSDE", "ana@mail.com", "112233445"));
+        String pacienteJson = objectMapper.writeValueAsString(new PacienteRequestDTO(DNI_VALID, NOMBRE_VALID, APELLIDO_VALID, OBRA_SOCIAL, EMAIL_VALID, TELEFONO_VALID));
 
-        mockMvc.perform(post("/pacientes")
+        mockMvc.perform(post(BASE_URL)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(pacienteJson))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.dni", is("12345678")))
-                .andExpect(jsonPath("$.nombre", is("Ana")))
-                .andExpect(jsonPath("$.apellido", is("Perez")))
-                .andExpect(jsonPath("$.obraSocial", is("OSDE")));
+                .andExpect(jsonPath("$.dni", is(DNI_VALID)))
+                .andExpect(jsonPath("$.nombre", is(NOMBRE_VALID)))
+                .andExpect(jsonPath("$.apellido", is(APELLIDO_VALID)))
+                .andExpect(jsonPath("$.obraSocial", is(OBRA_SOCIAL)));
 
-        Paciente pacienteGuardado = pacienteRepository.getByDni("12345678").orElse(null);
+        Paciente pacienteGuardado = pacienteRepository.getByDni(DNI_VALID).orElse(null);
         assertNotNull(pacienteGuardado);
-        assertEquals("Ana", pacienteGuardado.getNombre());
+        assertEquals(NOMBRE_VALID, pacienteGuardado.getNombre());
+        assertEquals(APELLIDO_VALID, pacienteGuardado.getApellido());
+        assertEquals(OBRA_SOCIAL, pacienteGuardado.getObraSocial());
+        assertEquals(EMAIL_VALID, pacienteGuardado.getEmail());
+        assertEquals(TELEFONO_VALID, pacienteGuardado.getTelefono());
     }
 
     @Test
     @DisplayName("Debe fallar al crear un paciente con DNI existente")
     void crearPacienteConDniExistente() throws Exception {
         pacienteRepository.save(paciente);
-        String pacienteJson = objectMapper.writeValueAsString(new PacienteRequestDTO("12345678", "Otro", "Nombre", "Swiss", "otro@mail.com", "123456789"));
+        String pacienteJson = objectMapper.writeValueAsString(new PacienteRequestDTO(DNI_VALID, "Otro", "Nombre", "Swiss", "otro@mail.com", "123456789"));
 
-        mockMvc.perform(post("/pacientes")
+        mockMvc.perform(post(BASE_URL)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(pacienteJson))
                 .andExpect(status().isConflict());
@@ -109,9 +145,9 @@ public class PacienteControllerTest {
     @Test
     @DisplayName("Debe fallar al crear un paciente con datos inválidos")
     void crearPacienteConDatosInvalidos() throws Exception {
-        String pacienteJson = objectMapper.writeValueAsString(new PacienteRequestDTO("", "", "", "", "mail-invalido", ""));
+        String pacienteJson = objectMapper.writeValueAsString(new PacienteRequestDTO(DNI_NO_VALID, NOMBRE_NO_VALID, APELLIDO_NO_VALID, OBRA_SOCIAL, EMAIL_NO_VALID, TELEFONO_NO_VALID));
 
-        mockMvc.perform(post("/pacientes")
+        mockMvc.perform(post(BASE_URL)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(pacienteJson))
                 .andExpect(status().isBadRequest());
@@ -121,32 +157,29 @@ public class PacienteControllerTest {
     @DisplayName("Debe actualizar un paciente existente")
     void actualizarPacienteExitosamente() throws Exception {
         Paciente savedPaciente = pacienteRepository.save(paciente);
-        String pacienteUpdateJson = """
-            {
-                "nombre": "Carlos",
-                "email": "jc@mail.com"
-            }
-            """;
+        String pacienteUpdateJson = String.format(
+                "{\"nombre\": \"%s\", \"email\": \"%s\"}",
+                UPDATE_NOMBRE_VALID, UPDATE_EMAIL_VALID
+        );
 
-        mockMvc.perform(put("/pacientes/" + savedPaciente.getDni())
+        mockMvc.perform(put(BASE_URL + "/" + savedPaciente.getDni())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(pacienteUpdateJson))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.nombre", is("Carlos")));
+                .andExpect(jsonPath("$.nombre", is(UPDATE_NOMBRE_VALID)));
 
         Paciente pacienteActualizado = pacienteRepository.getByDni(savedPaciente.getDni()).orElseThrow();
-        assertEquals("Carlos", pacienteActualizado.getNombre());
+        assertEquals(UPDATE_NOMBRE_VALID, pacienteActualizado.getNombre());
     }
 
     @Test
     @DisplayName("Debe fallar al actualizar un paciente inexistente")
     void actualizarPacienteInexistente() throws Exception {
-        String pacienteUpdateJson = """
-            {
-                "nombre": "Inexistente"
-            }
-            """;
-        mockMvc.perform(put("/pacientes/23232323")
+        String pacienteUpdateJson = String.format(
+                "{\"nombre\": \"%s\", \"email\": \"%s\"}",
+                UPDATE_NOMBRE_VALID, UPDATE_EMAIL_VALID
+        );
+        mockMvc.perform(put(BASE_URL+"/"+DNI_NO_EXISTS)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(pacienteUpdateJson))
                 .andExpect(status().isNotFound());
@@ -156,19 +189,18 @@ public class PacienteControllerTest {
     @DisplayName("Debe fallar al actualizar un paciente con datos inválidos")
     void actualizarPacienteConDatosInvalidos() throws Exception {
         Paciente savedPaciente = pacienteRepository.save(paciente);
-        String pacienteUpdateJson = """
-            {
-                "email": "mail-invalido"
-            }
-            """;
+        String pacienteUpdateJson = String.format(
+                "{\"nombre\": \"%s\", \"email\": \"%s\"}",
+                NOMBRE_NO_VALID, EMAIL_NO_VALID
+        );
 
-        mockMvc.perform(put("/pacientes/" + savedPaciente.getDni())
+        mockMvc.perform(put(BASE_URL+"/" + savedPaciente.getDni())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(pacienteUpdateJson))
                 .andExpect(status().isBadRequest());
 
         Paciente pacienteNoActualizado = pacienteRepository.getByDni(savedPaciente.getDni()).orElseThrow();
-        assertEquals("juan@mail.com", pacienteNoActualizado.getEmail());
+        assertEquals(EMAIL_VALID, pacienteNoActualizado.getEmail());
     }
 
     @Test
@@ -176,7 +208,7 @@ public class PacienteControllerTest {
     void borrarPacienteExitosamente() throws Exception {
         Paciente savedPaciente = pacienteRepository.save(paciente);
 
-        mockMvc.perform(delete("/pacientes/" + savedPaciente.getDni()))
+        mockMvc.perform(delete(BASE_URL+"/" + savedPaciente.getDni()))
                 .andExpect(status().isNoContent());
 
         assertFalse(pacienteRepository.getByDni(savedPaciente.getDni()).isPresent());
@@ -185,7 +217,7 @@ public class PacienteControllerTest {
     @Test
     @DisplayName("Debe fallar al borrar un paciente inexistente")
     void borrarPacienteInexistente() throws Exception {
-        mockMvc.perform(delete("/pacientes/999"))
+        mockMvc.perform(delete(BASE_URL+"/"+DNI_NO_EXISTS))
                 .andExpect(status().isNotFound());
     }
 
@@ -195,7 +227,7 @@ public class PacienteControllerTest {
         pacienteRepository.save(paciente);
         pacienteRepository.save(new Paciente("87654321", "Maria", "Gomez", "Galeno", "maria@mail.com", "123456789"));
 
-        mockMvc.perform(get("/pacientes"))
+        mockMvc.perform(get(BASE_URL))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(2)));
     }
@@ -207,13 +239,13 @@ public class PacienteControllerTest {
         pacienteRepository.save(new Paciente("87654321", "Juan", "Gonzalez", "Galeno", "juan.gonzalez@mail.com", "123456789"));
 */
         // Se mockea solamente el retorno de la DB por que usa un SP para obtener por nombre.
-        when(pacienteRepository.getByNombreContainingIgnoreCase("Juan")).thenReturn(List.of(paciente, paciente));
+        when(pacienteRepository.getByNombreContainingIgnoreCase(NOMBRE_VALID)).thenReturn(List.of(paciente, paciente));
 
-        mockMvc.perform(get("/pacientes?nombre=Juan"))
+        mockMvc.perform(get(BASE_URL+"?nombre="+NOMBRE_VALID))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(2)))
-                .andExpect(jsonPath("$[0].nombre", is("Juan")))
-                .andExpect(jsonPath("$[1].nombre", is("Juan")));
+                .andExpect(jsonPath("$[0].nombre", is(NOMBRE_VALID)))
+                .andExpect(jsonPath("$[1].nombre", is(NOMBRE_VALID)));
     }
 
     @Test
@@ -221,7 +253,7 @@ public class PacienteControllerTest {
     void obtenerPacientePorDni() throws Exception {
         pacienteRepository.save(paciente);
 
-        mockMvc.perform(get("/pacientes/dni/" + paciente.getDni()))
+        mockMvc.perform(get(BASE_URL+"/dni/" + paciente.getDni()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.dni", is(paciente.getDni())));
     }
@@ -229,7 +261,7 @@ public class PacienteControllerTest {
     @Test
     @DisplayName("Debe fallar al buscar un paciente por DNI inexistente")
     void obtenerPacientePorDniInexistente() throws Exception {
-        mockMvc.perform(get("/pacientes/dni/00000000"))
+        mockMvc.perform(get(BASE_URL+"/dni/"+DNI_NO_EXISTS))
                 .andExpect(status().isNotFound());
     }
 }

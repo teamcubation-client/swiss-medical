@@ -6,7 +6,6 @@ import microservice.pacientes.application.domain.model.Paciente;
 
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -19,7 +18,6 @@ import microservice.pacientes.shared.exception.PacienteDuplicadoException;
 import microservice.pacientes.shared.exception.PacienteNoEncontradoException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-//import org.junit.jupiter.api.extension.MediaType;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -34,6 +32,20 @@ import java.util.stream.Stream;
 
 @WebMvcTest(PacienteController.class)
 public class PacienteControllerTest {
+
+    private static final String DNI_VALID = "12345678";
+    private static final String DNI_NO_VALID = "12345678";
+    private static final String EMAIL_VALID = "ana@mail.com";
+    private static final String NOMBRE_VALID = "Ana";
+    private static final String NOMBRE_NO_VALID = "12s";
+    private static final String APELLIDO_VALID = "Perez";
+    private static final String APELLIDO_NO_VALID = "as2";
+    private static final String OBRA_SOCIAL = "Obra social";
+    private static final String TELEFONO_VALID = "123456789";
+    private static final String BASE_URL = "/pacientes";
+    private static final String UPDATE_NOMBRE_VALID = "Juana";
+    private static final String UPDATE_APELLIDO_VALID = "Rodriguez";
+    private static final String UPDATE_OBRA_SOCIAL_VALID = "OSDE";
 
     @Autowired
     private MockMvc mockMvc;
@@ -50,82 +62,94 @@ public class PacienteControllerTest {
     @MockitoBean
     private DeletePacienteUseCase deletePacienteUseCase;
 
+    private Paciente createPacienteValid() {
+        return new Paciente(DNI_VALID, NOMBRE_VALID, APELLIDO_VALID, OBRA_SOCIAL, EMAIL_VALID, TELEFONO_VALID);
+    }
+
+    private Paciente createUpdatePacienteValid() {
+        return new Paciente(DNI_VALID, UPDATE_NOMBRE_VALID, UPDATE_APELLIDO_VALID, UPDATE_OBRA_SOCIAL_VALID, EMAIL_VALID, TELEFONO_VALID);
+    }
+
     @Test
     @DisplayName("Debería obtener correctamente una lista de pacientes")
     void getAll() throws Exception {
-        Paciente paciente = new Paciente("123", "Ana", "Perez", "Obra social", "email@test.com", "123456789");
+        Paciente paciente = createPacienteValid();
 
         when(findPacienteUseCase.getAll()).thenReturn(List.of(paciente));
 
-        mockMvc.perform(get("/pacientes"))
+        mockMvc.perform(get(BASE_URL))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].dni").value("123"))
-                .andExpect(jsonPath("$[0].nombre").value("Ana"))
-                .andExpect(jsonPath("$[0].apellido").value("Perez"))
-                .andExpect(jsonPath("$[0].obraSocial").value("Obra social"));
+                .andExpect(jsonPath("$[0].dni").value(DNI_VALID))
+                .andExpect(jsonPath("$[0].nombre").value(NOMBRE_VALID))
+                .andExpect(jsonPath("$[0].apellido").value(APELLIDO_VALID))
+                .andExpect(jsonPath("$[0].obraSocial").value(OBRA_SOCIAL));
         verify(findPacienteUseCase, times(1)).getAll();
     }
 
     @Test
     @DisplayName("Debería obtener correctamente una lista de pacientes con nombre")
     void getAllWithNombre() throws Exception {
-        Paciente paciente = new Paciente("123", "Ana", "Perez", "Obra social", "email@test.com", "123456789");
+        Paciente paciente = createPacienteValid();
+        when(findPacienteUseCase.getByNombreContainingIgnoreCase(NOMBRE_VALID)).thenReturn(List.of(paciente));
 
-        when(findPacienteUseCase.getByNombreContainingIgnoreCase("Ana")).thenReturn(List.of(paciente));
-
-        mockMvc.perform(get("/pacientes?nombre=Ana"))
+        mockMvc.perform(get(BASE_URL+"?nombre="+NOMBRE_VALID))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].dni").value("123"))
-                .andExpect(jsonPath("$[0].nombre").value("Ana"))
-                .andExpect(jsonPath("$[0].apellido").value("Perez"))
-                .andExpect(jsonPath("$[0].obraSocial").value("Obra social"));
-         verify(findPacienteUseCase, times(1)).getByNombreContainingIgnoreCase("Ana");
+                .andExpect(jsonPath("$[0].dni").value(DNI_VALID))
+                .andExpect(jsonPath("$[0].nombre").value(NOMBRE_VALID))
+                .andExpect(jsonPath("$[0].apellido").value(APELLIDO_VALID))
+                .andExpect(jsonPath("$[0].obraSocial").value(OBRA_SOCIAL));
+         verify(findPacienteUseCase, times(1)).getByNombreContainingIgnoreCase(NOMBRE_VALID);
     }
 
     @Test
     @DisplayName("Debería obtener correctamente un paciente")
     void getByDniValid() throws Exception {
-        Paciente paciente = new Paciente("123", "Ana", "Perez", "Obra social", "email@test.com", "123456789");
+        Paciente paciente = createPacienteValid();
 
-        when(findPacienteUseCase.getByDni("123")).thenReturn(paciente);
+        when(findPacienteUseCase.getByDni(DNI_VALID)).thenReturn(paciente);
 
-        mockMvc.perform(get("/pacientes/123"))
+        mockMvc.perform(get(BASE_URL+"/"+DNI_VALID))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.dni").value("123"))
-                .andExpect(jsonPath("$.nombre").value("Ana"))
-                .andExpect(jsonPath("$.apellido").value("Perez"))
-                .andExpect(jsonPath("$.obraSocial").value("Obra social"));
-        verify(findPacienteUseCase, times(1)).getByDni("123");
+                .andExpect(jsonPath("$.dni").value(DNI_VALID))
+                .andExpect(jsonPath("$.nombre").value(NOMBRE_VALID))
+                .andExpect(jsonPath("$.apellido").value(APELLIDO_VALID))
+                .andExpect(jsonPath("$.obraSocial").value(OBRA_SOCIAL));
+        verify(findPacienteUseCase, times(1)).getByDni(DNI_VALID);
     }
 
     @Test
     @DisplayName("Debería lanzar una excepción al intentar obtener un paciente inexistente")
     void getByDniInvalid() throws Exception {
 
-        when(findPacienteUseCase.getByDni("123")).thenThrow(new PacienteNoEncontradoException());
+        when(findPacienteUseCase.getByDni(DNI_NO_VALID)).thenThrow(new PacienteNoEncontradoException());
 
-        mockMvc.perform(get("/pacientes/123"))
+        mockMvc.perform(get(BASE_URL+"/"+DNI_NO_VALID))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value("Paciente no encontrado"))
                 .andExpect(jsonPath("$.status").value(404));
-        verify(findPacienteUseCase, times(1)).getByDni("123");
+        verify(findPacienteUseCase, times(1)).getByDni(DNI_NO_VALID);
     }
 
     @Test
     @DisplayName("Debería obtener correctamente un paciente")
     void createValidPaciente() throws Exception {
-        Paciente paciente = new Paciente("123", "Ana", "Perez", "Obra social", "email@test.com", "123456789");
+        String jsonBody = String.format(
+                "{\"dni\": \"%s\", \"nombre\": \"%s\", \"apellido\": \"%s\", \"obraSocial\": \"%s\"}",
+                DNI_VALID, NOMBRE_VALID, APELLIDO_VALID, OBRA_SOCIAL
+        );
+        Paciente paciente = createPacienteValid();
 
         when(createPacienteUseCase.create(any(CreatePacienteCommand.class))).thenReturn(paciente);
 
+
         mockMvc.perform(post("/pacientes")
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content("{\"dni\": \"123\", \"nombre\": \"Ana\", \"apellido\": \"Perez\", \"obraSocial\": \"Obra social\"}"))
+                .content(jsonBody))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.dni").value("123"))
-                .andExpect(jsonPath("$.nombre").value("Ana"))
-                .andExpect(jsonPath("$.apellido").value("Perez"))
-                .andExpect(jsonPath("$.obraSocial").value("Obra social"));
+                .andExpect(jsonPath("$.dni").value(DNI_VALID))
+                .andExpect(jsonPath("$.nombre").value(NOMBRE_VALID))
+                .andExpect(jsonPath("$.apellido").value(APELLIDO_VALID))
+                .andExpect(jsonPath("$.obraSocial").value(OBRA_SOCIAL));
         verify(createPacienteUseCase, times(1)).create(any(CreatePacienteCommand.class));
     }
 
@@ -152,11 +176,16 @@ public class PacienteControllerTest {
     @Test
     @DisplayName("Debería lanzar excepción cuando intenta crear un paciente existente")
     void createExistsPaciente() throws Exception {
+        String jsonBody = String.format(
+                "{\"dni\": \"%s\", \"nombre\": \"%s\", \"apellido\": \"%s\", \"obraSocial\": \"%s\"}",
+                DNI_VALID, NOMBRE_VALID, APELLIDO_VALID, OBRA_SOCIAL
+        );
+
         when(createPacienteUseCase.create(any(CreatePacienteCommand.class))).thenThrow(new PacienteDuplicadoException());
 
         mockMvc.perform(post("/pacientes")
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content("{\"dni\": \"123\", \"nombre\": \"Ana\", \"apellido\": \"Perez\", \"obraSocial\": \"Obra social\"}"))
+                .content(jsonBody))
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.status").value(409));
         verify(createPacienteUseCase, times(1)).create(any(CreatePacienteCommand.class));
@@ -165,27 +194,37 @@ public class PacienteControllerTest {
     @Test
     @DisplayName("Debería actualizar correctamente un paciente")
     void updateValidPaciente() throws Exception {
-        Paciente paciente = new Paciente("123", "Ana", "Perez", "Obra social", "email@test.com", "123456789");
+        String jsonBody = String.format(
+                "{\"nombre\": \"%s\", \"apellido\": \"%s\", \"obraSocial\": \"%s\"}",
+                UPDATE_NOMBRE_VALID, UPDATE_APELLIDO_VALID, UPDATE_OBRA_SOCIAL_VALID
+        );
+
+        Paciente paciente = createUpdatePacienteValid();
 
         when(updatePacienteUseCase.update(anyString(), any(UpdatePacienteCommand.class))).thenReturn(paciente);
 
-        mockMvc.perform(put("/pacientes/123")
+        mockMvc.perform(put(BASE_URL+"/"+DNI_VALID)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content("{\"nombre\": \"Ana\", \"apellido\": \"Perez\", \"obraSocial\": \"Obra social\"}"))
+                .content(jsonBody))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.dni").value("123"))
-                .andExpect(jsonPath("$.nombre").value("Ana"))
-                .andExpect(jsonPath("$.apellido").value("Perez"))
-                .andExpect(jsonPath("$.obraSocial").value("Obra social"));
+                .andExpect(jsonPath("$.dni").value(DNI_VALID))
+                .andExpect(jsonPath("$.nombre").value(UPDATE_NOMBRE_VALID))
+                .andExpect(jsonPath("$.apellido").value(UPDATE_APELLIDO_VALID))
+                .andExpect(jsonPath("$.obraSocial").value(UPDATE_OBRA_SOCIAL_VALID));
         verify(updatePacienteUseCase, times(1)).update(anyString(), any(UpdatePacienteCommand.class));
     }
 
     @Test
     @DisplayName("Debería lanzar una excepción al intentar actualizar un paciente con datos inválidos")
     void updateInvalidPaciente() throws Exception {
-        mockMvc.perform(put("/pacientes/123")
+        String jsonBody = String.format(
+                "{\"nombre\": \"%s\", \"apellido\": \"%s\"}",
+                NOMBRE_NO_VALID, APELLIDO_NO_VALID
+        );
+
+        mockMvc.perform(put(BASE_URL+"/"+DNI_VALID)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content("{\"nombre\": \"\", \"apellido\": \"Perez\", \"obraSocial\": \"Obra social\"}"))
+                .content(jsonBody))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.status").value(400));
         verify(updatePacienteUseCase, times(0)).update(anyString(), any(UpdatePacienteCommand.class));
@@ -194,11 +233,16 @@ public class PacienteControllerTest {
     @Test
     @DisplayName("Debería lanzar una excepción al intentar actualizar un paciente inexistente")
     void updateNoExistsPaciente() throws Exception {
+        String jsonBody = String.format(
+                "{\"nombre\": \"%s\", \"apellido\": \"%s\", \"obraSocial\": \"%s\"}",
+                UPDATE_NOMBRE_VALID, UPDATE_APELLIDO_VALID, UPDATE_OBRA_SOCIAL_VALID
+        );
+
         when(updatePacienteUseCase.update(anyString(), any(UpdatePacienteCommand.class))).thenThrow(new PacienteNoEncontradoException());
 
-        mockMvc.perform(put("/pacientes/123")
+        mockMvc.perform(put(BASE_URL+"/"+DNI_VALID)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content("{\"nombre\": \"Ana\", \"apellido\": \"Perez\", \"obraSocial\": \"Obra social\"}"))
+                .content(jsonBody))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value("Paciente no encontrado"))
                 .andExpect(jsonPath("$.status").value(404));
@@ -208,103 +252,103 @@ public class PacienteControllerTest {
     @Test
     @DisplayName("Debería eliminar correctamente un paciente")
     void deleteExistsPaciente() throws Exception {
-        mockMvc.perform(delete("/pacientes/123"))
+        mockMvc.perform(delete(BASE_URL+"/"+DNI_VALID))
                 .andExpect(status().isNoContent());
-        verify(deletePacienteUseCase, times(1)).delete("123");
+        verify(deletePacienteUseCase, times(1)).delete(DNI_VALID);
     }
 
     @Test
     @DisplayName("Debería lanzar una excepción al intentar eliminar un paciente inexistente")
     void deleteNoExistsPaciente() throws Exception {
-        doThrow(new PacienteNoEncontradoException()).when(deletePacienteUseCase).delete("123");
+        doThrow(new PacienteNoEncontradoException()).when(deletePacienteUseCase).delete(DNI_VALID);
 
-        mockMvc.perform(delete("/pacientes/123"))
+        mockMvc.perform(delete(BASE_URL+"/"+DNI_VALID))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value("Paciente no encontrado"))
                 .andExpect(jsonPath("$.status").value(404));
-        verify(deletePacienteUseCase, times(1)).delete("123");
+        verify(deletePacienteUseCase, times(1)).delete(DNI_VALID);
     }
 
     @Test
     @DisplayName("Debería obtener correctamente un paciente por dni con SP")
     void getByDniSPValid() throws Exception {
-        Paciente paciente = new Paciente("123", "Ana", "Perez", "Obra social", "email@test.com", "123456789");
+        Paciente paciente = createPacienteValid();
 
-        when(findPacienteUseCase.getByDni("123")).thenReturn(paciente);
+        when(findPacienteUseCase.getByDni(DNI_VALID)).thenReturn(paciente);
 
-        mockMvc.perform(get("/pacientes/dni/123"))
+        mockMvc.perform(get(BASE_URL+"/dni/"+DNI_VALID))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.dni").value("123"))
-                .andExpect(jsonPath("$.nombre").value("Ana"))
-                .andExpect(jsonPath("$.apellido").value("Perez"))
-                .andExpect(jsonPath("$.obraSocial").value("Obra social"));
-        verify(findPacienteUseCase, times(1)).getByDni("123");
+                .andExpect(jsonPath("$.dni").value(DNI_VALID))
+                .andExpect(jsonPath("$.nombre").value(NOMBRE_VALID))
+                .andExpect(jsonPath("$.apellido").value(APELLIDO_VALID))
+                .andExpect(jsonPath("$.obraSocial").value(OBRA_SOCIAL));
+        verify(findPacienteUseCase, times(1)).getByDni(DNI_VALID);
     }
 
     @Test
     @DisplayName("Debería lanzar una excepción al intentar obtener un paciente inexistente por dni con SP")
     void getByDniSPInvalid() throws Exception {
-        when(findPacienteUseCase.getByDni("123")).thenThrow(new PacienteNoEncontradoException());
+        when(findPacienteUseCase.getByDni(DNI_VALID)).thenThrow(new PacienteNoEncontradoException());
 
-        mockMvc.perform(get("/pacientes/dni/123"))
+        mockMvc.perform(get(BASE_URL+"/dni/"+DNI_VALID))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value("Paciente no encontrado"))
                 .andExpect(jsonPath("$.status").value(404));
-        verify(findPacienteUseCase, times(1)).getByDni("123");
+        verify(findPacienteUseCase, times(1)).getByDni(DNI_VALID);
     }
 
     @Test
     @DisplayName("Debería obtener correctamente un paciente por nombre con SP")
     void getByNombreValid() throws Exception {
-        Paciente paciente = new Paciente("123", "Ana", "Perez", "Obra social", "email@test.com", "123456789");
+        Paciente paciente = createPacienteValid();
 
-        when(findPacienteUseCase.getByNombre("Ana")).thenReturn(paciente);
+        when(findPacienteUseCase.getByNombre(NOMBRE_VALID)).thenReturn(paciente);
 
-        mockMvc.perform(get("/pacientes/nombre/Ana"))
+        mockMvc.perform(get(BASE_URL+"/nombre/"+NOMBRE_VALID))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.dni").value("123"))
-                .andExpect(jsonPath("$.nombre").value("Ana"))
-                .andExpect(jsonPath("$.apellido").value("Perez"))
-                .andExpect(jsonPath("$.obraSocial").value("Obra social"));
-        verify(findPacienteUseCase, times(1)).getByNombre("Ana");
+                .andExpect(jsonPath("$.dni").value(DNI_VALID))
+                .andExpect(jsonPath("$.nombre").value(NOMBRE_VALID))
+                .andExpect(jsonPath("$.apellido").value(APELLIDO_VALID))
+                .andExpect(jsonPath("$.obraSocial").value(OBRA_SOCIAL));
+        verify(findPacienteUseCase, times(1)).getByNombre(NOMBRE_VALID);
     }
 
     @Test
     @DisplayName("Debería lanzar una excepción al intentar obtener un paciente inexistente por nombre con SP")
     void getByNombreInvalid() throws Exception {
-        when(findPacienteUseCase.getByNombre("Ana")).thenThrow(new PacienteNoEncontradoException());
+        when(findPacienteUseCase.getByNombre(NOMBRE_VALID)).thenThrow(new PacienteNoEncontradoException());
 
-        mockMvc.perform(get("/pacientes/nombre/Ana"))
+        mockMvc.perform(get(BASE_URL+"/nombre/"+NOMBRE_VALID))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value("Paciente no encontrado"))
                 .andExpect(jsonPath("$.status").value(404));
-        verify(findPacienteUseCase, times(1)).getByNombre("Ana");
+        verify(findPacienteUseCase, times(1)).getByNombre(NOMBRE_VALID);
     }
 
     @Test
     @DisplayName("Debería obtener correctamente una lista de pacientes por obra social con SP")
     void getByObraSocialValid() throws Exception {
-        Paciente paciente = new Paciente("123", "Ana", "Perez", "Obra social", "email@test.com", "123456789");
+        Paciente paciente = createPacienteValid();
 
-        when(findPacienteUseCase.getByObraSocial("Obra social", 10, 0)).thenReturn(List.of(paciente));
+        when(findPacienteUseCase.getByObraSocial(OBRA_SOCIAL, 10, 0)).thenReturn(List.of(paciente));
 
-        mockMvc.perform(get("/pacientes/obra_social?obraSocial=Obra social&page=1&size=10"))
+        mockMvc.perform(get(BASE_URL+"/obra_social?obraSocial="+OBRA_SOCIAL+"&page=1&size=10"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].dni").value("123"))
-                .andExpect(jsonPath("$[0].nombre").value("Ana"))
-                .andExpect(jsonPath("$[0].apellido").value("Perez"))
-                .andExpect(jsonPath("$[0].obraSocial").value("Obra social"));
-        verify(findPacienteUseCase, times(1)).getByObraSocial("Obra social", 10, 0);
+                .andExpect(jsonPath("$[0].dni").value(DNI_VALID))
+                .andExpect(jsonPath("$[0].nombre").value(NOMBRE_VALID))
+                .andExpect(jsonPath("$[0].apellido").value(APELLIDO_VALID))
+                .andExpect(jsonPath("$[0].obraSocial").value(OBRA_SOCIAL));
+        verify(findPacienteUseCase, times(1)).getByObraSocial(OBRA_SOCIAL, 10, 0);
     }
 
     @Test
     @DisplayName("Debería devolver una lista vacía al buscar pacientes por obra social con SP y no encontrar ninguno")
     void getByObraSocialNoExists() throws Exception {
-        when(findPacienteUseCase.getByObraSocial("Obra social", 10, 0)).thenReturn(List.of());
+        when(findPacienteUseCase.getByObraSocial(OBRA_SOCIAL, 10, 0)).thenReturn(List.of());
 
-        mockMvc.perform(get("/pacientes/obra_social?obraSocial=Obra social&page=1&size=10"))
+        mockMvc.perform(get(BASE_URL+"/obra_social?obraSocial="+OBRA_SOCIAL+"&page=1&size=10"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isEmpty());
-        verify(findPacienteUseCase, times(1)).getByObraSocial("Obra social", 10, 0);
+        verify(findPacienteUseCase, times(1)).getByObraSocial(OBRA_SOCIAL, 10, 0);
     }
 }

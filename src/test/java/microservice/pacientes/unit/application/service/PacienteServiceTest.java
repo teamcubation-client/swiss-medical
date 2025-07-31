@@ -64,13 +64,14 @@ public class PacienteServiceTest {
     @Test
     @DisplayName("Debería lanzar una excepción al intentar crear un paciente duplicado")
     void createExistsPaciente() {
-        CreatePacienteCommand createPacienteCommand = new CreatePacienteCommand("12345678", "Juan", "Perez", "Obra social", "email@test.com", "123456789");
-        Paciente paciente = new Paciente("12345678", "Juan", "Perez", "Obra social", "email@test.com", "123456789");
+        String dni = "12345678";
+        CreatePacienteCommand createPacienteCommand = new CreatePacienteCommand(dni, "Juan", "Perez", "Obra social", "email@test.com", "123456789");
+        Paciente paciente = new Paciente(dni, "Juan", "Perez", "Obra social", "email@test.com", "123456789");
         when(createPacienteMapper.toEntity(createPacienteCommand)).thenReturn(paciente);
-        when(pacientePortOut.existsByDni("12345678")).thenReturn(true);
+        when(pacientePortOut.existsByDni(dni)).thenReturn(true);
 
         assertThrows(PacienteDuplicadoException.class, () -> pacienteService.create(createPacienteCommand));
-        verify(pacientePortOut, times(1)).existsByDni("12345678");
+        verify(pacientePortOut, times(1)).existsByDni(dni);
         verify(createPacienteMapper, times(1)).toEntity(createPacienteCommand);
     }
 
@@ -99,22 +100,24 @@ public class PacienteServiceTest {
     @Test
     @DisplayName("Debería eliminar correctamente un paciente")
     void deleteExistsPaciente() {
-        Paciente paciente = new Paciente("12345678", "Juan", "Perez", "Obra social", "email@test.com", "123456789");
-        when(pacientePortOut.getByDni("12345678")).thenReturn(Optional.of(paciente));
+        String dni = "12345678";
+        Paciente paciente = new Paciente(dni, "Juan", "Perez", "Obra social", "email@test.com", "123456789");
+        when(pacientePortOut.getByDni(dni)).thenReturn(Optional.of(paciente));
 
-        pacienteService.delete("12345678");
+        pacienteService.delete(dni);
 
-        verify(pacientePortOut, times(1)).getByDni("12345678");
+        verify(pacientePortOut, times(1)).getByDni(dni);
         verify(pacientePortOut, times(1)).delete(paciente);
     }
 
     @Test
     @DisplayName("Debería lanzar una excepción al intentar eliminar un paciente inexistente")
     void deleteNoExistsPaciente() {
-        when(pacientePortOut.getByDni("12345678")).thenReturn(Optional.empty());
+        String dni = "12345678";
+        when(pacientePortOut.getByDni(dni)).thenReturn(Optional.empty());
 
-        assertThrows(PacienteNoEncontradoException.class, () -> pacienteService.delete("12345678"));
-        verify(pacientePortOut, times(1)).getByDni("12345678");
+        assertThrows(PacienteNoEncontradoException.class, () -> pacienteService.delete(dni));
+        verify(pacientePortOut, times(1)).getByDni(dni);
     }
 
     @Test
@@ -185,22 +188,24 @@ public class PacienteServiceTest {
     @Test
     @DisplayName("Debería obtener correctamente un paciente")
     void getByDni() {
-        Paciente paciente = new Paciente("12345678", "Juan", "Perez", "Obra social", "email@test.com", "123456789");
-        when(pacientePortOut.getByDni("12345678")).thenReturn(Optional.of(paciente));
+        String dni = "12345678";
+        Paciente paciente = new Paciente(dni, "Juan", "Perez", "Obra social", "email@test.com", "123456789");
+        when(pacientePortOut.getByDni(dni)).thenReturn(Optional.of(paciente));
 
-        Paciente pacienteReturn = pacienteService.getByDni("12345678");
+        Paciente pacienteReturn = pacienteService.getByDni(dni);
 
-        verify(pacientePortOut, times(1)).getByDni("12345678");
+        verify(pacientePortOut, times(1)).getByDni(dni);
         assertEquals(paciente, pacienteReturn);
     }
 
     @Test
     @DisplayName("Debería lanzar una excepción al intentar obtener un paciente inexistente")
     void getByNoExistsDni() {
-        when(pacientePortOut.getByDni("12345678")).thenReturn(Optional.empty());
+        String dni = "12345678";
+        when(pacientePortOut.getByDni(dni)).thenReturn(Optional.empty());
 
-        assertThrows(PacienteNoEncontradoException.class, () -> pacienteService.getByDni("12345678"));
-        verify(pacientePortOut, times(1)).getByDni("12345678");
+        assertThrows(PacienteNoEncontradoException.class, () -> pacienteService.getByDni(dni));
+        verify(pacientePortOut, times(1)).getByDni(dni);
     }
 
     @Test
@@ -297,15 +302,15 @@ public class PacienteServiceTest {
     @MethodSource("invalidUpdatePacienteCommands")
     @DisplayName("Debería lanzar una excepción al intentar actualizar un paciente con argumentos inválidos")
     void updateInvalidPaciente(UpdatePacienteCommand command) {
-        String DNI = "12345678";
-        Paciente pacienteExistente = new Paciente(DNI, "Juan", "Antiguo", "Medife", "viejo@email.com", "000000000");
-        when(pacientePortOut.getByDni(DNI)).thenReturn(Optional.of(pacienteExistente));
+        String dni = "12345678";
+        Paciente pacienteExistente = new Paciente(dni, "Juan", "Antiguo", "Medife", "viejo@email.com", "000000000");
+        when(pacientePortOut.getByDni(dni)).thenReturn(Optional.of(pacienteExistente));
         doThrow(new PacienteArgumentoInvalido("Argumento invalido"))
                 .when(pacienteUpdater).update(command, pacienteExistente);
 
         assertThrows(PacienteArgumentoInvalido.class,
-                () -> pacienteService.update(DNI, command));
-        verify(pacientePortOut, times(1)).getByDni(DNI);
+                () -> pacienteService.update(dni, command));
+        verify(pacientePortOut, times(1)).getByDni(dni);
     }
 
     static Stream<UpdatePacienteCommand> invalidUpdatePacienteCommands() {

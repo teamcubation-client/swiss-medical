@@ -1,16 +1,16 @@
 package microservice.pacientes.application.domain.command;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
 
 @Getter
-@Setter
-@NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class UpdatePacienteCommand {
-    private String nombre;
-    private String apellido;
-    private String obraSocial;
-    private String email;
-    private String telefono;
+    private final String nombre;
+    private final String apellido;
+    private final String obraSocial;
+    private final String email;
+    private final String telefono;
 }

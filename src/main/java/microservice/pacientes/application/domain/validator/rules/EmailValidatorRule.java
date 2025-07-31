@@ -6,6 +6,8 @@ import microservice.pacientes.shared.exception.PacienteArgumentoInvalido;
 
 @AllArgsConstructor
 public class EmailValidatorRule implements PacienteValidatorRule {
+
+    private static final String EMAIL_REGEX = "^[\\w!#$%&'*+/=?`{|}~^-]+(?:\\.[\\w!#$%&'*+/=?`{|}~^-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$";
     @Override
     public void validate(Paciente paciente) throws PacienteArgumentoInvalido {
         boolean isInvalid = isInvalid(paciente.getEmail());
@@ -14,6 +16,6 @@ public class EmailValidatorRule implements PacienteValidatorRule {
     }
 
     private boolean isInvalid(String email) {
-        return !email.matches("^[\\w!#$%&'*+/=?`{|}~^-]+(?:\\.[\\w!#$%&'*+/=?`{|}~^-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$");
+        return !email.matches(EMAIL_REGEX);
     }
 }
