@@ -5,6 +5,7 @@ import com.teamcubation.api.pacientes.application.domain.port.out.PatientExporte
 import com.teamcubation.api.pacientes.application.domain.port.out.PatientPortOut;
 import com.teamcubation.api.pacientes.infrastructure.adapter.in.exporter.factory.ExporterFactory;
 import com.teamcubation.api.pacientes.infrastructure.adapter.in.exporter.factory.ExporterFactoryProvider;
+import com.teamcubation.api.pacientes.shared.TestPatientBuilder;
 import com.teamcubation.api.pacientes.shared.exception.DuplicatedPatientException;
 import com.teamcubation.api.pacientes.shared.exception.ExporterTypeNotSupportedException;
 import com.teamcubation.api.pacientes.shared.exception.PatientDniAlreadyInUseException;
@@ -51,42 +52,9 @@ class PatientServiceTest {
         patientService = new PatientService(patientPortOut, exporterFactoryProvider);
     }
 
-    /**
-     * Se puede usar para utilizar paciente por defecto o crear nuevos pacientes
-     */
-    private static class TestPatientBuilder {
-        private Long id;
-        private String name = "Ana";
-        private String lastName = "Torres";
-        private String dni = "35784627";
-        private String insurance = null;
-        private String email = null;
-        private String phone = null;
-
-        TestPatientBuilder withId(Long id) { this.id = id; return this; }
-        TestPatientBuilder withName(String name) { this.name = name; return this; }
-        TestPatientBuilder withLastName(String lastName) { this.lastName = lastName; return this; }
-        TestPatientBuilder withDni(String dni) { this.dni = dni; return this; }
-        TestPatientBuilder withInsurance(String insurance) { this.insurance = insurance; return this; }
-        TestPatientBuilder withEmail(String email) { this.email = email; return this; }
-        TestPatientBuilder withPhone(String phone) { this.phone = phone; return this; }
-
-        Patient build() {
-            Patient p = new Patient();
-            p.setId(id);
-            p.setName(name);
-            p.setLastName(lastName);
-            p.setDni(dni);
-            p.setHealthInsuranceProvider(insurance);
-            p.setEmail(email);
-            p.setPhoneNumber(phone);
-            return p;
-        }
-    }
-
     private List<Patient> defaultPatients() {
         return List.of(
-                new TestPatientBuilder().withId(1L).build(),
+                new TestPatientBuilder().build(),
                 new TestPatientBuilder().withId(2L)
                         .withName("Juan")
                         .withLastName("Pérez")
@@ -119,12 +87,12 @@ class PatientServiceTest {
         @Test
         void createPatient_ShouldReturnPatientCreatedWithAllFieldsComplete() {
             Patient toCreate = new TestPatientBuilder()
+                    .withId(null)
                     .withEmail("anatorres@gmail.com")
                     .withPhone("1144773898")
                     .withInsurance("Swiss Medical")
                     .build();
             Patient saved = new TestPatientBuilder()
-                    .withId(1L)
                     .withEmail("anatorres@gmail.com")
                     .withPhone("1144773898")
                     .withInsurance("Swiss Medical")
@@ -139,7 +107,7 @@ class PatientServiceTest {
 
         @Test
         void createPatientWithRequiredFields_ShouldReturnPatientCreated(){
-            Patient patient = new TestPatientBuilder().build();
+            Patient patient = new TestPatientBuilder().withId(null).build();
             Patient savedPatient = new TestPatientBuilder().withId(1L).build();
 
             when(patientPortOut.save(patient)).thenReturn(savedPatient);
@@ -151,7 +119,7 @@ class PatientServiceTest {
 
         @Test
         void createPatientWithDuplicateDni_ShouldThrowException() {
-            Patient patient = new TestPatientBuilder().build();
+            Patient patient = new TestPatientBuilder().withId(null).build();
 
             when(patientPortOut.findByDni(patient.getDni()))
                     .thenReturn(Optional.of(new Patient()));
@@ -480,7 +448,7 @@ class PatientServiceTest {
 
             Patient patient = new TestPatientBuilder().build();
             patient.setHealthInsuranceProvider(healthInsuranceProvider);
-            Patient patient2 = new TestPatientBuilder().build();
+            Patient patient2 = new TestPatientBuilder().withId(2L).build();
             patient2.setDni("23456453");
             patient2.setHealthInsuranceProvider(healthInsuranceProvider);
             List<Patient> expectedPatients = List.of(patient, patient2);

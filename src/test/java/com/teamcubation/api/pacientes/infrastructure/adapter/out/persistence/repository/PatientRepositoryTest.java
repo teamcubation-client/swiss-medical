@@ -3,6 +3,7 @@ package com.teamcubation.api.pacientes.infrastructure.adapter.out.persistence.re
 import com.teamcubation.api.pacientes.application.domain.model.Patient;
 import com.teamcubation.api.pacientes.infrastructure.adapter.out.persistence.entity.PatientEntity;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -24,9 +25,7 @@ import static org.mockito.Mockito.when;
 class PatientRepositoryTest {
     @Mock
     private IPatientRepository jpaRepositoryMock;
-
     private PatientRepository patientRepository;
-
     private PatientEntity patientEntity1;
     private PatientEntity patientEntity2;
     private List<PatientEntity> patientEntityList;
@@ -46,189 +45,197 @@ class PatientRepositoryTest {
         this.patientEntityList = List.of(this.patientEntity1, this.patientEntity2);
     }
 
-    //TEST OBTENER PACIENTE POR DNI
-    @Test
-    void findByExistentDni_ShouldReturnPatient() {
-        String dni = this.patientEntity1.getDni();
-        when(this.jpaRepositoryMock.findByDni(dni)).thenReturn(Optional.of(this.patientEntity1));
+    @Nested
+    class FindByDni {
+        @Test
+        void findByExistentDni_ShouldReturnPatient() {
+            String dni = patientEntity1.getDni();
+            when(jpaRepositoryMock.findByDni(dni)).thenReturn(Optional.of(patientEntity1));
 
-        Optional<Patient> result = this.patientRepository.findByDni(dni);
+            Optional<Patient> result = patientRepository.findByDni(dni);
 
-        assertTrue(result.isPresent());
-        assertEquals(dni, result.get().getDni());
-        verify(this.jpaRepositoryMock).findByDni(dni);
+            assertTrue(result.isPresent());
+            assertEquals(dni, result.get().getDni());
+            verify(jpaRepositoryMock).findByDni(dni);
+        }
+
+        @Test
+        void findByNonExistentDni_ShouldReturnEmpty() {
+            String dni = "99999999";
+            when(jpaRepositoryMock.findByDni(dni)).thenReturn(Optional.empty());
+
+            Optional<Patient> result = patientRepository.findByDni(dni);
+
+            assertTrue(result.isEmpty());
+            verify(jpaRepositoryMock).findByDni(dni);
+        }
+
+        @Test
+        void findByNullDni_ShouldReturnEmpty() {
+            when(jpaRepositoryMock.findByDni(null)).thenReturn(Optional.empty());
+            Optional<Patient> result = patientRepository.findByDni(null);
+
+            assertTrue(result.isEmpty());
+            verify(jpaRepositoryMock).findByDni(null);
+        }
     }
 
-    @Test
-    void findByNonExistentDni_ShouldReturnEmpty() {
-        String dni = "99999999";
-        when(this.jpaRepositoryMock.findByDni(dni)).thenReturn(Optional.empty());
+    @Nested
+    class FindByName {
+        @Test
+        void findByExactName_ShouldReturnPatients() {
+            String name = patientEntity1.getName();
+            when(jpaRepositoryMock.findByName(name)).thenReturn(List.of(patientEntity1));
 
-        Optional<Patient> result = this.patientRepository.findByDni(dni);
+            List<Patient> result = patientRepository.findByName(name);
 
-        assertTrue(result.isEmpty());
-        verify(this.jpaRepositoryMock).findByDni(dni);
+            assertEquals(1, result.size());
+            assertEquals(name, result.get(0).getName());
+            verify(jpaRepositoryMock).findByName(name);
+        }
+
+        @Test
+        void findByNonExistentName_ShouldReturnEmptyList() {
+            String name = "Inexistente";
+
+            when(jpaRepositoryMock.findByName(name)).thenReturn(Collections.emptyList());
+
+            List<Patient> result = patientRepository.findByName(name);
+
+            assertTrue(result.isEmpty());
+            verify(jpaRepositoryMock).findByName(name);
+        }
+
+        @Test
+        void findByNullName_ShouldReturnEmptyList() {
+            when(jpaRepositoryMock.findByName(null)).thenReturn(Collections.emptyList());
+
+            List<Patient> result = patientRepository.findByName(null);
+
+            assertTrue(result.isEmpty());
+            verify(jpaRepositoryMock).findByName(null);
+        }
+
+        @Test
+        void findByEmptyName_ShouldReturnEmptyList() {
+            when(jpaRepositoryMock.findByName("")).thenReturn(Collections.emptyList());
+
+            List<Patient> result = patientRepository.findByName("");
+
+            assertTrue(result.isEmpty());
+            verify(jpaRepositoryMock).findByName("");
+        }
+
+        @Test
+        void findByNameWithDifferentCase_ShouldReturnPatients() {
+            String inputName = "carlos";
+
+            when(jpaRepositoryMock.findByName(inputName)).thenReturn(List.of(patientEntity2));
+
+            List<Patient> result = patientRepository.findByName(inputName);
+
+            assertEquals(1, result.size());
+            assertEquals("Carlos", result.get(0).getName());
+            verify(jpaRepositoryMock).findByName(inputName);
+        }
+
+        @Test
+        void findByPartialName_ShouldReturnMatchingPatients() {
+            String input = "Car";
+
+            when(jpaRepositoryMock.findByName(input)).thenReturn(List.of(patientEntity2));
+
+            List<Patient> result = patientRepository.findByName(input);
+
+            assertEquals(1, result.size());
+            assertTrue(result.stream().allMatch(p -> p.getName().startsWith("Car")));
+            verify(jpaRepositoryMock).findByName(input);
+        }
     }
 
-    @Test
-    void findByNullDni_ShouldReturnEmpty() {
-        when(this.jpaRepositoryMock.findByDni(null)).thenReturn(Optional.empty());
-        Optional<Patient> result = this.patientRepository.findByDni(null);
+    @Nested
+    class FindByHealthInsuranceProvider {
+        @Test
+        void findByHealthInsuranceProvider_ShouldReturnPatients() {
+            String provider = "OSDE";
+            int limit = 2, offset = 0;
 
-        assertTrue(result.isEmpty());
-        verify(this.jpaRepositoryMock).findByDni(null);
+            when(jpaRepositoryMock.findByHealthInsuranceProvider(provider, limit, offset))
+                    .thenReturn(patientEntityList);
+
+            List<Patient> result = patientRepository.findByHealthInsuranceProvider(provider, limit, offset);
+
+            assertEquals(2, result.size());
+            assertEquals(patientEntity1.getName(), result.get(0).getName());
+            assertEquals(patientEntity2.getName(), result.get(1).getName());
+            verify(jpaRepositoryMock).findByHealthInsuranceProvider(provider, limit, offset);
+        }
+
+        @Test
+        void findByHealthInsuranceProvider_ShouldReturnEmptyList() {
+            String provider = "NO_EXISTE";
+            int limit = 2, offset = 0;
+
+            when(jpaRepositoryMock.findByHealthInsuranceProvider(provider, limit, offset))
+                    .thenReturn(Collections.emptyList());
+
+            List<Patient> result = patientRepository.findByHealthInsuranceProvider(provider, limit, offset);
+
+            assertTrue(result.isEmpty());
+            verify(jpaRepositoryMock).findByHealthInsuranceProvider(provider, limit, offset);
+        }
+
+        @ParameterizedTest
+        @CsvSource({
+                "NoExiste, 5, 0",
+                "OSDE, 5, 999",
+                "OSDE, 0, 0"
+        })
+        void findByHealthInsuranceProvider_ShouldReturnEmptyList(String provider, int limit, int offset) {
+            when(jpaRepositoryMock.findByHealthInsuranceProvider(provider, limit, offset))
+                    .thenReturn(Collections.emptyList());
+
+            List<Patient> result = patientRepository.findByHealthInsuranceProvider(provider, limit, offset);
+
+            assertTrue(result.isEmpty());
+            verify(jpaRepositoryMock).findByHealthInsuranceProvider(provider,limit,offset);
+        }
+
+        @Test
+        void findByHealthInsuranceProviderDifferentCase_ShouldReturnPatients() {
+            String input = "osde";
+            PatientEntity p = new PatientEntity(); p.setName("Lucía");
+
+            when(jpaRepositoryMock.findByHealthInsuranceProvider(input, 1, 0))
+                    .thenReturn(List.of(p));
+
+            List<Patient> result = patientRepository.findByHealthInsuranceProvider(input, 1, 0);
+
+            assertEquals(1, result.size());
+            assertEquals("Lucía", result.get(0).getName());
+            verify(jpaRepositoryMock).findByHealthInsuranceProvider(input,1,0);
+        }
+
+        @Test
+        void findByNullHealthInsuranceProvider_ShouldReturnEmptyList() {
+            when(jpaRepositoryMock.findByHealthInsuranceProvider(null, 5, 0))
+                    .thenReturn(Collections.emptyList());
+
+            List<Patient> result = patientRepository.findByHealthInsuranceProvider(null, 5, 0);
+
+            assertTrue(result.isEmpty());
+            verify(jpaRepositoryMock).findByHealthInsuranceProvider(null,5,0);
+        }
+
+        @Test
+        void findByHealthInsuranceProviderWithEmptyProvider_ShouldReturnEmptyList() {
+            when(jpaRepositoryMock.findByHealthInsuranceProvider("", 5, 0))
+                    .thenReturn(Collections.emptyList());
+
+            List<Patient> result = patientRepository.findByHealthInsuranceProvider("", 5, 0);
+
+            assertTrue(result.isEmpty());
+            verify(jpaRepositoryMock).findByHealthInsuranceProvider("",5,0);
+        }
     }
-
-    //TEST OBTENER PACIENTES POR NOMBRE
-    @Test
-    void findByExactName_ShouldReturnPatients() {
-        String name = this.patientEntity1.getName();
-        when(this.jpaRepositoryMock.findByName(name)).thenReturn(List.of(this.patientEntity1));
-
-        List<Patient> result = this.patientRepository.findByName(name);
-
-        assertEquals(1, result.size());
-        assertEquals(name, result.get(0).getName());
-        verify(this.jpaRepositoryMock).findByName(name);
-    }
-
-    @Test
-    void findByNonExistentName_ShouldReturnEmptyList() {
-        String name = "Inexistente";
-
-        when(this.jpaRepositoryMock.findByName(name)).thenReturn(Collections.emptyList());
-
-        List<Patient> result = this.patientRepository.findByName(name);
-
-        assertTrue(result.isEmpty());
-        verify(this.jpaRepositoryMock).findByName(name);
-    }
-
-    @Test
-    void findByNullName_ShouldReturnEmptyList() {
-        when(this.jpaRepositoryMock.findByName(null)).thenReturn(Collections.emptyList());
-
-        List<Patient> result = this.patientRepository.findByName(null);
-
-        assertTrue(result.isEmpty());
-        verify(this.jpaRepositoryMock).findByName(null);
-    }
-
-    @Test
-    void findByEmptyName_ShouldReturnEmptyList() {
-        when(this.jpaRepositoryMock.findByName("")).thenReturn(Collections.emptyList());
-
-        List<Patient> result = this.patientRepository.findByName("");
-
-        assertTrue(result.isEmpty());
-        verify(this.jpaRepositoryMock).findByName("");
-    }
-
-    @Test
-    void findByNameWithDifferentCase_ShouldReturnPatients() {
-        String inputName = "carlos";
-
-        when(this.jpaRepositoryMock.findByName(inputName)).thenReturn(List.of(this.patientEntity2));
-
-        List<Patient> result = this.patientRepository.findByName(inputName);
-
-        assertEquals(1, result.size());
-        assertEquals("Carlos", result.get(0).getName());
-        verify(this.jpaRepositoryMock).findByName(inputName);
-    }
-
-    @Test
-    void findByPartialName_ShouldReturnMatchingPatients() {
-        String input = "Car";
-
-        when(this.jpaRepositoryMock.findByName(input)).thenReturn(List.of(this.patientEntity2));
-
-        List<Patient> result = this.patientRepository.findByName(input);
-
-        assertEquals(1, result.size());
-        assertTrue(result.stream().allMatch(p -> p.getName().startsWith("Car")));
-        verify(this.jpaRepositoryMock).findByName(input);
-    }
-
-
-    // TEST OBTENER PACIENTES POR OBRA SOCIAL
-    @Test
-    void findByHealthInsuranceProvider_ShouldReturnPatients() {
-        String provider = "OSDE";
-        int limit = 2, offset = 0;
-
-        when(this.jpaRepositoryMock.findByHealthInsuranceProvider(provider, limit, offset))
-                .thenReturn(patientEntityList);
-
-        List<Patient> result = this.patientRepository.findByHealthInsuranceProvider(provider, limit, offset);
-
-        assertEquals(2, result.size());
-        assertEquals(this.patientEntity1.getName(), result.get(0).getName());
-        assertEquals(this.patientEntity2.getName(), result.get(1).getName());
-        verify(this.jpaRepositoryMock).findByHealthInsuranceProvider(provider, limit, offset);
-    }
-
-    @Test
-    void findByHealthInsuranceProvider_ShouldReturnEmptyList() {
-        String provider = "NO_EXISTE";
-        int limit = 2, offset = 0;
-
-        when(this.jpaRepositoryMock.findByHealthInsuranceProvider(provider, limit, offset))
-                .thenReturn(Collections.emptyList());
-
-        List<Patient> result = this.patientRepository.findByHealthInsuranceProvider(provider, limit, offset);
-
-        assertTrue(result.isEmpty());
-        verify(this.jpaRepositoryMock).findByHealthInsuranceProvider(provider, limit, offset);
-    }
-
-    @ParameterizedTest
-    @CsvSource({
-            "NoExiste, 5, 0",
-            "OSDE, 5, 999",
-            "OSDE, 0, 0"
-    })
-    void findByHealthInsuranceProvider_ShouldReturnEmptyList(String provider, int limit, int offset) {
-        when(this.jpaRepositoryMock.findByHealthInsuranceProvider(provider, limit, offset))
-                .thenReturn(Collections.emptyList());
-
-        List<Patient> result = this.patientRepository.findByHealthInsuranceProvider(provider, limit, offset);
-
-        assertTrue(result.isEmpty());
-    }
-
-    @Test
-    void findByHealthInsuranceProviderDifferentCase_ShouldReturnPatients() {
-        String input = "osde";
-        PatientEntity p = new PatientEntity(); p.setName("Lucía");
-
-        when(this.jpaRepositoryMock.findByHealthInsuranceProvider(input, 1, 0))
-                .thenReturn(List.of(p));
-
-        List<Patient> result = this.patientRepository.findByHealthInsuranceProvider(input, 1, 0);
-
-        assertEquals(1, result.size());
-        assertEquals("Lucía", result.get(0).getName());
-    }
-
-    @Test
-    void findByNullHealthInsuranceProvider_ShouldReturnEmptyList() {
-        when(this.jpaRepositoryMock.findByHealthInsuranceProvider(null, 5, 0))
-                .thenReturn(Collections.emptyList());
-
-        List<Patient> result = this.patientRepository.findByHealthInsuranceProvider(null, 5, 0);
-
-        assertTrue(result.isEmpty());
-    }
-
-    @Test
-    void findByHealthInsuranceProvider_EmptyProvider_ShouldReturnEmptyList() {
-        when(this.jpaRepositoryMock.findByHealthInsuranceProvider("", 5, 0))
-                .thenReturn(Collections.emptyList());
-
-        List<Patient> result = this.patientRepository.findByHealthInsuranceProvider("", 5, 0);
-
-        assertTrue(result.isEmpty());
-    }
-
 }

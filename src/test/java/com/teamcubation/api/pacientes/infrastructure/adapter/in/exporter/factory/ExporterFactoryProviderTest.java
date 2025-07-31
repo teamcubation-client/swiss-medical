@@ -15,16 +15,15 @@ class ExporterFactoryProviderTest {
     }
 
     @Test
-    void getFactory_csvType_returnsCsvExporterFactory() {
+    void getFactoryCsvType_ShouldReturnsCsvExporterFactory() {
         ExporterFactory factory = factoryProvider.getFactory("csv");
 
         assertNotNull(factory);
-        assertTrue(factory instanceof CsvExporterFactory);
-        assertInstanceOf(JsonExporterFactory.class, factory);
+        assertInstanceOf(CsvExporterFactory.class, factory);
     }
 
     @Test
-    void getFactory_jsonType_returnsJsonExporterFactory() {
+    void getFactoryJsonType_ShouldReturnsJsonExporterFactory() {
         ExporterFactory factory = factoryProvider.getFactory("json");
 
         assertNotNull(factory);
@@ -32,7 +31,7 @@ class ExporterFactoryProviderTest {
     }
 
     @Test
-    void getFactory_unsupportedType_throwsExporterTypeNotSupportedException() {
+    void getFactoryUnsupportedType_ShouldThrowExporterTypeNotSupportedException() {
         String unsupportedType = "xml";
 
         ExporterTypeNotSupportedException exception = assertThrows(
