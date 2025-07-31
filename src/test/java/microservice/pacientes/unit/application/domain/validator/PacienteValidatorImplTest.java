@@ -9,6 +9,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -17,7 +18,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-@ExtendWith(org.mockito.junit.jupiter.MockitoExtension.class)
+@ExtendWith(MockitoExtension.class)
 @DisplayName("PacienteValidatorImpl Tests")
 class PacienteValidatorImplTest {
 
@@ -52,6 +53,7 @@ class PacienteValidatorImplTest {
         verify(rule1, times(1)).validate(paciente);
         verify(rule2, times(1)).validate(paciente);
         verify(rule3, times(1)).validate(paciente);
+        verifyNoMoreInteractions(rule1, rule2, rule3);
     }
 
     @Test

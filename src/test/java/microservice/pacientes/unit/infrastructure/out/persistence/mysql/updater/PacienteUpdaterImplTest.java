@@ -53,7 +53,7 @@ class PacienteUpdaterImplTest {
         Paciente paciente = new Paciente("12345678", "Juan", "Perez", "OSDE", "juan.perez@gmail.com", "123456789");
         doThrow(new PacienteArgumentoInvalido("Argumento inválido")).when(pacienteValidator).validate(paciente);
         
-        assertThrows(RuntimeException.class, () -> pacienteUpdater.update(command, paciente));
+        assertThrows(PacienteArgumentoInvalido.class, () -> pacienteUpdater.update(command, paciente));
         
         verify(mapStructPacienteUpdater).update(command, paciente);
         verify(pacienteValidator).validate(paciente);

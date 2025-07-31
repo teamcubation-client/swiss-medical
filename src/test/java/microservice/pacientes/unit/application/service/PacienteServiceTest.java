@@ -18,6 +18,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,15 +28,15 @@ import java.util.stream.Stream;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-@ExtendWith(org.mockito.junit.jupiter.MockitoExtension.class)
+@ExtendWith(MockitoExtension.class)
 @DisplayName("PacienteServiceTest Tests")
 public class PacienteServiceTest {
 
     @Mock
     private PacientePortOut pacientePortOut;
 
-    @Spy
-    private PacienteUpdater pacienteUpdater; // esto puede ser un spy?
+    @Mock
+    private PacienteUpdater pacienteUpdater;
 
     @Mock
     private CreatePacienteMapper createPacienteMapper;
@@ -253,12 +254,11 @@ public class PacienteServiceTest {
     @Test
     @DisplayName("Debería actualizar correctamente un paciente")
     void updateValidPaciente() {
-        // hace falta probar que realmente se actualiza el paciente o eso  lo prueba el unit test de pacienteupdater?
         String dni = "12345678";
         UpdatePacienteCommand command = new UpdatePacienteCommand("Agustin", "Perez", "OSDE", "agustin.perez@gmail.com", "123456789");
         Paciente pacienteExistente = new Paciente(dni, "Juan", "Antiguo", "Medife", "viejo@email.com", "000000000");
         when(pacientePortOut.getByDni(dni)).thenReturn(Optional.of(pacienteExistente));
-        doAnswer(invocation -> { // es mejor usar un spy en este caso?
+        doAnswer(invocation -> {
             UpdatePacienteCommand cmd = invocation.getArgument(0);
             Paciente pac = invocation.getArgument(1);
             pac.setNombre(cmd.getNombre());

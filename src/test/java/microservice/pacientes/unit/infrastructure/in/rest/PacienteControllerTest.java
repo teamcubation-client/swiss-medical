@@ -19,12 +19,13 @@ import microservice.pacientes.shared.exception.PacienteDuplicadoException;
 import microservice.pacientes.shared.exception.PacienteNoEncontradoException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.MediaType;
+//import org.junit.jupiter.api.extension.MediaType;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -118,7 +119,7 @@ public class PacienteControllerTest {
         when(createPacienteUseCase.create(any(CreatePacienteCommand.class))).thenReturn(paciente);
 
         mockMvc.perform(post("/pacientes")
-                .contentType(MediaType.APPLICATION_JSON.toString())
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content("{\"dni\": \"123\", \"nombre\": \"Ana\", \"apellido\": \"Perez\", \"obraSocial\": \"Obra social\"}"))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.dni").value("123"))
@@ -133,7 +134,7 @@ public class PacienteControllerTest {
     @DisplayName("Debería lanzar una excepción al intentar crear un paciente con datos inválidos")
     void createInvalidPaciente(String pacienteDTO) throws Exception {
         mockMvc.perform(post("/pacientes")
-                .contentType(MediaType.APPLICATION_JSON.toString())
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(pacienteDTO))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.status").value(400));
@@ -154,7 +155,7 @@ public class PacienteControllerTest {
         when(createPacienteUseCase.create(any(CreatePacienteCommand.class))).thenThrow(new PacienteDuplicadoException());
 
         mockMvc.perform(post("/pacientes")
-                .contentType(MediaType.APPLICATION_JSON.toString())
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content("{\"dni\": \"123\", \"nombre\": \"Ana\", \"apellido\": \"Perez\", \"obraSocial\": \"Obra social\"}"))
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.status").value(409));
@@ -169,7 +170,7 @@ public class PacienteControllerTest {
         when(updatePacienteUseCase.update(anyString(), any(UpdatePacienteCommand.class))).thenReturn(paciente);
 
         mockMvc.perform(put("/pacientes/123")
-                .contentType(MediaType.APPLICATION_JSON.toString())
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content("{\"nombre\": \"Ana\", \"apellido\": \"Perez\", \"obraSocial\": \"Obra social\"}"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.dni").value("123"))
@@ -183,7 +184,7 @@ public class PacienteControllerTest {
     @DisplayName("Debería lanzar una excepción al intentar actualizar un paciente con datos inválidos")
     void updateInvalidPaciente() throws Exception {
         mockMvc.perform(put("/pacientes/123")
-                .contentType(MediaType.APPLICATION_JSON.toString())
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content("{\"nombre\": \"\", \"apellido\": \"Perez\", \"obraSocial\": \"Obra social\"}"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.status").value(400));
@@ -196,7 +197,7 @@ public class PacienteControllerTest {
         when(updatePacienteUseCase.update(anyString(), any(UpdatePacienteCommand.class))).thenThrow(new PacienteNoEncontradoException());
 
         mockMvc.perform(put("/pacientes/123")
-                .contentType(MediaType.APPLICATION_JSON.toString())
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content("{\"nombre\": \"Ana\", \"apellido\": \"Perez\", \"obraSocial\": \"Obra social\"}"))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value("Paciente no encontrado"))
