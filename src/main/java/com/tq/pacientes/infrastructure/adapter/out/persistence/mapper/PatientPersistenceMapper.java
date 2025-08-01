@@ -4,6 +4,9 @@ import com.tq.pacientes.application.domain.model.Patient;
 import com.tq.pacientes.infrastructure.adapter.out.persistence.PatientEntity;
 
 public class PatientPersistenceMapper {
+
+    private PatientPersistenceMapper() {}
+
     public static Patient toDomain(PatientEntity entity) {
         return Patient.builder()
                 .id(entity.getId())

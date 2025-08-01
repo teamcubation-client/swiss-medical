@@ -77,5 +77,5 @@ public interface PatientControllerAPI {
             @ApiResponse(responseCode = "409", description = "El paciente ya está activo"),
             @ApiResponse(responseCode = "204", description = "Paciente no encontrado")
     })
-    ResponseEntity<Void> activate(Long id);
+    ResponseEntity<PatientResponse> activate(Long id);
 }

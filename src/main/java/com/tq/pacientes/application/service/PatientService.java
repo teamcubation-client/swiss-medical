@@ -7,8 +7,8 @@ import com.tq.pacientes.shared.exceptions.PatientNotFoundException;
 import com.tq.pacientes.application.domain.model.Patient;
 import com.tq.pacientes.application.domain.port.in.PatientUseCase;
 import com.tq.pacientes.application.domain.port.out.PatientRepositoryPort;
-import com.tq.pacientes.application.domain.model.patientprocessing.PatientSaveFactory;
-import com.tq.pacientes.application.domain.model.patientprocessing.PatientSaveTemplate;
+import com.tq.pacientes.application.domain.model.patient.processing.PatientSaveFactory;
+import com.tq.pacientes.application.domain.model.patient.processing.PatientSaveTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -33,7 +33,7 @@ public class PatientService implements PatientUseCase {
         }
         patient.setCreationDate(LocalDateTime.now());
         patient.setLastModifiedDate(LocalDateTime.now());
-        PatientSaveTemplate saveTemplate = patientSaveFactory.getPatientSaveStrategy(patient, patientRepositoryPort);
+        PatientSaveTemplate saveTemplate = patientSaveFactory.createStrategyFor(patient, patientRepositoryPort);
         saveTemplate.save(patient);
         return patient;
     }
@@ -49,12 +49,9 @@ public class PatientService implements PatientUseCase {
     }
 
     @Override
-    public Optional<Patient> getByDni(String dni) {
-        Optional<Patient> patientOpt = patientRepositoryPort.findByDni(dni);
-        if (patientOpt.isEmpty()) {
-            throw new PatientDniNotFoundException(dni);
-        }
-        return patientOpt;
+    public Patient getByDni(String dni) {
+        return patientRepositoryPort.findByDni(dni)
+                .orElseThrow(() -> new PatientDniNotFoundException(dni));
     }
 
     @Override
@@ -112,14 +109,14 @@ public class PatientService implements PatientUseCase {
     }
 
     @Override
-    public void activate(Long id) {
-        Patient patient = getById(id)
+    public Patient activate(Long id) {
+        Patient patient = patientRepositoryPort.findByIdIgnoringActive(id)
                 .orElseThrow(() -> new PatientNotFoundException(id));
         if (Boolean.TRUE.equals(patient.getActive())) {
             throw new PatientAlreadyActiveException(id);
         }
         patient.setActive(true);
         patient.setLastModifiedDate(LocalDateTime.now());
-        patientRepositoryPort.update(patient);
+        return patientRepositoryPort.update(patient);
     }
 }

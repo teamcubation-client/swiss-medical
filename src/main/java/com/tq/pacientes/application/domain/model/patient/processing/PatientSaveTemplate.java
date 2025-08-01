@@ -1,4 +1,4 @@
-package com.tq.pacientes.application.domain.model.patientprocessing;
+package com.tq.pacientes.application.domain.model.patient.processing;
 
 import com.tq.pacientes.application.domain.model.Patient;
 import com.tq.pacientes.application.domain.port.out.PatientRepositoryPort;
@@ -10,7 +10,7 @@ public abstract class PatientSaveTemplate {
     protected final PatientRepositoryPort patientRepositoryPort;
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 
-    public PatientSaveTemplate(PatientRepositoryPort patientRepositoryPort) {
+    protected PatientSaveTemplate(PatientRepositoryPort patientRepositoryPort) {
         this.patientRepositoryPort = patientRepositoryPort;
     }
 
@@ -24,7 +24,9 @@ public abstract class PatientSaveTemplate {
     protected abstract void validate(Patient patient);
     protected abstract void preProcess(Patient patient);
     protected void persist(Patient patient) {
-        patientRepositoryPort.save(patient);
+        Patient savedPatient = patientRepositoryPort.save(patient);
+        patient.setId(savedPatient.getId());
     }
+
     protected abstract void postProcess(Patient patient);
 }
