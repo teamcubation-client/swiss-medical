@@ -7,6 +7,7 @@ import com.practica.crud_pacientes.infrastructure.adapter.out.mediator.TrafficMo
 import com.practica.crud_pacientes.infrastructure.adapter.out.observer.SistemaLoggerObserver;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,7 +51,8 @@ class TrafficAlertIntegrationTest {
     }
 
     @Test
-    void shouldTriggerAlertWhenTrafficExceedsThreshold() throws Exception {
+    @DisplayName("Should trigger alert when traffic exceeds threshold")
+    void shouldTriggerAlert_whenTrafficExceedsThreshold() throws Exception {
         int threshold = trafficMonitor.getTHRESHOLD();
 
         for (int i = 0; i < threshold; i++) {

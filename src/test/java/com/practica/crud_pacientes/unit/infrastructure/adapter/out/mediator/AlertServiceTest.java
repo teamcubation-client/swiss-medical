@@ -2,6 +2,7 @@ package com.practica.crud_pacientes.unit.infrastructure.adapter.out.mediator;
 
 import com.practica.crud_pacientes.application.domain.port.out.SistemaEventPublisher;
 import com.practica.crud_pacientes.infrastructure.adapter.out.mediator.AlertService;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -23,7 +24,8 @@ class AlertServiceTest {
     private AlertService alertService;
 
     @Test
-    void shouldSendAlert() {
+    @DisplayName("Should send an alert when AlertService is called")
+    void shouldSendAlert_whenAlertServiceIsCalled() {
         alertService.sendAlert(ENDPOINT, REQUEST_COUNT);
 
         verify(publisher, times(1)).publishAlertCreated(ENDPOINT, REQUEST_COUNT);

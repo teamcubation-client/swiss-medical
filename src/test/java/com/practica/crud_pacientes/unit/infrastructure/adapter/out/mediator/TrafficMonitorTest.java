@@ -2,6 +2,7 @@ package com.practica.crud_pacientes.unit.infrastructure.adapter.out.mediator;
 
 import com.practica.crud_pacientes.infrastructure.adapter.out.mediator.TrafficMonitor;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -19,7 +20,8 @@ class TrafficMonitorTest {
     }
 
     @Test
-    void shouldTriggerWhenHighRequest() {
+    @DisplayName("Should trigger when theres high request")
+    void shouldTrigger_whenHighRequest() {
         trafficMonitor.shouldTriggerAlert();
         trafficMonitor.shouldTriggerAlert();
         boolean result = trafficMonitor.shouldTriggerAlert();
@@ -31,7 +33,8 @@ class TrafficMonitorTest {
     }
 
     @Test
-    void shouldNotTriggerWhenBelowThreshold() {
+    @DisplayName("Should not trigger when is below threshold")
+    void shouldNotTrigger_whenBelowThreshold() {
         boolean first = trafficMonitor.shouldTriggerAlert();
         boolean second = trafficMonitor.shouldTriggerAlert();
 
@@ -40,7 +43,8 @@ class TrafficMonitorTest {
     }
 
     @Test
-    void shouldRequestCountBeCeroWhenReset() {
+    @DisplayName("Should requestCount be zero when reset")
+    void shouldRequestCountBeZero_whenReset() {
         trafficMonitor.shouldTriggerAlert();
         trafficMonitor.shouldTriggerAlert();
         trafficMonitor.shouldTriggerAlert();

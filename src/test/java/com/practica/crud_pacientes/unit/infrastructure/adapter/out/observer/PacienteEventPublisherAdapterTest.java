@@ -4,6 +4,7 @@ import com.practica.crud_pacientes.application.domain.model.Paciente;
 import com.practica.crud_pacientes.application.domain.port.out.PacienteObserver;
 import com.practica.crud_pacientes.infrastructure.adapter.out.observer.PacienteEventPublisherAdapter;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -34,7 +35,8 @@ class PacienteEventPublisherAdapterTest {
     }
 
     @Test
-    void shouldPublishOnPacienteCreado() {
+    @DisplayName("Should publish when calls PacienteCreado")
+    void shouldPublish_whenPacienteCreado() {
         publisher.publishPacienteCreado(paciente);
 
         verify(observer1, times(1)).onPacienteCreado(paciente);
@@ -42,7 +44,8 @@ class PacienteEventPublisherAdapterTest {
     }
 
     @Test
-    void shouldPublishOnPacienteEliminado() {
+    @DisplayName("Should publish when calls PacienteEliminado")
+    void shouldPublish_whenPacienteEliminado() {
         publisher.publishPacienteEliminado(paciente);
 
         verify(observer1, times(1)).onPacienteEliminado(paciente);

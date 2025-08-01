@@ -35,17 +35,6 @@ public class GlobalExceptionHandler {
         );
     }
 
-    @ExceptionHandler(Exception.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ErrorResponse handleExcepcionGenerica(Exception ex, HttpServletRequest request) {
-        String mensaje = "Ocurrió un error inesperado: " + ex.getMessage();
-        return buildError(
-                HttpStatus.INTERNAL_SERVER_ERROR,
-                mensaje,
-                request.getRequestURI()
-        );
-    }
-
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleValidationsException(MethodArgumentNotValidException exception, HttpServletRequest request){
@@ -60,6 +49,17 @@ public class GlobalExceptionHandler {
                 "Errores de validacion",
                 request.getRequestURI(),
                 errores
+        );
+    }
+
+    @ExceptionHandler(Exception.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErrorResponse handleExcepcionGenerica(Exception ex, HttpServletRequest request) {
+        String mensaje = "Ocurrió un error inesperado: " + ex.getMessage();
+        return buildError(
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                mensaje,
+                request.getRequestURI()
         );
     }
 

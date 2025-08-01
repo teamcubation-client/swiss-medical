@@ -7,6 +7,7 @@ import com.practica.crud_pacientes.application.service.PacienteService;
 import com.practica.crud_pacientes.shared.exceptions.PacienteDuplicadoException;
 import com.practica.crud_pacientes.shared.exceptions.PacienteNoEncontradoException;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -16,6 +17,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.List;
 
 import static com.practica.crud_pacientes.utils.PacienteTestFactory.buildDomain;
+import static com.practica.crud_pacientes.utils.TestConstants.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -40,6 +42,7 @@ class PacienteServiceTest {
     }
 
     @Test
+    @DisplayName("Should get all pacientes")
     void shouldGetAllPacientes() {
         when(pacienteRepository.findAll()).thenReturn(pacientes);
 
@@ -50,29 +53,30 @@ class PacienteServiceTest {
     }
 
     @Test
-    void shouldGetPacienteById() {
-        int id = 1;
-        when(pacienteRepository.findById(id)).thenReturn(paciente);
+    @DisplayName("Should get paciente by ID when valid ID is given")
+    void shouldGetPacienteById_whenValidIdIsGiven() {
+        when(pacienteRepository.findById(ID)).thenReturn(paciente);
 
-        Paciente foundPaciente = pacienteService.getPacienteById(id);
+        Paciente foundPaciente = pacienteService.getPacienteById(ID);
 
         assertEquals(paciente, foundPaciente);
-        verify(pacienteRepository, times(1)).findById(id);
+        verify(pacienteRepository, times(1)).findById(ID);
     }
 
     @Test
-    void shouldThrowExceptionWhenPacienteNotFound() {
-        int id = 13;
-        when(pacienteRepository.findById(id)).thenThrow(new PacienteNoEncontradoException());
+    @DisplayName("Should throw exception when paciente not found with given ID")
+    void shouldThrowException_whenPacienteNotFoundWithGivenId() {
+        when(pacienteRepository.findById(ID)).thenThrow(new PacienteNoEncontradoException());
 
         assertThrows(PacienteNoEncontradoException.class, () -> {
-            pacienteService.getPacienteById(id);
+            pacienteService.getPacienteById(ID);
         });
-        verify(pacienteRepository, times(1)).findById(id);
+        verify(pacienteRepository, times(1)).findById(ID);
     }
 
     @Test
-    void shouldSavePaciente() {
+    @DisplayName("Should save paciente when all arguments are valid")
+    void shouldSavePaciente_whenAllArgumentsAreValid() {
         when(pacienteRepository.getPacienteByDni(paciente.getDni())).thenReturn(null);
         when(pacienteRepository.save(paciente)).thenReturn(paciente);
         doNothing().when(pacienteEventPublisher).publishPacienteCreado(paciente);
@@ -86,7 +90,8 @@ class PacienteServiceTest {
     }
 
     @Test
-    void shouldThrowDuplicadoExceptionWhenSavedPacienteAlreadyExists() {
+    @DisplayName("Should throw duplicado exception when saved paciente already exists")
+    void shouldThrowDuplicadoException_whenSavedPacienteAlreadyExists() {
         when(pacienteRepository.getPacienteByDni(paciente.getDni())).thenReturn(paciente);
 
         assertThrows(PacienteDuplicadoException.class, () -> {
@@ -98,46 +103,47 @@ class PacienteServiceTest {
     }
 
     @Test
-    void shouldUpdatePaciente() {
-        String newEmail = "jDoe@gmail.com";
-        paciente.setEmail(newEmail);
+    @DisplayName("Should update paciente when paciente exists and DNI is not duplicated")
+    void shouldUpdatePaciente_whenPacienteExistsAndDniIsNotDuplicated() {
+        paciente.setEmail(NEW_EMAIL);
         when(pacienteRepository.findById(paciente.getId())).thenReturn(paciente);
         when(pacienteRepository.getPacienteByDni(paciente.getDni())).thenReturn(paciente);
         when(pacienteRepository.save(paciente)).thenReturn(paciente);
 
         Paciente updatedPaciente = pacienteService.updatePaciente(paciente.getId(), paciente);
 
-        assertEquals(newEmail, updatedPaciente.getEmail());
+        assertEquals(NEW_EMAIL, updatedPaciente.getEmail());
         verify(pacienteRepository, times(1)).findById(paciente.getId());
         verify(pacienteRepository, times(1)).getPacienteByDni(paciente.getDni());
         verify(pacienteRepository, times(1)).save(paciente);
     }
 
     @Test
-    void shouldThrowNoEncontradoExceptionWhenIdNotFound() {
-        int id = 23;
-        when(pacienteRepository.findById(id)).thenThrow(new PacienteNoEncontradoException());
+    @DisplayName("Should throw PacienteNoEncontradoException when paciente ID does not exist")
+    void shouldThrowPacienteNoEncontradoException_whenPacienteIdDoesNotExist() {
+        when(pacienteRepository.findById(ID)).thenThrow(new PacienteNoEncontradoException());
 
         assertThrows(PacienteNoEncontradoException.class, () -> {
-            pacienteService.updatePaciente(id, paciente);
+            pacienteService.updatePaciente(ID, paciente);
         });
-        verify(pacienteRepository, times(1)).findById(id);
+        verify(pacienteRepository, times(1)).findById(ID);
         verify(pacienteRepository, never()).getPacienteByDni(paciente.getDni());
         verify(pacienteRepository, never()).save(paciente);
     }
 
     @Test
-    void shouldThrowDuplicadoExceptionWhenDniDuplicated() {
-        paciente.setId(1);
-        paciente.setDni("12121212");
+    @DisplayName("Should throw PacienteDuplicadoException when DNI belongs to another paciente")
+    void shouldThrowPacienteDuplicadoException_whenDniBelongsToAnotherPaciente() {
+        paciente.setId(ID);
+        paciente.setDni(DNI);
         Paciente pacienteExistenteConMismoDni = new Paciente();
-        pacienteExistenteConMismoDni.setId(222);
-        pacienteExistenteConMismoDni.setDni("12121212");
+        pacienteExistenteConMismoDni.setId(12);
+        pacienteExistenteConMismoDni.setDni(DNI);
         when(pacienteRepository.findById(paciente.getId())).thenReturn(paciente);
         when(pacienteRepository.getPacienteByDni(paciente.getDni())).thenReturn(pacienteExistenteConMismoDni);
 
         assertThrows(PacienteDuplicadoException.class, () -> {
-            pacienteService.updatePaciente(1, paciente);
+            pacienteService.updatePaciente(ID, paciente);
         });
         assertNotEquals(paciente.getId(), pacienteExistenteConMismoDni.getId());
         verify(pacienteRepository, times(1)).findById(paciente.getId());
@@ -146,7 +152,8 @@ class PacienteServiceTest {
     }
 
     @Test
-    void shouldDeletePaciente() {
+    @DisplayName("Should delete paciente when paciente exists")
+    void shouldDeletePaciente_whenPacienteExists() {
         when(pacienteRepository.findById(paciente.getId())).thenReturn(paciente);
         doNothing().when(pacienteRepository).deleteById(paciente.getId());
         doNothing().when(pacienteEventPublisher).publishPacienteEliminado(paciente);
@@ -159,63 +166,59 @@ class PacienteServiceTest {
     }
 
     @Test
-    void shouldThrowNoEncontradoExceptionWhenPacienteNotFoundAndNotDelete() {
-        int id = 22;
-        when(pacienteRepository.findById(id)).thenReturn(null);
+    @DisplayName("Should throw PacienteNoEncontradoException when paciente does not exist on delete")
+    void shouldThrowPacienteNoEncontradoException_whenPacienteDoesNotExistOnDelete() {
+        when(pacienteRepository.findById(ID)).thenReturn(null);
 
         assertThrows(PacienteNoEncontradoException.class, () -> {
-            pacienteService.deletePaciente(id);
+            pacienteService.deletePaciente(ID);
         });
-        verify(pacienteRepository, times(1)).findById(id);
-        verify(pacienteRepository, never()).deleteById(id);
+        verify(pacienteRepository, times(1)).findById(ID);
+        verify(pacienteRepository, never()).deleteById(ID);
         verify(pacienteEventPublisher, never()).publishPacienteEliminado(paciente);
     }
 
     @Test
-    void shouldGetPacienteByDni() {
-        String dni = "12121212";
-        when(pacienteRepository.getPacienteByDni(dni)).thenReturn(paciente);
+    @DisplayName("Should get paciente by DNI when DNI exists")
+    void shouldGetPacienteByDni_whenDniExists() {
+        when(pacienteRepository.getPacienteByDni(DNI)).thenReturn(paciente);
 
-        Paciente foundPaciente = pacienteService.getPacienteByDni(dni);
+        Paciente foundPaciente = pacienteService.getPacienteByDni(DNI);
 
         assertEquals(paciente, foundPaciente);
-        verify(pacienteRepository, times(1)).getPacienteByDni(dni);
+        verify(pacienteRepository, times(1)).getPacienteByDni(DNI);
     }
 
     @Test
-    void shouldThrowNoEncontradoExceptionWhenPacienteNotFoundWithDni() {
-        String incorrectDni = "11111111";
-        when(pacienteRepository.getPacienteByDni(incorrectDni)).thenReturn(null);
+    @DisplayName("Should throw PacienteNoEncontradoException when DNI does not exist")
+    void shouldThrowPacienteNoEncontradoException_whenDniDoesNotExist() {
+        when(pacienteRepository.getPacienteByDni(DNI)).thenReturn(null);
 
         assertThrows(PacienteNoEncontradoException.class, () -> {
-            pacienteService.getPacienteByDni(incorrectDni);
+            pacienteService.getPacienteByDni(DNI);
         });
-        verify(pacienteRepository, times(1)).getPacienteByDni(incorrectDni);
+        verify(pacienteRepository, times(1)).getPacienteByDni(DNI);
     }
 
     @Test
-    void shouldGetPacientesByNombre() {
-        String nombre = "Jane";
+    @DisplayName("Should return pacientes list when nombre matches")
+    void shouldReturnPacientesList_whenNombreMatches() {
+        when(pacienteRepository.getPacientesByNombre(NOMBRE.toLowerCase())).thenReturn(pacientes);
 
-        when(pacienteRepository.getPacientesByNombre(nombre.toLowerCase())).thenReturn(pacientes);
-
-        List<Paciente> foundPacientes = pacienteService.getPacientesByName(nombre);
+        List<Paciente> foundPacientes = pacienteService.getPacientesByName(NOMBRE);
 
         assertEquals(pacientes.size(), foundPacientes.size());
-        verify(pacienteRepository, times(1)).getPacientesByNombre(nombre.toLowerCase());
+        verify(pacienteRepository, times(1)).getPacientesByNombre(NOMBRE.toLowerCase());
     }
 
     @Test
-    void shouldGetPacientesByObraSocial() {
-        String obraSocial = "Swiss Medical";
-        int limite = 3;
-        int off = 0;
+    @DisplayName("Should return pacientes list when obra social matches with pagination")
+    void shouldReturnPacientesList_whenObraSocialMatchesWithPagination() {
+        when(pacienteRepository.getPacientesByObraSocial(OBRA_SOCIAL, LIMITE, OFF)).thenReturn(pacientes);
 
-        when(pacienteRepository.getPacientesByObraSocial(obraSocial, limite, off)).thenReturn(pacientes);
-
-        List<Paciente> foundPacientes = pacienteService.getPacientesByObraSocial(obraSocial, limite, off);
+        List<Paciente> foundPacientes = pacienteService.getPacientesByObraSocial(OBRA_SOCIAL, LIMITE, OFF);
 
         assertEquals(pacientes.size(), foundPacientes.size());
-        verify(pacienteRepository, times(1)).getPacientesByObraSocial(obraSocial, limite, off);
+        verify(pacienteRepository, times(1)).getPacientesByObraSocial(OBRA_SOCIAL, LIMITE, OFF);
     }
 }

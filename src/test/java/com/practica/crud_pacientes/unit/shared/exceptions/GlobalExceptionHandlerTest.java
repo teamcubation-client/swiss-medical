@@ -5,7 +5,9 @@ import com.practica.crud_pacientes.shared.exceptions.GlobalExceptionHandler;
 import com.practica.crud_pacientes.shared.exceptions.PacienteDuplicadoException;
 import com.practica.crud_pacientes.shared.exceptions.PacienteNoEncontradoException;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 
 import java.util.Map;
 
+import static com.practica.crud_pacientes.utils.TestConstants.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -29,36 +32,39 @@ class GlobalExceptionHandlerTest {
     }
 
     @Test
-    void shouldHandlePacienteNoEncontradoException() {
-        request.setRequestURI("/pacientes/buscar-por-id/1234");
+    @DisplayName("Should handle PacienteNoEncontradoException when paciente is not found")
+    void shouldHandlePacienteNoEncontradoException_whenPacienteIsNotFound() {
+        request.setRequestURI(PATH_BUSCAR_ID);
         PacienteNoEncontradoException exception = new PacienteNoEncontradoException();
 
         ErrorResponse response = handler.handlePacienteNoEncontrado(exception, request);
 
-        assertThat(response.getStatus()).isEqualTo(404);
-        assertThat(response.getMensaje()).isEqualTo("El paciente que se intenta buscar no existe.");
-        assertThat(response.getPath()).isEqualTo("/pacientes/buscar-por-id/1234");
-        assertThat(response.getError()).isEqualTo("Not Found");
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.NOT_FOUND.value());
+        assertThat(response.getMensaje()).isEqualTo(exception.getMessage());
+        assertThat(response.getPath()).isEqualTo(request.getRequestURI());
+        assertThat(response.getError()).isEqualTo(HttpStatus.NOT_FOUND.getReasonPhrase());
     }
 
     @Test
-    void shouldHandleGenericException() {
-        request.setRequestURI("/pacientes");
-        Exception exception = new RuntimeException("Algo salió mal");
+    @DisplayName("Should handle generic exception when unexpected exception occurs")
+    void shouldHandleGenericException_whenUnexpectedExceptionOccurs() {
+        request.setRequestURI(ENDPOINT);
+        Exception exception = new RuntimeException(MENSAJE_EXCEPCION_GENERICA);
 
         ErrorResponse response = handler.handleExcepcionGenerica(exception, request);
 
-        assertThat(response.getStatus()).isEqualTo(500);
-        assertThat(response.getMensaje()).contains("Ocurrió un error inesperado: Algo salió mal");
-        assertThat(response.getPath()).isEqualTo("/pacientes");
-        assertThat(response.getError()).isEqualTo("Internal Server Error");
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        assertThat(response.getMensaje()).contains(exception.getMessage());
+        assertThat(response.getPath()).isEqualTo(ENDPOINT);
+        assertThat(response.getError()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
     }
 
     @Test
-    void shouldHandleValidationErrors() {
-        request.setRequestURI("/pacientes/nuevo-paciente");
-        FieldError fieldError1 = new FieldError("paciente", "nombre", "El nombre es obligatorio");
-        FieldError fieldError2 = new FieldError("paciente", "dni", "El DNI no es válido");
+    @DisplayName("Should handle validation errors when request has invalid fields")
+    void shouldHandleValidationErrors_whenRequestHasInvalidFields() {
+        request.setRequestURI(ENDPOINT);
+        FieldError fieldError1 = new FieldError(ENTITY_NAME, ERROR_FIELD_1, ERROR_MSG_1);
+        FieldError fieldError2 = new FieldError(ENTITY_NAME, ERROR_FIELD_2, ERROR_MSG_2);
 
         BindingResult bindingResult = mock(BindingResult.class);
         when(bindingResult.getFieldErrors()).thenReturn(java.util.List.of(fieldError1, fieldError2));
@@ -67,27 +73,28 @@ class GlobalExceptionHandlerTest {
 
         ErrorResponse response = handler.handleValidationsException(exception, request);
 
-        assertThat(response.getStatus()).isEqualTo(400);
-        assertThat(response.getMensaje()).isEqualTo("Errores de validacion");
-        assertThat(response.getPath()).isEqualTo("/pacientes/nuevo-paciente");
-        assertThat(response.getError()).isEqualTo("Bad Request");
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.getMensaje()).isEqualTo(ERROR_MSG_EXCEPTION);
+        assertThat(response.getPath()).isEqualTo(ENDPOINT);
+        assertThat(response.getError()).isEqualTo(HttpStatus.BAD_REQUEST.getReasonPhrase());
 
         Map<String, String> errores = response.getErrores();
         assertThat(errores)
-                .containsEntry("nombre", "El nombre es obligatorio")
-                .containsEntry("dni", "El DNI no es válido");
+                .containsEntry(ERROR_FIELD_1, ERROR_MSG_1)
+                .containsEntry(ERROR_FIELD_2, ERROR_MSG_2);
     }
 
     @Test
-    void shouldHandlePacienteDuplicadoException() {
-        request.setRequestURI("/pacientes/nuevo-paciente");
+    @DisplayName("Should handle PacienteDuplicadoException when paciente with same DNI already exists")
+    void shouldHandlePacienteDuplicadoException_whenPacienteWithSameDniAlreadyExists() {
+        request.setRequestURI(ENDPOINT);
         PacienteDuplicadoException exception = new PacienteDuplicadoException();
 
         ErrorResponse response = handler.handlePacienteDuplicado(exception, request);
 
-        assertThat(response.getStatus()).isEqualTo(409);
-        assertThat(response.getMensaje()).isEqualTo("Ya existe un paciente con ese DNI.");
-        assertThat(response.getPath()).isEqualTo("/pacientes/nuevo-paciente");
-        assertThat(response.getError()).isEqualTo("Conflict");
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.CONFLICT.value());
+        assertThat(response.getMensaje()).isEqualTo(exception.getMessage());
+        assertThat(response.getPath()).isEqualTo(ENDPOINT);
+        assertThat(response.getError()).isEqualTo(HttpStatus.CONFLICT.getReasonPhrase());
     }
 }

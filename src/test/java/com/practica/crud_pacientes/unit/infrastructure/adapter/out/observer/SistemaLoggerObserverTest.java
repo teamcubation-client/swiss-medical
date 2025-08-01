@@ -5,11 +5,11 @@ import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
 import com.practica.crud_pacientes.infrastructure.adapter.out.observer.SistemaLoggerObserver;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.slf4j.LoggerFactory;
 
-import static com.practica.crud_pacientes.utils.TestConstants.ENDPOINT;
-import static com.practica.crud_pacientes.utils.TestConstants.REQUEST_COUNT;
+import static com.practica.crud_pacientes.utils.TestConstants.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class SistemaLoggerObserverTest {
@@ -27,14 +27,15 @@ class SistemaLoggerObserverTest {
     }
 
     @Test
-    void shouldLogAlert() {
+    @DisplayName("Should log alert when AlertaGenerada")
+    void shouldLogAlert_whenAlertaGenerada() {
         observer.onAlertaGenerada(ENDPOINT, REQUEST_COUNT);
 
         assertThat(listApprender.list)
                 .hasSize(1)
                 .anySatisfy(logEvent -> {
-                    assertThat(logEvent.getLevel().toString()).hasToString("WARN");
-                    assertThat(logEvent.getFormattedMessage()).contains("High traffic detected", "/pacientes", String.valueOf(REQUEST_COUNT));
+                    assertThat(logEvent.getLevel().toString()).hasToString(WARN_LEVEL);
+                    assertThat(logEvent.getFormattedMessage()).contains(HIGH_TRAFFIC_MESSAGE, ENDPOINT, String.valueOf(REQUEST_COUNT));
                 });
     }
 }

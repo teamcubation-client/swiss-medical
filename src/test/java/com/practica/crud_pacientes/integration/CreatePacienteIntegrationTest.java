@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.practica.crud_pacientes.application.domain.model.Paciente;
 import com.practica.crud_pacientes.application.domain.port.out.PacienteRepositoryPort;
 import com.practica.crud_pacientes.infrastructure.adapter.in.rest.dto.PacienteRequest;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -16,6 +17,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 import static com.practica.crud_pacientes.utils.PacienteTestFactory.buildRequest;
+import static com.practica.crud_pacientes.utils.TestConstants.DNI;
 import static com.practica.crud_pacientes.utils.TestConstants.ENDPOINT;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -39,10 +41,11 @@ class CreatePacienteIntegrationTest {
     @Test
     @Transactional
     @Rollback
-    void shouldReturn201WhenPacienteIsCreatedSuccessfully() throws Exception {
+    @DisplayName("Should return 201 when paciente is created successfully")
+    void shouldReturn201_whenPacienteIsCreatedSuccessfully() throws Exception {
         PacienteRequest pacienteRequest = buildRequest();
 
-        doReturn(null).when(pacienteRepositoryPort).getPacienteByDni("12121212");
+        doReturn(null).when(pacienteRepositoryPort).getPacienteByDni(DNI);
 
 
         mockMvc.perform(post(ENDPOINT)
@@ -50,7 +53,7 @@ class CreatePacienteIntegrationTest {
                 .content(objectMapper.writeValueAsString(pacienteRequest)))
                 .andExpect(status().isCreated());
 
-        verify(pacienteRepositoryPort).getPacienteByDni("12121212");
+        verify(pacienteRepositoryPort).getPacienteByDni(DNI);
         verify(pacienteRepositoryPort).save(any(Paciente.class));
     }
 }

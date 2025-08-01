@@ -3,6 +3,7 @@ package com.practica.crud_pacientes.unit.infrastructure.adapter.out.mediator;
 import com.practica.crud_pacientes.infrastructure.adapter.out.mediator.AlertService;
 import com.practica.crud_pacientes.infrastructure.adapter.out.mediator.TrafficMediator;
 import com.practica.crud_pacientes.infrastructure.adapter.out.mediator.TrafficMonitor;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -26,7 +27,8 @@ class TrafficMediatorTest {
     private TrafficMediator trafficMediator;
 
     @Test
-    void shouldTriggerAndSendAnAlert() {
+    @DisplayName("Should trigger and send an alert when traffic exceeds threshold")
+    void shouldTriggerAndSendAlert_whenTrafficExceedsThreshold() {
         when(trafficMonitor.shouldTriggerAlert()).thenReturn(true);
         when(trafficMonitor.getRequestCount()).thenReturn(REQUEST_COUNT);
 
@@ -38,7 +40,8 @@ class TrafficMediatorTest {
     }
 
     @Test
-    void shouldNotTrigger() {
+    @DisplayName("Should not trigger an alert when traffic is below threshold")
+    void shouldNotTriggerAlert_whenTrafficBelowThreshold() {
         when(trafficMonitor.shouldTriggerAlert()).thenReturn(false);
 
         trafficMediator.notify(ENDPOINT);

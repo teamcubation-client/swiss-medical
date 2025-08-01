@@ -6,10 +6,12 @@ import ch.qos.logback.core.read.ListAppender;
 import com.practica.crud_pacientes.application.domain.model.Paciente;
 import com.practica.crud_pacientes.infrastructure.adapter.out.observer.PacienteLoggerObserver;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.slf4j.LoggerFactory;
 
 import static com.practica.crud_pacientes.utils.PacienteTestFactory.buildDomain;
+import static com.practica.crud_pacientes.utils.TestConstants.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class PacienteLoggerObserverTest {
@@ -30,26 +32,28 @@ class PacienteLoggerObserverTest {
     }
 
     @Test
-    void shouldLogPacienteCreado() {
+    @DisplayName("Should log when PacienteCreado")
+    void shouldLog_whenPacienteCreado() {
         observer.onPacienteCreado(paciente);
 
         assertThat(listApprender.list)
                 .hasSize(1)
                 .anySatisfy(event -> {
-                    assertThat(event.getLevel().toString()).hasToString("INFO");
-                    assertThat(event.getFormattedMessage()).contains("Paciente creado", "Jane", "Doe");
+                    assertThat(event.getLevel().toString()).hasToString(INFO_LEVEL);
+                    assertThat(event.getFormattedMessage()).contains(PACIENTE_CREADO_MESSAGE, NOMBRE, APELLIDO);
                 });
     }
 
     @Test
-    void shouldLogPacienteEliminado() {
+    @DisplayName("Should log when PacienteEliminado")
+    void shouldLog_whenPacienteEliminado() {
         observer.onPacienteEliminado(paciente);
 
         assertThat(listApprender.list)
                 .hasSize(1)
                 .anySatisfy(event -> {
-                    assertThat(event.getLevel().toString()).hasToString("INFO");
-                    assertThat(event.getFormattedMessage()).contains("Paciente eliminado", "Jane", "Doe");
+                    assertThat(event.getLevel().toString()).hasToString(INFO_LEVEL);
+                    assertThat(event.getFormattedMessage()).contains(PACIENTE_ELIMINADO_MESSAGE, NOMBRE, APELLIDO);
                 });
     }
 }

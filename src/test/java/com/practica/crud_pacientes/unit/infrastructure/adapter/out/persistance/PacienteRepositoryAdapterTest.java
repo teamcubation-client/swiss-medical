@@ -7,17 +7,18 @@ import com.practica.crud_pacientes.infrastructure.adapter.out.persistence.Pacien
 import com.practica.crud_pacientes.infrastructure.adapter.out.persistence.PacienteRepositoryAdapter;
 import com.practica.crud_pacientes.shared.exceptions.PacienteNoEncontradoException;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import static com.practica.crud_pacientes.utils.PacienteTestFactory.buildDomain;
+import static com.practica.crud_pacientes.utils.TestConstants.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -31,16 +32,29 @@ class PacienteRepositoryAdapterTest {
     private PacienteRepositoryAdapter pacienteRepositoryAdapter;
     private Paciente paciente;
     private PacienteEntity pacienteEntity;
+    private PacienteEntity entity1;
+    private PacienteEntity entity2;
+    List<PacienteEntity> pacientesEntity;
+    Paciente paciente1;
+    Paciente paciente2;
 
     @BeforeEach
     void setUp() {
         this.paciente = buildDomain();
 
         this.pacienteEntity = new PacienteEntity();
+
+        entity1 = new PacienteEntity();
+        entity2 = new PacienteEntity();
+        pacientesEntity = List.of(entity1, entity2);
+
+        paciente1 = new Paciente();
+        paciente2 = new Paciente();
     }
 
     @Test
-    void shouldSavePaciente() {
+    @DisplayName("Should save paciente when valid domain paciente is provided")
+    void shouldSavePaciente_whenValidDomainPacienteProvided() {
         when(mapper.domainToEntity(paciente)).thenReturn(pacienteEntity);
         when(jpaRepository.save(pacienteEntity)).thenReturn(pacienteEntity);
         when(mapper.entityToDomain(pacienteEntity)).thenReturn(paciente);
@@ -54,17 +68,8 @@ class PacienteRepositoryAdapterTest {
     }
 
     @Test
-    void shouldFindAllPacientes() {
-        List<PacienteEntity> pacientesEntity = new ArrayList<>();
-        PacienteEntity entity1 = new PacienteEntity();
-        PacienteEntity entity2 = new PacienteEntity();
-
-        pacientesEntity.add(entity1);
-        pacientesEntity.add(entity2);
-
-        Paciente paciente1 = new Paciente();
-        Paciente paciente2 = new Paciente();
-
+    @DisplayName("Should return all pacientes when findAll is called")
+    void shouldReturnAllPacientes_whenFindAllIsCalled() {
         when(jpaRepository.findAll()).thenReturn(pacientesEntity);
         when(mapper.entityToDomain(entity1)).thenReturn(paciente1);
         when(mapper.entityToDomain(entity2)).thenReturn(paciente2);
@@ -78,7 +83,8 @@ class PacienteRepositoryAdapterTest {
     }
 
     @Test
-    void shouldFindPacienteById() {
+    @DisplayName("Should return paciente when ID exists")
+    void shouldReturnPaciente_whenIdExists() {
         when(jpaRepository.findById(pacienteEntity.getId())).thenReturn(Optional.ofNullable(pacienteEntity));
         when(mapper.entityToDomain(pacienteEntity)).thenReturn(paciente);
 
@@ -90,17 +96,19 @@ class PacienteRepositoryAdapterTest {
     }
 
     @Test
-    void shouldThrowExceptionWhenFindPacienteByid() {
-        when(jpaRepository.findById(100)).thenReturn(Optional.empty());
+    @DisplayName("Should throw PacienteNoEncontradoException when ID does not exist")
+    void shouldThrowPacienteNoEncontradoException_whenIdDoesNotExist() {
+        when(jpaRepository.findById(ID)).thenReturn(Optional.empty());
 
         assertThrows(PacienteNoEncontradoException.class, () ->{
-            pacienteRepositoryAdapter.findById(100);
+            pacienteRepositoryAdapter.findById(ID);
         });
-        verify(jpaRepository, times(1)).findById(100);
+        verify(jpaRepository, times(1)).findById(ID);
     }
 
     @Test
-    void shouldFindPacienteByDni() {
+    @DisplayName("Should return paciente when DNI exists")
+    void shouldReturnPaciente_whenDniExists() {
         when(jpaRepository.getByDni(pacienteEntity.getDni())).thenReturn(pacienteEntity);
         when(mapper.entityToDomain(pacienteEntity)).thenReturn(paciente);
 
@@ -112,97 +120,76 @@ class PacienteRepositoryAdapterTest {
     }
 
     @Test
-    void shouldReturnNullWhenFindPacienteByDni() {
-        String dni = "12345678";
-        when(jpaRepository.getByDni(dni)).thenReturn(null);
+    @DisplayName("Should return null when DNI does not exist")
+    void shouldReturnNull_whenDniDoesNotExist() {
+        when(jpaRepository.getByDni(DNI)).thenReturn(null);
         when(mapper.entityToDomain(null)).thenReturn(null);
 
-        Paciente foundPaciente = pacienteRepositoryAdapter.getPacienteByDni(dni);
+        Paciente foundPaciente = pacienteRepositoryAdapter.getPacienteByDni(DNI);
 
         assertNull(foundPaciente);
-        verify(jpaRepository, times(1)).getByDni(dni);
+        verify(jpaRepository, times(1)).getByDni(DNI);
         verify(mapper, times(1)).entityToDomain(null);
     }
 
     @Test
-    void shouldGetPacientesByNombre() {
-        String nombre = "John";
-        List<PacienteEntity> pacientesEntity = new ArrayList<>();
-        PacienteEntity pacienteEntity1 = new PacienteEntity();
-        PacienteEntity pacienteEntity2 = new PacienteEntity();
-        pacientesEntity.add(pacienteEntity1);
-        pacientesEntity.add(pacienteEntity2);
+    @DisplayName("Should return pacientes list when nombre matches")
+    void shouldReturnPacientesList_whenNombreMatches() {
+        when(jpaRepository.getPacientesByNombre(NOMBRE.toLowerCase())).thenReturn(pacientesEntity);
+        when(mapper.entityToDomain(entity1)).thenReturn(paciente1);
+        when(mapper.entityToDomain(entity2)).thenReturn(paciente2);
 
-        Paciente paciente1 = new Paciente();
-        Paciente paciente2 = new Paciente();
-
-        when(jpaRepository.getPacientesByNombre(nombre.toLowerCase())).thenReturn(pacientesEntity);
-        when(mapper.entityToDomain(pacienteEntity1)).thenReturn(paciente1);
-        when(mapper.entityToDomain(pacienteEntity2)).thenReturn(paciente2);
-
-        List<Paciente> pacientes = pacienteRepositoryAdapter.getPacientesByNombre(nombre);
+        List<Paciente> pacientes = pacienteRepositoryAdapter.getPacientesByNombre(NOMBRE);
 
         assertEquals(2, pacientes.size());
-        verify(jpaRepository, times(1)).getPacientesByNombre(nombre.toLowerCase());
-        verify(mapper, times(1)).entityToDomain(pacienteEntity1);
-        verify(mapper, times(1)).entityToDomain(pacienteEntity2);
+        verify(jpaRepository, times(1)).getPacientesByNombre(NOMBRE.toLowerCase());
+        verify(mapper, times(1)).entityToDomain(entity1);
+        verify(mapper, times(1)).entityToDomain(entity2);
     }
 
     @Test
-    void shouldGetPacientesByObraSocial() {
-        String obraSocial = "Swiss Medical";
-        int limite = 2;
-        int off = 0;
-        List<PacienteEntity> pacientesEntity = new ArrayList<>();
-        PacienteEntity pacienteEntity1 = new PacienteEntity();
-        PacienteEntity pacienteEntity2 = new PacienteEntity();
-        pacientesEntity.add(pacienteEntity1);
-        pacientesEntity.add(pacienteEntity2);
+    @DisplayName("Should return pacientes list when obra social matches with pagination")
+    void shouldReturnPacientesList_whenObraSocialMatchesWithPagination() {
+        when(jpaRepository.getPacietesbyObraSocial(OBRA_SOCIAL, LIMITE, OFF)).thenReturn(pacientesEntity);
+        when(mapper.entityToDomain(entity1)).thenReturn(paciente1);
+        when(mapper.entityToDomain(entity2)).thenReturn(paciente2);
 
-        Paciente paciente1 = new Paciente();
-        Paciente paciente2 = new Paciente();
-
-        when(jpaRepository.getPacietesbyObraSocial(obraSocial, limite, off)).thenReturn(pacientesEntity);
-        when(mapper.entityToDomain(pacienteEntity1)).thenReturn(paciente1);
-        when(mapper.entityToDomain(pacienteEntity2)).thenReturn(paciente2);
-
-        List<Paciente> pacientes = pacienteRepositoryAdapter.getPacientesByObraSocial(obraSocial, limite, off);
+        List<Paciente> pacientes = pacienteRepositoryAdapter.getPacientesByObraSocial(OBRA_SOCIAL, LIMITE, OFF);
 
         assertEquals(2, pacientes.size());
-        verify(jpaRepository, times(1)).getPacietesbyObraSocial(obraSocial, limite, off);
-        verify(mapper, times(1)).entityToDomain(pacienteEntity1);
-        verify(mapper, times(1)).entityToDomain(pacienteEntity2);
+        verify(jpaRepository, times(1)).getPacietesbyObraSocial(OBRA_SOCIAL, LIMITE, OFF);
+        verify(mapper, times(1)).entityToDomain(entity1);
+        verify(mapper, times(1)).entityToDomain(entity2);
     }
 
     @Test
-    void shouldReturnTrueWhenPacienteExistsById() {
-        int id = 1;
-        when(jpaRepository.existsById(id)).thenReturn(true);
+    @DisplayName("Should return true when paciente exists by ID")
+    void shouldReturnTrue_whenPacienteExistsById() {
+        when(jpaRepository.existsById(ID)).thenReturn(true);
 
-        boolean exists = pacienteRepositoryAdapter.existsById(id);
+        boolean exists = pacienteRepositoryAdapter.existsById(ID);
 
         assertTrue(exists);
-        verify(jpaRepository, times(1)).existsById(id);
+        verify(jpaRepository, times(1)).existsById(ID);
     }
 
     @Test
-    void shouldReturnFalseWhenPacienteDoesNotExistById() {
-        int id = 2;
-        when(jpaRepository.existsById(id)).thenReturn(false);
+    @DisplayName("Should return false when paciente does not exist by ID")
+    void shouldReturnFalse_whenPacienteDoesNotExistById() {
+        when(jpaRepository.existsById(ID)).thenReturn(false);
 
-        boolean exists = pacienteRepositoryAdapter.existsById(id);
+        boolean exists = pacienteRepositoryAdapter.existsById(ID);
 
         assertFalse(exists);
-        verify(jpaRepository, times(1)).existsById(id);
+        verify(jpaRepository, times(1)).existsById(ID);
     }
 
     @Test
-    void shouldDeletePacienteById() {
-        int id = 3;
+    @DisplayName("Should delete paciente when deleteById is called")
+    void shouldDeletePaciente_whenDeleteByIdIsCalled() {
+        pacienteRepositoryAdapter.deleteById(ID);
 
-        pacienteRepositoryAdapter.deleteById(id);
-
-        verify(jpaRepository, times(1)).deleteById(id);
+        verify(jpaRepository, times(1)).deleteById(ID);
     }
 
 }
