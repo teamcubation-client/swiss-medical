@@ -7,6 +7,7 @@ import microservice.pacientes.application.validation.PacienteValidator;
 import microservice.pacientes.shared.PacienteDuplicadoException;
 import org.springframework.stereotype.Component;
 
+import java.util.Objects;
 import java.util.Optional;
 
 @Component
@@ -20,10 +21,11 @@ public class DniDuplicadoValidator implements PacienteValidator {
 
     @Override
     public void validate(Paciente paciente){
-        Optional<Paciente> existente = pacientePortOutRead.buscarByDni(paciente.getDni());
-        if (existente.isPresent()) {
-            throw new PacienteDuplicadoException(paciente.getDni());
-        }
+        pacientePortOutRead.buscarByDni(paciente.getDni())
+                .filter(existente -> !Objects.equals(existente.getId(), paciente.getId()))
+                .ifPresent(existente -> {
+                    throw new PacienteDuplicadoException(paciente.getDni());
+                });
         if (next != null) {
             next.validate(paciente);
         }

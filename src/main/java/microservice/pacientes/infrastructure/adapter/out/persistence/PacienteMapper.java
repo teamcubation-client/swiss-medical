@@ -9,7 +9,6 @@ import microservice.pacientes.shared.PacienteNullException;
  */
 public final class PacienteMapper {
 
-    //impide una instanciacion
     private PacienteMapper() {}
 
     public static PacienteEntity toEntity(Paciente paciente) {
