@@ -35,7 +35,7 @@ public class PacienteService implements PacienteUseCase {
     @Override
     @Transactional
     public Paciente addPaciente(Paciente paciente) {
-        if(pacienteRepositoryPort.getByDni(paciente.getDni()) != null)
+        if(pacienteRepositoryPort.getPacienteByDni(paciente.getDni()) != null)
             throw new PacienteDuplicadoException();
 
         Paciente pacienteCreado = pacienteRepositoryPort.save(paciente);
@@ -50,7 +50,7 @@ public class PacienteService implements PacienteUseCase {
         Optional.ofNullable(pacienteRepositoryPort.findById(id))
                 .orElseThrow(PacienteNoEncontradoException::new);
 
-        Paciente existingPaciente = pacienteRepositoryPort.getByDni(paciente.getDni());
+        Paciente existingPaciente = pacienteRepositoryPort.getPacienteByDni(paciente.getDni());
         if (existingPaciente != null && existingPaciente.getId() != id)
             throw new PacienteDuplicadoException();
 
@@ -70,8 +70,8 @@ public class PacienteService implements PacienteUseCase {
 
     @Override
     @Transactional
-    public Paciente getByDni(String dni) {
-        Paciente paciente = pacienteRepositoryPort.getByDni(dni);
+    public Paciente getPacienteByDni(String dni) {
+        Paciente paciente = pacienteRepositoryPort.getPacienteByDni(dni);
         if(paciente == null)
             throw new PacienteNoEncontradoException();
 
@@ -80,13 +80,13 @@ public class PacienteService implements PacienteUseCase {
 
     @Override
     @Transactional
-    public List<Paciente> getPacientesbyName(String nombre) {
+    public List<Paciente> getPacientesByName(String nombre) {
         return pacienteRepositoryPort.getPacientesByNombre(nombre.toLowerCase());
     }
 
     @Override
     @Transactional
-    public List<Paciente> getPacietesbyObraSocial(String obraSocial, int limite, int off) {
-        return pacienteRepositoryPort.getPacietesbyObraSocial(obraSocial, limite, off);
+    public List<Paciente> getPacientesByObraSocial(String obraSocial, int limite, int off) {
+        return pacienteRepositoryPort.getPacientesByObraSocial(obraSocial, limite, off);
     }
 }

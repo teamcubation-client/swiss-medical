@@ -17,21 +17,7 @@ public class Paciente {
     private LocalDate fechaNacimiento;
     private String estadoCivil;
 
-    public Paciente() {
-    }
-
-    public Paciente(int id, String nombre, String apellido, String dni, String obraSocial, String email, String telefono, String domicilio, LocalDate fechaNacimiento, String estadoCivil) {
-        this.id = id;
-        this.nombre = nombre;
-        this.apellido = apellido;
-        this.dni = dni;
-        this.obraSocial = obraSocial;
-        this.email = email;
-        this.telefono = telefono;
-        this.domicilio = domicilio;
-        this.fechaNacimiento = fechaNacimiento;
-        this.estadoCivil = estadoCivil;
-    }
+    public Paciente() {}
 
     public int getId() {
         return id;
