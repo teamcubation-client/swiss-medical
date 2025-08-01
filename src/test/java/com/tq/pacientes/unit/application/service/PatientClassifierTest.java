@@ -15,10 +15,15 @@ import java.time.LocalDate;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class PatientClassifierTest {
+class PatientClassifierTest {
 
     private PatientClassifier classifier;
     private Patient patient;
+
+    private static final int SENIOR_AGE = 65;
+    private static final int ADULT_AGE = 30;
+    private static final int LEGAL_AGE = 18;
+    private static final int YOUNG_AGE = 10;
 
     @BeforeEach
     void setUp() {
@@ -28,8 +33,8 @@ public class PatientClassifierTest {
 
 
     @Test
-    void shouldClassifyAsSenior() {
-        patient.setBirthDate(LocalDate.now().minusYears(65));
+    void shouldClassifyAsSenior_whenPatientIsSenior() {
+        patient.setBirthDate(LocalDate.now().minusYears(SENIOR_AGE));
 
         PatientType result = classifier.classify(patient);
 
@@ -37,8 +42,8 @@ public class PatientClassifierTest {
     }
 
     @Test
-    void shouldClassifyAsAdult() {
-        patient.setBirthDate(LocalDate.now().minusYears(30));
+    void shouldClassifyAsAdult_whenPatientIsAdult() {
+        patient.setBirthDate(LocalDate.now().minusYears(ADULT_AGE));
 
         PatientType result = classifier.classify(patient);
 
@@ -46,8 +51,8 @@ public class PatientClassifierTest {
     }
 
     @Test
-    void shouldClassifyAsYoung() {
-        patient.setBirthDate(LocalDate.now().minusYears(10));
+    void shouldClassifyAsYoung_whenPatientIsYoung() {
+        patient.setBirthDate(LocalDate.now().minusYears(YOUNG_AGE));
 
         PatientType result = classifier.classify(patient);
 
@@ -56,7 +61,7 @@ public class PatientClassifierTest {
 
     @ParameterizedTest
     @ValueSource(ints = {65, 70, 80, 100})
-    void shouldClassifyAsSeniorForVariousAges(int age) {
+    void shouldClassifyAsSenior_whenPatientAgeIsGreaterThan(int age){
         patient.setBirthDate(LocalDate.now().minusYears(age));
 
         PatientType result = classifier.classify(patient);
@@ -65,24 +70,20 @@ public class PatientClassifierTest {
     }
 
     @Test
-    void shouldThrowExceptionWhenBirthDateIsNull() {
+    void shouldThrowException_whenBirthDateIsNull() {
         patient.setBirthDate(null);
-        assertThrows(MissingBirthDateException.class, () -> {
-            classifier.classify(patient);
-        });
+        assertThrows(MissingBirthDateException.class, () -> classifier.classify(patient));
     }
 
     @Test
-    void shouldThrowExceptionWhenBirthDateIsFuture() {
+    void shouldThrowException_whenBirthDateIsFuture() {
         patient.setBirthDate(LocalDate.now().plusDays(1));
 
-        assertThrows(InvalidPatientAgeException.class, () -> {
-            classifier.classify(patient);
-        });
+        assertThrows(InvalidPatientAgeException.class, () -> classifier.classify(patient));
     }
 
     @Test
-    void shouldClassifyAsYoungAtZeroYears() {
+    void shouldClassifyAsYoung_whenPatientIsZeroYearsOld() {
         patient.setBirthDate(LocalDate.now());
 
         PatientType result = classifier.classify(patient);
@@ -91,22 +92,14 @@ public class PatientClassifierTest {
     }
 
     @Test
-    void shouldClassifyAsAdultAt18thBirthday() {
-        patient.setBirthDate(LocalDate.now().minusYears(18));
+    void shouldClassifyAsAdultAtLegalAge() {
+        patient.setBirthDate(LocalDate.now().minusYears(LEGAL_AGE));
 
         PatientType result = classifier.classify(patient);
 
         assertEquals(PatientType.ADULT, result);
     }
 
-    @Test
-    void shouldClassifyAsSeniorAt65thBirthday() {
-        patient.setBirthDate(LocalDate.now().minusYears(65));
-
-        PatientType result = classifier.classify(patient);
-
-        assertEquals(PatientType.SENIOR, result);
-    }
 
 }
 

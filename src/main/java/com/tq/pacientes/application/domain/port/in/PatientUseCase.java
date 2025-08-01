@@ -8,7 +8,7 @@ public interface PatientUseCase {
     Patient create(Patient patient);
     List<Patient> getAll();
     Optional<Patient> getById(Long id);
-    Optional<Patient> getByDni(String dni);
+    Patient getByDni(String dni);
     List<Patient> searchByFirstName(String firstName);
     List<Patient> searchByHealthInsurancePaginated(String healthInsurance, int limit, int offset);
     Patient update(Long id, Patient patientDetails);

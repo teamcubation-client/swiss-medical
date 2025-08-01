@@ -2,7 +2,7 @@ package com.tq.pacientes.unit.application.domain.model.patientprocessing;
 
 import com.tq.pacientes.application.domain.model.Patient;
 import com.tq.pacientes.application.domain.model.PatientType;
-import com.tq.pacientes.application.domain.model.patientprocessing.*;
+import com.tq.pacientes.application.domain.model.patient.processing.*;
 import com.tq.pacientes.application.domain.port.out.PatientRepositoryPort;
 import com.tq.pacientes.application.service.PatientClassifier;
 import com.tq.pacientes.shared.exceptions.InvalidPatientAgeException;
@@ -39,10 +39,10 @@ class PatientSaveFactoryTest {
     }
 
     @Test
-    void shouldCreateSeniorStrategy() {
+    void shouldCreateSeniorStrategy_whenPatientIsSenior() {
         when(classifier.classify(patient)).thenReturn(PatientType.SENIOR);
 
-        PatientSaveTemplate strategy = factory.getPatientSaveStrategy(patient, repositoryPort);
+        PatientSaveTemplate strategy = factory.createStrategyFor(patient, repositoryPort);
 
         assertAll(
                 () -> assertNotNull(strategy),
@@ -52,10 +52,10 @@ class PatientSaveFactoryTest {
     }
 
     @Test
-    void shouldCreateAdultStrategy() {
+    void shouldCreateAdultStrategy_whenPatientIsAdult() {
         when(classifier.classify(patient)).thenReturn(PatientType.ADULT);
 
-        PatientSaveTemplate strategy = factory.getPatientSaveStrategy(patient, repositoryPort);
+        PatientSaveTemplate strategy = factory.createStrategyFor(patient, repositoryPort);
 
         assertAll(
                 () -> assertNotNull(strategy),
@@ -65,10 +65,10 @@ class PatientSaveFactoryTest {
     }
 
     @Test
-    void shouldCreateYoungStrategy() {
+    void shouldCreateYoungStrategy_whenPatientIsYoung() {
         when(classifier.classify(patient)).thenReturn(PatientType.YOUNG);
 
-        PatientSaveTemplate strategy = factory.getPatientSaveStrategy(patient, repositoryPort);
+        PatientSaveTemplate strategy = factory.createStrategyFor(patient, repositoryPort);
 
         assertAll(
                 () -> assertNotNull(strategy),
@@ -78,38 +78,38 @@ class PatientSaveFactoryTest {
     }
 
     @Test
-    void shouldHandleNullPatient() {
+    void shouldHandleNullPatient_whenPatientIsNull() {
         assertThrows(IllegalArgumentException.class, () ->
-                factory.getPatientSaveStrategy(null, repositoryPort)
+                factory.createStrategyFor(null, repositoryPort)
         );
 
         verify(classifier, never()).classify(any(Patient.class));
     }
 
     @Test
-    void shouldHandleNullRepository() {
+    void shouldHandleNullRepository_whenRepositoryIsNull() {
         assertThrows(IllegalArgumentException.class, () ->
-                factory.getPatientSaveStrategy(patient, null)
+                factory.createStrategyFor(patient, null)
         );
 
         verify(classifier, never()).classify(any(Patient.class));
     }
 
     @Test
-    void shouldUseClassifierToGetType() {
+    void shouldCallClassifier_whenPatientIsNotNull() {
         when(classifier.classify(patient)).thenReturn(PatientType.ADULT);
 
-        factory.getPatientSaveStrategy(patient, repositoryPort);
+        factory.createStrategyFor(patient, repositoryPort);
 
         verify(classifier, times(1)).classify(patient);
     }
 
     @Test
-    void shouldHandleClassifierExceptions() {
+    void shouldThrowException_whenPatientAgeIsInvalid() {
         when(classifier.classify(patient)).thenThrow(new InvalidPatientAgeException(0));
 
         assertThrows(InvalidPatientAgeException.class, () ->
-                factory.getPatientSaveStrategy(patient, repositoryPort)
+                factory.createStrategyFor(patient, repositoryPort)
         );
 
         verify(classifier, times(1)).classify(patient);

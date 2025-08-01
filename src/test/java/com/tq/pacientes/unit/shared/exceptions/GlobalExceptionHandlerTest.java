@@ -1,20 +1,33 @@
 package com.tq.pacientes.unit.shared.exceptions;
 
 import com.tq.pacientes.infrastructure.adapter.in.rest.dto.ErrorDTO;
-import com.tq.pacientes.shared.exceptions.*;
+import com.tq.pacientes.shared.exceptions.DuplicatePatientException;
+import com.tq.pacientes.shared.exceptions.GlobalExceptionHandler;
+import com.tq.pacientes.shared.exceptions.InvalidPatientAgeException;
+import com.tq.pacientes.shared.exceptions.MissingBirthDateException;
+import com.tq.pacientes.shared.exceptions.PatientAlreadyActiveException;
+import com.tq.pacientes.shared.exceptions.PatientDniNotFoundException;
+import com.tq.pacientes.shared.exceptions.PatientNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class GlobalExceptionHandlerTest {
 
     private final GlobalExceptionHandler handler = new GlobalExceptionHandler();
 
+    private static final Long PATIENT_ID = 1L;
+    private static final String DNI = "12345678";
+    private static final String UNEXPECTED_ERROR_MESSAGE = "An unexpected error occurred";
+
     @Test
-    void shouldHandlePatientNotFoundException() {
-        PatientNotFoundException ex = new PatientNotFoundException(1L);
+    void shouldHandlePatientNotFoundException_whenPatientIsNotFound() {
+        PatientNotFoundException ex = new PatientNotFoundException(PATIENT_ID);
 
         ResponseEntity<ErrorDTO> response = handler.handleNotFound(ex);
 
@@ -27,8 +40,8 @@ class GlobalExceptionHandlerTest {
     }
 
     @Test
-    void shouldHandleDuplicatePatientException() {
-        DuplicatePatientException ex = new DuplicatePatientException("12345678");
+    void shouldHandleDuplicatePatientException_whenPatientDniIsDuplicated() {
+        DuplicatePatientException ex = new DuplicatePatientException(DNI);
 
         ResponseEntity<ErrorDTO> response = handler.handleDuplicate(ex);
 
@@ -41,8 +54,8 @@ class GlobalExceptionHandlerTest {
     }
 
     @Test
-    void shouldHandlePatientDniNotFoundException() {
-        PatientDniNotFoundException ex = new PatientDniNotFoundException("12345678");
+    void shouldHandlePatientDniNotFoundException_whenPatientDniIsNotFound() {
+        PatientDniNotFoundException ex = new PatientDniNotFoundException(DNI);
 
         ResponseEntity<ErrorDTO> response = handler.handleDniNotFound(ex);
 
@@ -54,8 +67,8 @@ class GlobalExceptionHandlerTest {
     }
 
     @Test
-    void shouldHandlePatientAlreadyActiveException() {
-        PatientAlreadyActiveException ex = new PatientAlreadyActiveException(1L);
+    void shouldHandlePatientAlreadyActiveException_whenPatientIsAlreadyActive() {
+        PatientAlreadyActiveException ex = new PatientAlreadyActiveException(PATIENT_ID);
 
         ResponseEntity<ErrorDTO> response = handler.handleAlreadyActive(ex);
 
@@ -67,7 +80,7 @@ class GlobalExceptionHandlerTest {
     }
 
     @Test
-    void shouldHandleMissingBirthDateException() {
+    void shouldHandleMissingBirthDateException_whenBirthDateIsNull() {
         MissingBirthDateException ex = new MissingBirthDateException();
 
         ResponseEntity<ErrorDTO> response = handler.handleMissingBirthDate(ex);
@@ -80,7 +93,7 @@ class GlobalExceptionHandlerTest {
     }
 
     @Test
-    void shouldHandleInvalidPatientAgeException() {
+    void shouldHandleInvalidPatientAgeException_whenPatientAgeIsInvalid() {
         InvalidPatientAgeException ex = new InvalidPatientAgeException(0);
 
         ResponseEntity<ErrorDTO> response = handler.handleInvalidPatientAge(ex);
@@ -93,7 +106,7 @@ class GlobalExceptionHandlerTest {
     }
 
     @Test
-    void shouldHandleGenericException() {
+    void shouldHandleGenericException_whenExceptionIsThrown() {
         Exception ex = new Exception();
 
         ResponseEntity<ErrorDTO> response = handler.handleException(ex);
@@ -102,7 +115,7 @@ class GlobalExceptionHandlerTest {
                 () -> assertNotNull(response.getBody()),
                 () -> assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode()),
                 () -> assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.value(), response.getBody().status()),
-                () -> assertTrue(response.getBody().message().contains("An unexpected error occurred"))
+                () -> assertTrue(response.getBody().message().contains(UNEXPECTED_ERROR_MESSAGE))
         );
     }
 }

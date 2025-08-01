@@ -7,7 +7,6 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Repository
 public class PatientPersistenceAdapter implements PatientRepositoryPort {
@@ -27,16 +26,12 @@ public class PatientPersistenceAdapter implements PatientRepositoryPort {
 
     @Override
     public Optional<Patient> findByDni(String dni) {
-        return patientRepositoryJpa.findByDni(dni)
-                .map(PatientPersistenceMapper::toDomain);
+        return toDomain(patientRepositoryJpa.findByDni(dni));
     }
 
     @Override
     public List<Patient> findAll() {
-        return patientRepositoryJpa.findAll()
-                .stream()
-                .map(PatientPersistenceMapper::toDomain)
-                .collect(Collectors.toList());
+        return toDomainList(patientRepositoryJpa.findAll());
     }
 
     @Override
@@ -48,30 +43,32 @@ public class PatientPersistenceAdapter implements PatientRepositoryPort {
 
     @Override
     public List<Patient> searchByFirstName(String firstName) {
-        return patientRepositoryJpa.findByFirstNameContainingIgnoreCase(firstName)
-                .stream()
-                .map(PatientPersistenceMapper::toDomain)
-                .collect(java.util.stream.Collectors.toList());
+        return toDomainList(patientRepositoryJpa.findByFirstNameContainingIgnoreCase(firstName));
     }
 
     @Override
     public List<Patient> searchByHealthInsurancePaginated(String healthInsurance, int limit, int offset) {
-        return patientRepositoryJpa.findByHealthInsurancePaginated(healthInsurance, limit, offset)
-                .stream()
-                .map(PatientPersistenceMapper::toDomain)
-                .collect(java.util.stream.Collectors.toList());
+        return toDomainList(patientRepositoryJpa.findByHealthInsurancePaginated(healthInsurance, limit, offset));
     }
 
     @Override
     public Optional<Patient> findById(Long id) {
-        return patientRepositoryJpa.findById(id)
-                .map(PatientPersistenceMapper::toDomain);
+        return toDomain(patientRepositoryJpa.findById(id));
     }
 
     @Override
     public Optional<Patient> findByIdIgnoringActive(Long id) {
-        return patientRepositoryJpa.findByIdWithoutActiveFilter(id)
-                .map(PatientPersistenceMapper::toDomain);
+        return toDomain(patientRepositoryJpa.findByIdWithoutActiveFilter(id));
     }
 
-} 
+    private List<Patient> toDomainList(List<PatientEntity> entities) {
+        return entities.stream()
+                .map(PatientPersistenceMapper::toDomain)
+                .toList();
+    }
+
+    private Optional<Patient> toDomain(Optional<PatientEntity> entity) {
+        return entity.map(PatientPersistenceMapper::toDomain);
+    }
+
+}

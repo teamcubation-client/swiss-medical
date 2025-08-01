@@ -23,18 +23,23 @@ import static org.assertj.core.api.Assertions.assertThat;
 @ActiveProfiles("test")
 @Import(PatientPersistenceAdapter.class)
 @Sql(scripts = "classpath:schema.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-
 class PatientPersistenceAdapterIntegrationTest {
 
     @Autowired
     private PatientRepositoryJpa patientRepository;
+
+    private static final String EXISTING_DNI = "12345678";
+    private static final String FIRST_NAME_SEARCH_FRAGMENT = "ju";
+    private static final String HEALTH_INSURANCE_SWISS = "SWISS";
+    private static final int PAGE_SIZE = 10;
+    private static final int PAGE_OFFSET = 0;
 
     @BeforeEach
     void setUp() {
         PatientEntity testPatient = PatientEntity.builder()
                 .firstName("Juan")
                 .lastName("Pérez")
-                .dni("12345678")
+                .dni(EXISTING_DNI)
                 .birthDate(LocalDate.of(1990, 1, 1))
                 .healthInsurance("SWISS")
                 .healthPlan("PREMIUM")
@@ -49,27 +54,29 @@ class PatientPersistenceAdapterIntegrationTest {
     }
 
     @Test
-    void findByDni_ShouldReturnPatient() {
-        Optional<PatientEntity> result = patientRepository.findByDni("12345678");
+    void shouldReturnPatient_whenFindByDniExists() {
+        Optional<PatientEntity> result = patientRepository.findByDni(EXISTING_DNI);
 
         assertThat(result).isPresent();
-        assertThat(result.get().getDni()).isEqualTo("12345678");
+        assertThat(result.get().getDni()).isEqualTo(EXISTING_DNI);
     }
 
     @Test
-    void findByFirstNameContainingIgnoreCase_ShouldReturnMatchingPatients() {
-        Deque<PatientEntity> expected = new LinkedList<>(patientRepository.findByFirstNameContainingIgnoreCase("ju"));
+    void shouldReturnPatients_whenFindByFirstNameContainsIgnoreCase() {
+        Deque<PatientEntity> expected = new LinkedList<>(patientRepository.findByFirstNameContainingIgnoreCase(FIRST_NAME_SEARCH_FRAGMENT));
 
         assertThat(expected).isNotEmpty();
-        assertThat(expected.getFirst().getFirstName()).containsIgnoringCase("ju");
+        assertThat(expected.getFirst().getFirstName()).containsIgnoringCase(FIRST_NAME_SEARCH_FRAGMENT);
     }
 
     @Test
-    void findByHealthInsurancePaginated_ShouldReturnPaginatedResults() {
-
-        Deque<PatientEntity> expected = new LinkedList<>(patientRepository.findByHealthInsurancePaginated("SWISS", 10, 0));
+    void shouldReturnPaginatedPatients_whenFindByHealthInsuranceWithPagination() {
+        Deque<PatientEntity> expected = new LinkedList<>(patientRepository.findByHealthInsurancePaginated(
+                HEALTH_INSURANCE_SWISS,
+                PAGE_SIZE,
+                PAGE_OFFSET));
 
         assertThat(expected).isNotEmpty();
-        assertThat(expected.getFirst().getHealthInsurance()).isEqualTo("SWISS");
+        assertThat(expected.getFirst().getHealthInsurance()).isEqualTo(HEALTH_INSURANCE_SWISS);
     }
 }

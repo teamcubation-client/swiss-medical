@@ -10,7 +10,11 @@ import org.junit.jupiter.api.Test;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class PatientRestMapperTest {
 
@@ -56,7 +60,7 @@ class PatientRestMapperTest {
     }
 
     @Test
-    void toDomain_ShouldMapAllFields() {
+    void shouldMapAllFields_whenPatientRequestIsNotNull() {
         Patient result = mapper.toDomain(request);
 
         assertAll(
@@ -77,7 +81,7 @@ class PatientRestMapperTest {
     }
 
     @Test
-    void toDomain_ShouldHandleNullValues() {
+    void shouldMapAllFields_whenPatientRequestIsNull() {
 
         Patient result = mapper.toDomain(emptyRequest);
 
@@ -99,7 +103,7 @@ class PatientRestMapperTest {
     }
 
     @Test
-    void toResponse_ShouldMapAllFields() {
+    void shouldMapAllFields_whenPatientIsNotNull() {
         PatientResponse result = mapper.toResponse(patient);
 
         assertAll(
@@ -118,7 +122,7 @@ class PatientRestMapperTest {
     }
 
     @Test
-    void toResponse_ShouldHandleNullValues() {
+    void shouldMapAllFields_whenPatientIsNull() {
         Patient emptyPatient = new Patient();
 
         PatientResponse result = mapper.toResponse(emptyPatient);

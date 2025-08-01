@@ -8,6 +8,9 @@ import java.time.LocalDate;
 import java.time.Period;
 
 public class PatientUtils {
+
+    private PatientUtils() {}
+
     public static int calculateAge(Patient patient) {
         if (patient.getBirthDate() == null) {
             throw new MissingBirthDateException();

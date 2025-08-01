@@ -18,8 +18,17 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.mockito.Mockito.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import static org.mockito.ArgumentMatchers.any;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ExtendWith(MockitoExtension.class)
 class PatientRepositoryAdapterTest {
@@ -34,15 +43,26 @@ class PatientRepositoryAdapterTest {
     private PatientEntity patientEntity;
     private final LocalDateTime now = LocalDateTime.now();
 
+    private static final String PATIENT_ID = "1";
+    private static final String FIRST_NAME = "Juan";
+    private static final String LAST_NAME = "Pérez";
+    private static final String EXISTING_DNI = "12345678";
+    private static final String HEALTH_INSURANCE_OSDE = "OSDE";
+
+    private static final String NOT_EXISTING_DNI = "99999999";
+
+    private static final int PAGE_SIZE = 10;
+    private static final int PAGE_OFFSET = 0;
+
     @BeforeEach
     void setUp() {
         patient = Patient.builder()
-                .id(1L)
-                .firstName("Juan")
-                .lastName("Pérez")
-                .dni("12345678")
+                .id(Long.valueOf(PATIENT_ID))
+                .firstName(FIRST_NAME)
+                .lastName(LAST_NAME)
+                .dni(EXISTING_DNI)
                 .birthDate(LocalDate.of(1990, 1, 1))
-                .healthInsurance("OSDE")
+                .healthInsurance(HEALTH_INSURANCE_OSDE)
                 .healthPlan("210")
                 .address("Calle Falsa 123")
                 .phoneNumber("1234567890")
@@ -54,11 +74,11 @@ class PatientRepositoryAdapterTest {
 
         patientEntity = PatientEntity.builder()
                 .id(1L)
-                .firstName("Juan")
-                .lastName("Pérez")
-                .dni("12345678")
+                .firstName(FIRST_NAME)
+                .lastName(LAST_NAME)
+                .dni(EXISTING_DNI)
                 .birthDate(LocalDate.of(1990, 1, 1))
-                .healthInsurance("OSDE")
+                .healthInsurance(HEALTH_INSURANCE_OSDE)
                 .healthPlan("210")
                 .address("Calle Falsa 123")
                 .phoneNumber("1234567890")
@@ -70,7 +90,7 @@ class PatientRepositoryAdapterTest {
     }
 
     @Test
-    void shouldSaveNewPatient() {
+    void shouldSaveNewPatient_whenPatientIsNotNull() {
         when(repositoryJpa.save(any(PatientEntity.class))).thenReturn(patientEntity);
 
         Patient saved = adapter.save(patient);
@@ -84,7 +104,7 @@ class PatientRepositoryAdapterTest {
     }
 
     @Test
-    void shouldUpdateExistingPatient() {
+    void shouldUpdateExistingPatient_whenPatientIsNotNull() {
         when(repositoryJpa.save(any(PatientEntity.class))).thenReturn(patientEntity);
 
         Patient updated = adapter.update(patient);
@@ -97,32 +117,32 @@ class PatientRepositoryAdapterTest {
     }
 
     @Test
-    void shouldFindByDni() {
-        when(repositoryJpa.findByDni("12345678")).thenReturn(Optional.of(patientEntity));
+    void shouldFindByDni_whenDniExists() {
+        when(repositoryJpa.findByDni(EXISTING_DNI)).thenReturn(Optional.of(patientEntity));
 
-        Optional<Patient> found = adapter.findByDni("12345678");
+        Optional<Patient> found = adapter.findByDni(EXISTING_DNI);
 
         assertAll(
                 () -> assertTrue(found.isPresent()),
-                () -> assertEquals("12345678", found.get().getDni()),
-                () -> verify(repositoryJpa, times(1)).findByDni("12345678")
+                () -> assertEquals(EXISTING_DNI, found.get().getDni()),
+                () -> verify(repositoryJpa, times(1)).findByDni(EXISTING_DNI)
         );
     }
 
     @Test
-    void shouldReturnEmptyOptionalWhenDniNotFound() {
-        when(repositoryJpa.findByDni("99999999")).thenReturn(Optional.empty());
+    void shouldReturnEmptyOptional_whenDniNotFound() {
+        when(repositoryJpa.findByDni(NOT_EXISTING_DNI)).thenReturn(Optional.empty());
 
-        Optional<Patient> found = adapter.findByDni("99999999");
+        Optional<Patient> found = adapter.findByDni(NOT_EXISTING_DNI);
 
         assertAll(
                 () -> assertFalse(found.isPresent()),
-                () -> verify(repositoryJpa, times(1)).findByDni("99999999")
+                () -> verify(repositoryJpa, times(1)).findByDni(NOT_EXISTING_DNI)
         );
     }
 
     @Test
-    void shouldFindAllPatients() {
+    void shouldFindAllPatients_whenThereArePatients() {
         List<PatientEntity> entities = List.of(patientEntity);
         when(repositoryJpa.findAll()).thenReturn(entities);
 
@@ -136,50 +156,61 @@ class PatientRepositoryAdapterTest {
     }
 
     @Test
-    void shouldSearchByFirstName() {
+    void shouldSearchByFirstName_whenThereArePatientsWithThatName() {
         List<PatientEntity> entities = List.of(patientEntity);
-        when(repositoryJpa.findByFirstNameContainingIgnoreCase("Juan"))
+        when(repositoryJpa.findByFirstNameContainingIgnoreCase(FIRST_NAME))
                 .thenReturn(entities);
 
-        Deque<Patient> patients = new LinkedList<>(adapter.searchByFirstName("Juan"));
+        Deque<Patient> patients = new LinkedList<>(adapter.searchByFirstName(FIRST_NAME));
 
         assertAll(
                 () -> assertFalse(patients.isEmpty()),
-                () -> assertEquals("Juan", patients.getFirst().getFirstName()),
-                () -> verify(repositoryJpa, times(1)).findByFirstNameContainingIgnoreCase("Juan")
+                () -> assertEquals(FIRST_NAME, patients.getFirst().getFirstName()),
+                () -> verify(repositoryJpa, times(1)).findByFirstNameContainingIgnoreCase(FIRST_NAME)
         );
     }
 
     @Test
-    void shouldSearchByHealthInsurancePaginated() {
+    void shouldSearchByHealthInsurancePaginated_whenThereArePatientsWithThatHealthInsurance() {
         List<PatientEntity> entities = List.of(patientEntity);
-        when(repositoryJpa.findByHealthInsurancePaginated("OSDE", 10, 0))
+        when(repositoryJpa.findByHealthInsurancePaginated(
+                HEALTH_INSURANCE_OSDE,
+                PAGE_SIZE,
+                PAGE_OFFSET
+        ))
                 .thenReturn(entities);
 
-        Deque<Patient> patients = new LinkedList<>(adapter.searchByHealthInsurancePaginated("OSDE", 10, 0));
+        Deque<Patient> patients = new LinkedList<>(adapter.searchByHealthInsurancePaginated(
+                HEALTH_INSURANCE_OSDE,
+                PAGE_SIZE,
+                PAGE_OFFSET
+        ));
 
         assertAll(
                 () -> assertFalse(patients.isEmpty()),
-                () -> assertEquals("OSDE", patients.getFirst().getHealthInsurance()),
-                () -> verify(repositoryJpa, times(1)).findByHealthInsurancePaginated("OSDE", 10, 0)
-        );
+                () -> assertEquals(HEALTH_INSURANCE_OSDE, patients.getFirst().getHealthInsurance()),
+                () -> verify(repositoryJpa, times(1)).findByHealthInsurancePaginated(
+                        HEALTH_INSURANCE_OSDE,
+                        PAGE_SIZE,
+                        PAGE_OFFSET
+                ));
     }
 
     @Test
-    void shouldFindById() {
-        when(repositoryJpa.findById(1L)).thenReturn(Optional.of(patientEntity));
+    void shouldFindById_whenIdExists() {
+        when(repositoryJpa.findById(Long.valueOf(PATIENT_ID))).thenReturn(Optional.of(patientEntity));
 
-        Optional<Patient> found = adapter.findById(1L);
+        Optional<Patient> found = adapter.findById(Long.valueOf(PATIENT_ID));
 
         assertAll(
                 () -> assertTrue(found.isPresent()),
-                () -> assertEquals(1L, found.get().getId()),
-                () -> verify(repositoryJpa, times(1)).findById(1L)
+                () -> assertEquals(Long.valueOf(PATIENT_ID), found.get().getId()),
+                () -> verify(repositoryJpa, times(1)).findById(Long.valueOf(PATIENT_ID))
         );
     }
 
     @Test
-    void shouldPreserveAllFieldsWhenMapping() {
+    void shouldPreserveAllFieldsWhenMapping_whenPatientIsNotNull() {
         when(repositoryJpa.save(any(PatientEntity.class))).thenReturn(patientEntity);
 
         Patient saved = adapter.save(patient);
