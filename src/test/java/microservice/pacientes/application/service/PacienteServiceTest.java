@@ -35,7 +35,6 @@ public class PacienteServiceTest {
 
     private Paciente paciente;
     private Paciente pacienteInactivo;
-    private static final LocalDate FIXED_DATE = LocalDate.of(2025, 7, 30);
 
     @BeforeEach
     void setUp() {
@@ -50,7 +49,7 @@ public class PacienteServiceTest {
                 .email("ana@mail.com")
                 .telefono("112233456")
                 .tipoPlanObraSocial("PlanA")
-                .fechaAlta(FIXED_DATE.minusDays(1))
+                .fechaAlta(LocalDate.now())
                 .estado(true)
                 .build();
 
@@ -63,10 +62,9 @@ public class PacienteServiceTest {
                 .email("carlos@mail.com")
                 .telefono("22334455")
                 .tipoPlanObraSocial("PlanB")
-                .fechaAlta(FIXED_DATE.minusDays(1))
+                .fechaAlta(LocalDate.now())
                 .estado(false)
                 .build();
-
     }
 
     @Test
@@ -119,7 +117,7 @@ public class PacienteServiceTest {
     @Test
     @DisplayName("Debe lanzar InvalidFechaAltaException si la fecha de alta es futura")
     void crearPaciente_FallarSiFechaAltaFutura(){
-        paciente.setFechaAlta(FIXED_DATE.plusDays(2));
+        paciente.setFechaAlta(LocalDate.now().plusDays(2));
 
         when(portOutRead.buscarByDni("12345678"))
                 .thenReturn(Optional.empty());
@@ -476,7 +474,7 @@ public class PacienteServiceTest {
     @Test
     @DisplayName("Debe lanzar InvalidFechaAltaException si la fecha de alta es futura al actualizar")
     void actualizarPaciente_FallarSiFechaAltaFutura(){
-        paciente.setFechaAlta(FIXED_DATE.plusDays(2));
+        paciente.setFechaAlta(LocalDate.now().plusDays(2));
 
         when(portOutRead.findById(1L))
                 .thenReturn(Optional.of(paciente));

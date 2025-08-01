@@ -6,13 +6,16 @@ import microservice.pacientes.shared.InvalidFechaAltaException;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Component
 public class FechaAltaValidator implements PacienteValidator {
 
     private PacienteValidator next;
 
-    public FechaAltaValidator() { }
+    public FechaAltaValidator() {
+    }
+
 
     @Override
     public void validate(Paciente paciente) {

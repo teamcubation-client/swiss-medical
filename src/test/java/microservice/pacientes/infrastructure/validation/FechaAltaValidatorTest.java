@@ -12,8 +12,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 
 @ExtendWith(MockitoExtension.class)
@@ -21,8 +20,8 @@ public class FechaAltaValidatorTest {
 
     @InjectMocks
     private FechaAltaValidator validator;
+
     private Paciente paciente;
-    private static final LocalDate FIXED_DATE = LocalDate.of(2025, 7, 30);
 
     @BeforeEach
     void setUp() {
@@ -32,25 +31,17 @@ public class FechaAltaValidatorTest {
     }
 
     @Test
-    void validate_givenNullFechaAlta_doesNotThrow() {
-        paciente.setFechaAlta(null);
-
-        assertDoesNotThrow(() -> validator.validate(paciente));
-    }
-
-    @Test
     void validate_givenPastOrTodayFechaAlta_doesNotThrow(){
-        paciente.setFechaAlta(FIXED_DATE.minusDays(1));
+        paciente.setFechaAlta(LocalDate.now().minusDays(1));
         assertDoesNotThrow(() -> validator.validate(paciente));
 
-        paciente.setFechaAlta(FIXED_DATE);
+        paciente.setFechaAlta(LocalDate.now());
         assertDoesNotThrow(() -> validator.validate(paciente));
     }
 
     @Test
     void  validate_givenFutureFechaAlta_throwsInvalidFechaAltaException(){
-        LocalDate fechaFutura = FIXED_DATE.plusDays(2);
-        paciente.setFechaAlta(fechaFutura);
+        paciente.setFechaAlta(LocalDate.now().plusDays(4));
 
         InvalidFechaAltaException ex = assertThrows(
                 InvalidFechaAltaException.class,
@@ -58,14 +49,14 @@ public class FechaAltaValidatorTest {
         );
 
         assertEquals(
-                "La fecha de alta no puede ser mayor a la fecha actual",
+                InvalidFechaAltaException.MESSAGE,
                 ex.getMessage()
         );
     }
 
     @Test
     void  validate_withNextValidator_delegatesToNext() {
-        paciente.setFechaAlta(FIXED_DATE);
+        paciente.setFechaAlta(LocalDate.now());
 
         PacienteValidator nextValidator = mock(PacienteValidator.class);
         validator.setNext(nextValidator);

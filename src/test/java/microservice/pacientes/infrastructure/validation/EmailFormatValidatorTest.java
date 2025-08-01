@@ -49,7 +49,7 @@ public class EmailFormatValidatorTest {
                 () -> validator.validate(paciente)
         );
 
-        assertEquals("Formato de mail invalido",ex.getMessage());
+        assertEquals(InvalidEmailFormatException.MESSAGE,ex.getMessage());
     }
 
     @Test
@@ -62,7 +62,7 @@ public class EmailFormatValidatorTest {
                 () -> validator.validate(paciente)
         );
 
-        assertEquals("Formato de mail invalido", ex.getMessage());
+        assertEquals(InvalidEmailFormatException.MESSAGE, ex.getMessage());
     }
 
     @Test
