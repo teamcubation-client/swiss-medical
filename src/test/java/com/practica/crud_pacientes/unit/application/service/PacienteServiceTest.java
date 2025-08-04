@@ -2,6 +2,7 @@ package com.practica.crud_pacientes.unit.application.service;
 
 import com.practica.crud_pacientes.application.domain.model.Paciente;
 import com.practica.crud_pacientes.application.domain.port.out.PacienteEventPublisher;
+import com.practica.crud_pacientes.application.domain.port.out.PacienteLoggerPort;
 import com.practica.crud_pacientes.application.domain.port.out.PacienteRepositoryPort;
 import com.practica.crud_pacientes.application.service.PacienteService;
 import com.practica.crud_pacientes.shared.exceptions.PacienteDuplicadoException;
@@ -43,6 +44,9 @@ class PacienteServiceTest {
 
     @Mock
     private PacienteEventPublisher pacienteEventPublisher;
+
+    @Mock
+    private PacienteLoggerPort loggerPort;
 
     @InjectMocks
     private PacienteService pacienteService;
