@@ -18,9 +18,6 @@ public class GlobalExceptionHandler {
     public static final String PARAMETER_ERROR_MESSAGE = "El parametro es obligatorio";
     public static final String UNEXPECTED_ERROR_MESSAGE="Ha ocurrido un error inesperado: ";
 
-
-
-
     @ExceptionHandler(PacienteNotFoundException.class)
     public ResponseEntity<ErrorResponse> handlePacienteNotFound(PacienteNotFoundException ex) {
         ErrorResponse body = new ErrorResponse(
@@ -30,7 +27,6 @@ public class GlobalExceptionHandler {
         );
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
     }
-
 
     @ExceptionHandler({
             PacienteDuplicadoException.class,
@@ -69,7 +65,6 @@ public class GlobalExceptionHandler {
         );
         return ResponseEntity.badRequest().body(body);
     }
-
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGlobalException(Exception ex) {
