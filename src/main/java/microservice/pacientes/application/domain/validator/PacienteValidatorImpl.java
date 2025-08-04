@@ -10,6 +10,7 @@ import java.util.List;
 public class PacienteValidatorImpl implements PacienteValidator {
     private List<PacienteValidatorRule> rules;
 
+    @Override
     public void validate(Paciente paciente) {
         rules.forEach(rule -> rule.validate(paciente));
     }

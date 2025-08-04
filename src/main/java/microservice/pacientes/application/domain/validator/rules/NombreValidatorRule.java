@@ -4,8 +4,11 @@ import lombok.AllArgsConstructor;
 import microservice.pacientes.application.domain.model.Paciente;
 import microservice.pacientes.shared.exception.PacienteArgumentoInvalido;
 
+import static microservice.pacientes.shared.constants.Constants.NOMBRE_REGEX;
+
 @AllArgsConstructor
 public class NombreValidatorRule implements PacienteValidatorRule {
+
     @Override
     public void validate(Paciente paciente) throws PacienteArgumentoInvalido {
         boolean isInvalid = isInvalid(paciente.getNombre());
@@ -14,6 +17,6 @@ public class NombreValidatorRule implements PacienteValidatorRule {
     }
 
     private boolean isInvalid(String nombre) {
-        return !nombre.matches("^[\\p{L}\\s]+$");
+        return !nombre.matches(NOMBRE_REGEX);
     }
 }
