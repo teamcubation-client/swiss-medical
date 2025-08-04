@@ -11,7 +11,11 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.LoggerFactory;
 
 import static com.practica.crud_pacientes.utils.PacienteTestFactory.buildDomain;
-import static com.practica.crud_pacientes.utils.TestConstants.*;
+import static com.practica.crud_pacientes.utils.TestConstants.INFO_LEVEL;
+import static com.practica.crud_pacientes.utils.TestConstants.PACIENTE_CREADO_MESSAGE;
+import static com.practica.crud_pacientes.utils.TestConstants.PACIENTE_ELIMINADO_MESSAGE;
+import static com.practica.crud_pacientes.utils.TestConstants.NOMBRE;
+import static com.practica.crud_pacientes.utils.TestConstants.APELLIDO;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class PacienteLoggerObserverTest {

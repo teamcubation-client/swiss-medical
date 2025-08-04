@@ -4,7 +4,15 @@ import com.practica.crud_pacientes.application.domain.model.Paciente;
 import com.practica.crud_pacientes.infrastructure.adapter.in.rest.dto.PacienteRequest;
 import com.practica.crud_pacientes.infrastructure.adapter.in.rest.dto.PacienteResponse;
 
-import static com.practica.crud_pacientes.utils.TestConstants.*;
+import static com.practica.crud_pacientes.utils.TestConstants.APELLIDO;
+import static com.practica.crud_pacientes.utils.TestConstants.OBRA_SOCIAL;
+import static com.practica.crud_pacientes.utils.TestConstants.NOMBRE;
+import static com.practica.crud_pacientes.utils.TestConstants.DOMICILIO;
+import static com.practica.crud_pacientes.utils.TestConstants.DNI;
+import static com.practica.crud_pacientes.utils.TestConstants.TELEFONO;
+import static com.practica.crud_pacientes.utils.TestConstants.EMAIL;
+import static com.practica.crud_pacientes.utils.TestConstants.FECHA_NACIMIENTO;
+import static com.practica.crud_pacientes.utils.TestConstants.ESTADO_CIVIL;
 
 public class PacienteTestFactory {
     public static PacienteRequest buildRequest() {

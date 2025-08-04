@@ -15,7 +15,15 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 
 import java.util.Map;
 
-import static com.practica.crud_pacientes.utils.TestConstants.*;
+import static com.practica.crud_pacientes.utils.TestConstants.PATH_BUSCAR_ID;
+import static com.practica.crud_pacientes.utils.TestConstants.ENDPOINT;
+import static com.practica.crud_pacientes.utils.TestConstants.MENSAJE_EXCEPCION_GENERICA;
+import static com.practica.crud_pacientes.utils.TestConstants.ENTITY_NAME;
+import static com.practica.crud_pacientes.utils.TestConstants.ERROR_FIELD_1;
+import static com.practica.crud_pacientes.utils.TestConstants.ERROR_MSG_1;
+import static com.practica.crud_pacientes.utils.TestConstants.ERROR_FIELD_2;
+import static com.practica.crud_pacientes.utils.TestConstants.ERROR_MSG_2;
+import static com.practica.crud_pacientes.utils.TestConstants.ERROR_MSG_EXCEPTION;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;

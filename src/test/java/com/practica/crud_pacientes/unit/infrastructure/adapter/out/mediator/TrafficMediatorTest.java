@@ -12,7 +12,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import static com.practica.crud_pacientes.utils.TestConstants.ENDPOINT;
 import static com.practica.crud_pacientes.utils.TestConstants.REQUEST_COUNT;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.never;
 
 @ExtendWith(MockitoExtension.class)
 class TrafficMediatorTest {

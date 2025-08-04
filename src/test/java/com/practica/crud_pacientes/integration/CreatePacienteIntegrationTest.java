@@ -19,7 +19,9 @@ import org.springframework.transaction.annotation.Transactional;
 import static com.practica.crud_pacientes.utils.PacienteTestFactory.buildRequest;
 import static com.practica.crud_pacientes.utils.TestConstants.DNI;
 import static com.practica.crud_pacientes.utils.TestConstants.ENDPOINT;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.any;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 

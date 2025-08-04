@@ -9,7 +9,10 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.slf4j.LoggerFactory;
 
-import static com.practica.crud_pacientes.utils.TestConstants.*;
+import static com.practica.crud_pacientes.utils.TestConstants.ENDPOINT;
+import static com.practica.crud_pacientes.utils.TestConstants.REQUEST_COUNT;
+import static com.practica.crud_pacientes.utils.TestConstants.WARN_LEVEL;
+import static com.practica.crud_pacientes.utils.TestConstants.HIGH_TRAFFIC_MESSAGE;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class SistemaLoggerObserverTest {

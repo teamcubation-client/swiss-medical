@@ -17,9 +17,24 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.List;
 
 import static com.practica.crud_pacientes.utils.PacienteTestFactory.buildDomain;
-import static com.practica.crud_pacientes.utils.TestConstants.*;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static com.practica.crud_pacientes.utils.TestConstants.LIMITE;
+import static com.practica.crud_pacientes.utils.TestConstants.OBRA_SOCIAL;
+import static com.practica.crud_pacientes.utils.TestConstants.NOMBRE;
+import static com.practica.crud_pacientes.utils.TestConstants.OFF;
+import static com.practica.crud_pacientes.utils.TestConstants.DNI;
+import static com.practica.crud_pacientes.utils.TestConstants.ID;
+import static com.practica.crud_pacientes.utils.TestConstants.NEW_EMAIL;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.never;
+
+
 
 @ExtendWith(MockitoExtension.class)
 class PacienteServiceTest {

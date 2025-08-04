@@ -20,7 +20,14 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.List;
 
 import static com.practica.crud_pacientes.utils.PacienteTestFactory.*;
-import static com.practica.crud_pacientes.utils.TestConstants.*;
+import static com.practica.crud_pacientes.utils.TestConstants.LIMITE;
+import static com.practica.crud_pacientes.utils.TestConstants.OBRA_SOCIAL;
+import static com.practica.crud_pacientes.utils.TestConstants.NOMBRE;
+import static com.practica.crud_pacientes.utils.TestConstants.OFF;
+import static com.practica.crud_pacientes.utils.TestConstants.DNI;
+import static com.practica.crud_pacientes.utils.TestConstants.ID;
+import static com.practica.crud_pacientes.utils.TestConstants.ENDPOINT;
+import static com.practica.crud_pacientes.utils.TestConstants.EMAIL;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;

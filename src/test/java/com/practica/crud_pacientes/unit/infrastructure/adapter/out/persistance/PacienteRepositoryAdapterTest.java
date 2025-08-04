@@ -18,9 +18,20 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.practica.crud_pacientes.utils.PacienteTestFactory.buildDomain;
-import static com.practica.crud_pacientes.utils.TestConstants.*;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static com.practica.crud_pacientes.utils.TestConstants.LIMITE;
+import static com.practica.crud_pacientes.utils.TestConstants.OBRA_SOCIAL;
+import static com.practica.crud_pacientes.utils.TestConstants.NOMBRE;
+import static com.practica.crud_pacientes.utils.TestConstants.OFF;
+import static com.practica.crud_pacientes.utils.TestConstants.DNI;
+import static com.practica.crud_pacientes.utils.TestConstants.ID;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.times;
 
 @ExtendWith(MockitoExtension.class)
 class PacienteRepositoryAdapterTest {
