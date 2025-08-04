@@ -1,6 +1,11 @@
 package com.practica.crud_pacientes.infrastructure.adapter.in.rest.dto;
 
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Past;
 
 import java.time.LocalDate;
 
@@ -43,18 +48,6 @@ public class PacienteRequest {
     private String estadoCivil;
 
     public PacienteRequest() {
-    }
-
-    public PacienteRequest(String nombre, String apellido, String dni, String obraSocial, String email, String telefono, String domicilio, LocalDate fechaNacimiento, String estadoCivil) {
-        this.nombre = nombre;
-        this.apellido = apellido;
-        this.dni = dni;
-        this.obraSocial = obraSocial;
-        this.email = email;
-        this.telefono = telefono;
-        this.domicilio = domicilio;
-        this.fechaNacimiento = fechaNacimiento;
-        this.estadoCivil = estadoCivil;
     }
 
     public void setNombre(String nombre) {

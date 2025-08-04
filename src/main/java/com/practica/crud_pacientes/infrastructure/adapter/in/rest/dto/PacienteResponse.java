@@ -16,18 +16,6 @@ public class PacienteResponse {
     public PacienteResponse() {
     }
 
-    public PacienteResponse(String nombre, String apellido, String dni, String obraSocial, String email, String telefono, String domicilio, LocalDate fechaNacimiento, String estadoCivil) {
-        this.nombre = nombre;
-        this.apellido = apellido;
-        this.dni = dni;
-        this.obraSocial = obraSocial;
-        this.email = email;
-        this.telefono = telefono;
-        this.domicilio = domicilio;
-        this.fechaNacimiento = fechaNacimiento;
-        this.estadoCivil = estadoCivil;
-    }
-
     public void setNombre(String nombre) {
         this.nombre = nombre;
     }

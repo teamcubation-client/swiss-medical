@@ -1,6 +1,11 @@
 package com.practica.crud_pacientes.infrastructure.adapter.out.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Table;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Column;
 
 import java.time.LocalDate;
 
@@ -29,19 +34,6 @@ public class PacienteEntity {
     private String estadoCivil;
 
     public PacienteEntity() {
-    }
-
-    public PacienteEntity(int id, String nombre, String apellido, String dni, String obraSocial, String email, String telefono, String domicilio, LocalDate fechaNacimiento, String estadoCivil) {
-        this.id = id;
-        this.nombre = nombre;
-        this.apellido = apellido;
-        this.dni = dni;
-        this.obraSocial = obraSocial;
-        this.email = email;
-        this.telefono = telefono;
-        this.domicilio = domicilio;
-        this.fechaNacimiento = fechaNacimiento;
-        this.estadoCivil = estadoCivil;
     }
 
     public int getId() {

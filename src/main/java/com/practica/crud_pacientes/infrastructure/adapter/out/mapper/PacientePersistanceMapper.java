@@ -5,7 +5,7 @@ import com.practica.crud_pacientes.infrastructure.adapter.out.entity.PacienteEnt
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
-@Mapper
+@Mapper(componentModel = "spring")
 public interface PacientePersistanceMapper {
 
     PacientePersistanceMapper mapper = Mappers.getMapper(PacientePersistanceMapper.class);

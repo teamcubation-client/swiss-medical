@@ -13,7 +13,7 @@ public interface PacienteUseCase {
     Paciente addPaciente(Paciente pacienteDto);
     Paciente updatePaciente(int id, Paciente pacienteDto) throws PacienteNoEncontradoException;
     void deletePaciente(int id) throws PacienteNoEncontradoException;
-    Paciente getByDni(String dni);
-    List<Paciente> getPacientesbyName(String nombre);
-    List<Paciente> getPacietesbyObraSocial(String obraSocial, int limite, int off);
+    Paciente getPacienteByDni(String dni);
+    List<Paciente> getPacientesByName(String nombre);
+    List<Paciente> getPacientesByObraSocial(String obraSocial, int limite, int off);
 }
