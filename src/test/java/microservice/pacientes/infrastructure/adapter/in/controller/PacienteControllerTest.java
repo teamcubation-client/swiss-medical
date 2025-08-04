@@ -5,7 +5,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import microservice.pacientes.application.domain.model.Paciente;
 import microservice.pacientes.application.domain.port.in.PacientePortInRead;
 import microservice.pacientes.application.domain.port.in.PacientePortInWrite;
+import microservice.pacientes.application.domain.port.out.LoggerPort;
 import microservice.pacientes.shared.GlobalExceptionHandler;
+import microservice.pacientes.shared.PacienteNotFoundException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -37,6 +39,9 @@ public class PacienteControllerTest {
 
     @MockBean
     private PacientePortInWrite portInWrite;
+
+    @MockBean
+    private LoggerPort loggerPort;
 
     private Paciente pacienteActivo;
     private Paciente pacienteInactivo;
@@ -256,7 +261,7 @@ public class PacienteControllerTest {
                 .build();
 
         when(portInWrite.actualizarPaciente(eq(999L), any(Paciente.class)))
-                .thenReturn(null);
+                .thenThrow(PacienteNotFoundException.porId(999L));
 
         mvc.perform(put("/api/pacientes/999")
                         .contentType(MediaType.APPLICATION_JSON)

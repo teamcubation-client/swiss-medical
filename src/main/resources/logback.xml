@@ -8,17 +8,24 @@
         </encoder>
     </appender>
 
-    <!-- Logger por paquete personalizado -->
+    <!-- Logger general del microservicio -->
     <logger name="microservice.pacientes" level="DEBUG" />
-    
-    <!-- Logger específico para controllers -->
+
+    <!-- Logger específico para controller -->
     <logger name="microservice.pacientes.infrastructure.adapter.in.controller" level="INFO" />
-    
+
     <!-- Logger específico para services -->
     <logger name="microservice.pacientes.application.service" level="DEBUG" />
-    
+
     <!-- Logger específico para validators -->
     <logger name="microservice.pacientes.infrastructure.validation" level="DEBUG" />
+
+    <!-- Logger para adapter de logs -->
+    <logger name="microservice.pacientes.infrastructure.adapter.out.logging" level="DEBUG" />
+
+    <!-- Si seguís usando un nombre explícito como "PacienteLogger", agregalo también -->
+    <logger name="PacienteLogger" level="DEBUG" />
+
 
     <!-- Nivel raíz -->
     <root level="INFO">

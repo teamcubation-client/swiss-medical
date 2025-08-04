@@ -1,6 +1,7 @@
 package microservice.pacientes.application.service;
 
 import microservice.pacientes.application.domain.model.Paciente;
+import microservice.pacientes.application.domain.port.out.LoggerPort;
 import microservice.pacientes.application.domain.port.out.PacientePortOutRead;
 import microservice.pacientes.application.domain.port.out.PacientePortOutWrite;
 import microservice.pacientes.shared.*;
@@ -11,6 +12,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -29,6 +31,9 @@ public class PacienteServiceTest {
 
     @Mock
     private PacientePortOutWrite portOutWrite;
+
+    @Mock
+    private LoggerPort loggerPort;
 
     @InjectMocks
     private PacienteService service;
@@ -409,7 +414,6 @@ public class PacienteServiceTest {
 
         assertSame(actualizado, result);
 
-        verify(portOutRead).findById(1L);
         verify(portOutWrite).update(paciente);
     }
 
@@ -445,7 +449,6 @@ public class PacienteServiceTest {
         assertThrows(PacienteDuplicadoException.class,
                 () -> service.actualizarPaciente(1L, paciente));
 
-        verify(portOutRead).findById(1L);
         verify(portOutRead).buscarByDni("12345678");
         verify(portOutWrite, never()).update(any());
     }
@@ -466,7 +469,6 @@ public class PacienteServiceTest {
                 () -> service.actualizarPaciente(1L, paciente)
         );
 
-        verify(portOutRead).findById(1L);
         verify(portOutRead).buscarByDni("12345678");
         verify(portOutWrite, never()).update(any());
     }
@@ -487,7 +489,6 @@ public class PacienteServiceTest {
                 () -> service.actualizarPaciente(1L, paciente)
         );
 
-        verify(portOutRead).findById(1L);
         verify(portOutRead).buscarByDni("12345678");
         verify(portOutWrite, never()).update(any());
     }

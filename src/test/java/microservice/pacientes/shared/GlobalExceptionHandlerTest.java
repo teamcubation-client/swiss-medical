@@ -34,9 +34,9 @@ public class GlobalExceptionHandlerTest {
         assertThat(notFoundAnswer.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
         ErrorResponse bodyNotFound = notFoundAnswer.getBody();
         assertThat(bodyNotFound).isNotNull();
-        assertThat(bodyNotFound.getStatus()).isEqualTo(HttpStatus.NOT_FOUND.value());
-        assertThat(bodyNotFound.getMensaje()).isEqualTo(notFoundException.getMessage());
-        assertThat(bodyNotFound.getTimestamp()).isBeforeOrEqualTo(LocalDateTime.now());
+        assertThat(bodyNotFound.status()).isEqualTo(HttpStatus.NOT_FOUND.value());
+        assertThat(bodyNotFound.mensaje()).isEqualTo(notFoundException.getMessage());
+        assertThat(bodyNotFound.timestamp()).isBeforeOrEqualTo(LocalDateTime.now());
     }
     @Test
     void handlePacienteDuplicado() {
@@ -48,9 +48,9 @@ public class GlobalExceptionHandlerTest {
         assertThat(pacienteDuplicadoAnswer.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
         ErrorResponse bodyDuplicado = pacienteDuplicadoAnswer.getBody();
         assertThat(bodyDuplicado).isNotNull();
-        assertThat(bodyDuplicado.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-        assertThat(bodyDuplicado.getMensaje()).isEqualTo(pacienteDuplicadoException.getMessage());
-        assertThat(bodyDuplicado.getTimestamp()).isBeforeOrEqualTo(LocalDateTime.now());
+        assertThat(bodyDuplicado.status()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(bodyDuplicado.mensaje()).isEqualTo(pacienteDuplicadoException.getMessage());
+        assertThat(bodyDuplicado.timestamp()).isBeforeOrEqualTo(LocalDateTime.now());
 
     }
 
@@ -63,9 +63,9 @@ public class GlobalExceptionHandlerTest {
 
         ErrorResponse nullBody = nullAnswer.getBody();
         assertThat(nullBody).isNotNull();
-        assertThat(nullBody.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-        assertThat(nullBody.getMensaje()).isEqualTo(nullException.getMessage());
-        assertThat(nullBody.getTimestamp()).isBeforeOrEqualTo(LocalDateTime.now());
+        assertThat(nullBody.status()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(nullBody.mensaje()).isEqualTo(nullException.getMessage());
+        assertThat(nullBody.timestamp()).isBeforeOrEqualTo(LocalDateTime.now());
     }
 
     @Test
@@ -78,9 +78,9 @@ public class GlobalExceptionHandlerTest {
 
         ErrorResponse invalidEmailAnswerBodyBody = invalidEmailAnswer.getBody();
         assertThat(invalidEmailAnswerBodyBody).isNotNull();
-        assertThat(invalidEmailAnswerBodyBody.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-        assertThat(invalidEmailAnswerBodyBody.getMensaje()).isEqualTo(invalidEmailFormatException.getMessage());
-        assertThat(invalidEmailAnswerBodyBody.getTimestamp()).isBeforeOrEqualTo(LocalDateTime.now());
+        assertThat(invalidEmailAnswerBodyBody.status()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(invalidEmailAnswerBodyBody.mensaje()).isEqualTo(invalidEmailFormatException.getMessage());
+        assertThat(invalidEmailAnswerBodyBody.timestamp()).isBeforeOrEqualTo(LocalDateTime.now());
     }
 
     @Test
@@ -93,9 +93,9 @@ public class GlobalExceptionHandlerTest {
 
         ErrorResponse invalidFechaAltaAnswerBodybody = invalidFechaAltaAnswer.getBody();
         assertThat(invalidFechaAltaAnswerBodybody).isNotNull();
-        assertThat(invalidFechaAltaAnswerBodybody.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-        assertThat(invalidFechaAltaAnswerBodybody.getMensaje()).isEqualTo(invalidFechaAltaException.getMessage());
-        assertThat(invalidFechaAltaAnswerBodybody.getTimestamp()).isBeforeOrEqualTo(LocalDateTime.now());
+        assertThat(invalidFechaAltaAnswerBodybody.status()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(invalidFechaAltaAnswerBodybody.mensaje()).isEqualTo(invalidFechaAltaException.getMessage());
+        assertThat(invalidFechaAltaAnswerBodybody.timestamp()).isBeforeOrEqualTo(LocalDateTime.now());
     }
 
     @Test
@@ -108,9 +108,9 @@ public class GlobalExceptionHandlerTest {
 
         ErrorResponse pacienteActivoAnswerBody = pacienteActivoAnswer.getBody();
         assertThat(pacienteActivoAnswerBody).isNotNull();
-        assertThat(pacienteActivoAnswerBody.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-        assertThat(pacienteActivoAnswerBody.getMensaje()).isEqualTo(pacienteActivoException.getMessage());
-        assertThat(pacienteActivoAnswerBody.getTimestamp()).isBeforeOrEqualTo(LocalDateTime.now());
+        assertThat(pacienteActivoAnswerBody.status()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(pacienteActivoAnswerBody.mensaje()).isEqualTo(pacienteActivoException.getMessage());
+        assertThat(pacienteActivoAnswerBody.timestamp()).isBeforeOrEqualTo(LocalDateTime.now());
     }
 
 }
