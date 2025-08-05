@@ -72,7 +72,6 @@ public class PacienteService implements PacientePortInWrite, PacientePortInRead 
     public Paciente crearPaciente(Paciente paciente) {
         logger.entrada();
         logger.info("[PacienteService] Creando paciente con DNI: {}", paciente.getDni());
-        logger.info("[PacienteService] Datos recibidos para creacion: {}", paciente);
 
         createChain.validate(paciente);
         logger.info("[PacienteService] Validaciones de creacion completadas");

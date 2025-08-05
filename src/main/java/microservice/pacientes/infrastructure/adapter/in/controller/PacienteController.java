@@ -44,7 +44,6 @@ public class PacienteController implements PacienteApi {
                 .toList();
 
         logger.info("[PacienteController] listarPacientes() - Respuesta con {} pacientes", pacientes.size());
-        logger.info("[PacienteController] listarPacientes() - Pacientes devueltos: {}", pacientes.toString());
         return ResponseEntity.ok(pacientes);
     }
 
@@ -70,7 +69,7 @@ public class PacienteController implements PacienteApi {
             throw PacienteNotFoundException.porId(id);
         }
         PacienteDTO response = PacienteResponseMapper.toDTO(paciente);
-        logger.info("[PacienteController] Paciente encontrado: {}", response.toString());
+        logger.info("[PacienteController] Paciente con ID {} encontrado",response.getId());
         return ResponseEntity.ok(response);
     }
 
@@ -99,12 +98,11 @@ public class PacienteController implements PacienteApi {
     public ResponseEntity<PacienteDTO> actualizarPaciente(@PathVariable Long id, @RequestBody PacienteDTO pacienteDTO) {
         logger.entrada();
         logger.info("[PacienteController] Endpoint invocado: PUT /api/pacientes/{}", id);
-        logger.info("[PacienteController] Datos para actualizar: {}", pacienteDTO.toString());
         Paciente paciente = PacienteResponseMapper.toModel(pacienteDTO);
         Paciente actualizado = pacientePortInWrite.actualizarPaciente(id, paciente);
         PacienteDTO response = PacienteResponseMapper.toDTO(actualizado);
 
-        logger.info("[PacienteController] Paciente actualizado: {}", response.toString());
+        logger.info("[PacienteController] Paciente con ID  :{} actualizado ", response.getId());
         return ResponseEntity.ok(response);
     }
 
@@ -136,7 +134,7 @@ public class PacienteController implements PacienteApi {
         logger.info("[PacienteController] Endpoint invocado: GET /api/pacientes/sp/buscar/dni/{}", dni);
         Paciente paciente = pacientePortInRead.buscarByDni(dni);
         PacienteDTO dto = PacienteResponseMapper.toDTO(paciente);
-        logger.info("[PacienteController] Paciente encontrado por DNI {}: {}", dni, dto.toString());
+        logger.info("[PacienteController] Paciente encontrado por DNI {}:", dni);
         return ResponseEntity.ok(dto);
     }
 
