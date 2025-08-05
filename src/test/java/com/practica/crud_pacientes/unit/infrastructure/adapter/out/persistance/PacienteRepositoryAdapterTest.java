@@ -1,6 +1,7 @@
 package com.practica.crud_pacientes.unit.infrastructure.adapter.out.persistance;
 
 import com.practica.crud_pacientes.application.domain.model.Paciente;
+import com.practica.crud_pacientes.application.domain.port.out.PacienteLoggerPort;
 import com.practica.crud_pacientes.infrastructure.adapter.out.entity.PacienteEntity;
 import com.practica.crud_pacientes.infrastructure.adapter.out.mapper.PacientePersistanceMapper;
 import com.practica.crud_pacientes.infrastructure.adapter.out.persistence.PacienteJpaRepository;
@@ -39,6 +40,8 @@ class PacienteRepositoryAdapterTest {
     private PacienteJpaRepository jpaRepository;
     @Mock
     private PacientePersistanceMapper mapper;
+    @Mock
+    private PacienteLoggerPort loggerPort;
     @InjectMocks
     private PacienteRepositoryAdapter pacienteRepositoryAdapter;
     private Paciente paciente;

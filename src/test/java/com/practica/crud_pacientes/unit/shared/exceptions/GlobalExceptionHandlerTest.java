@@ -1,5 +1,6 @@
 package com.practica.crud_pacientes.unit.shared.exceptions;
 
+import com.practica.crud_pacientes.application.domain.port.out.PacienteLoggerPort;
 import com.practica.crud_pacientes.shared.exceptions.ErrorResponse;
 import com.practica.crud_pacientes.shared.exceptions.GlobalExceptionHandler;
 import com.practica.crud_pacientes.shared.exceptions.PacienteDuplicadoException;
@@ -7,6 +8,10 @@ import com.practica.crud_pacientes.shared.exceptions.PacienteNoEncontradoExcepti
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.validation.BindingResult;
@@ -28,14 +33,19 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
 class GlobalExceptionHandlerTest {
 
+    @Mock
+    private PacienteLoggerPort loggerPort;
+
+    @InjectMocks
     private GlobalExceptionHandler handler;
+
     private MockHttpServletRequest request;
 
     @BeforeEach
     void setUp() {
-        handler = new GlobalExceptionHandler();
         request = new MockHttpServletRequest();
     }
 
