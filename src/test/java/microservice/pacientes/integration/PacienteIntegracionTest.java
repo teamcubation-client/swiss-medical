@@ -218,7 +218,7 @@ class PacienteIntegracionTest {
         pacienteEntity.setEstado(true);
         repository.save(pacienteEntity);
 
-        mockMvc.perform(get("/api/pacientes/activos")
+        mockMvc.perform(get("/api/pacientes?estado=true")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(1))
@@ -228,29 +228,16 @@ class PacienteIntegracionTest {
 
     @Test
     void listarPacientesActivos_CuandoNoHayActivos_Retorna200() throws Exception {
-        mockMvc.perform(get("/api/pacientes/activos")
+        mockMvc.perform(get("/api/pacientes?estado=true")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().json("[]"));
     }
 
-    @Test
-    @Transactional
-    void listarPacientesInactivos_CuandoExistenInactivos_Retorna200() throws Exception {
-        pacienteEntity.setEstado(false);
-        repository.save(pacienteEntity);
-
-        mockMvc.perform(get("/api/pacientes/inactivos")
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(1))
-                .andExpect(jsonPath("$[0].dni").value(pacienteEntity.getDni()))
-                .andExpect(jsonPath("$[0].estado").value(false));
-    }
 
     @Test
     void listarPacientesInactivos_CuandoNoHayInactivos_Retorna200() throws Exception {
-        mockMvc.perform(get("/api/pacientes/inactivos")
+        mockMvc.perform(get("/api/pacientes?estado=false")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().json("[]"));

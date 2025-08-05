@@ -8,7 +8,7 @@ public interface PacientePortInRead {
 
     Paciente obtenerPacientePorId(Long id);
 
-    List<Paciente> listarPacientes();
+    List<Paciente> listarPacientesPorEstado(Boolean estado);
 
     List<Paciente> buscarPorNombreParcial(String nombre);
 

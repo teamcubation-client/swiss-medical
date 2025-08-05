@@ -82,7 +82,7 @@ public class PacienteControllerTest {
 
     @Test
     void listarPacientes_CuandoExistenPacientes_Retorna200() throws Exception {
-        when(portInRead.listarPacientes()).thenReturn(List.of(pacienteActivo, pacienteInactivo));
+        when(portInRead.listarPacientesPorEstado(null)).thenReturn(List.of(pacienteActivo, pacienteInactivo));
 
         mvc.perform(get("/api/pacientes"))
                 .andExpect(status().isOk())
@@ -92,7 +92,7 @@ public class PacienteControllerTest {
                 .andExpect(jsonPath("$[1].id").value(pacienteInactivo.getId()))
                 .andExpect(jsonPath("$[1].dni").value(pacienteInactivo.getDni()));
 
-        verify(portInRead).listarPacientes();
+        verify(portInRead).listarPacientesPorEstado(null);
         verifyNoMoreInteractions(portInRead, portInWrite);
     }
 
@@ -328,29 +328,29 @@ public class PacienteControllerTest {
 
     @Test
     void listarPacientesActivos_CuandoHayActivos_Retorna200() throws Exception {
-        when(portInRead.listarPacientes()).thenReturn(List.of(pacienteActivo, pacienteInactivo));
+        when(portInRead.listarPacientesPorEstado(true)).thenReturn(List.of(pacienteActivo));
 
-        mvc.perform(get("/api/pacientes/activos"))
+        mvc.perform(get("/api/pacientes?estado=true"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(1))
                 .andExpect(jsonPath("$[0].id").value(1))
                 .andExpect(jsonPath("$[0].estado").value(true));
 
-        verify(portInRead).listarPacientes();
+        verify(portInRead).listarPacientesPorEstado(true);
         verifyNoMoreInteractions(portInRead, portInWrite);
     }
 
     @Test
     void listarPacientesInactivos_CuandoHayInactivos_Retorna200() throws Exception {
-        when(portInRead.listarPacientes()).thenReturn(List.of(pacienteActivo, pacienteInactivo));
+        when(portInRead.listarPacientesPorEstado(false)).thenReturn(List.of(pacienteInactivo));
 
-        mvc.perform(get("/api/pacientes/inactivos"))
+        mvc.perform(get("/api/pacientes?estado=false"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(1))
                 .andExpect(jsonPath("$[0].id").value(2))
                 .andExpect(jsonPath("$[0].estado").value(false));
 
-        verify(portInRead).listarPacientes();
+        verify(portInRead).listarPacientesPorEstado(false);
         verifyNoMoreInteractions(portInRead, portInWrite);
     }
 

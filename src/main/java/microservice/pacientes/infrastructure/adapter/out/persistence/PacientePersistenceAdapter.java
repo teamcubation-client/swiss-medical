@@ -102,4 +102,11 @@ public class PacientePersistenceAdapter implements PacientePortOutRead, Paciente
                 .map(PacienteMapper::toModel)
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public List<Paciente> findByEstado(Boolean estado) {
+        return pacienteRepository.findByEstado(estado).stream()
+                .map(PacienteMapper::toModel)
+                .collect(Collectors.toList());
+    }
 }

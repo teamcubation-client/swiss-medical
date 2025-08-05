@@ -6,10 +6,12 @@ import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.ToString;
 
 @AllArgsConstructor
 @Builder(toBuilder = true)
 @Getter
+@ToString
 public class PacienteDTO {
     private final Long id;
     @NotBlank(message = "El nombre es obligatorio")

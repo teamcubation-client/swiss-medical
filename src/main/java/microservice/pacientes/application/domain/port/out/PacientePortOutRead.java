@@ -14,6 +14,8 @@ public interface PacientePortOutRead {
 
     List<Paciente> findAll();
 
+    List<Paciente> findByEstado(@Param("estado") Boolean estado);
+
     Optional<Paciente> buscarByDni(@Param("dni") String dni);
 
     List<Paciente> buscarByNombre(@Param("nombre") String nombre);

@@ -2,6 +2,7 @@ package microservice.pacientes.infrastructure.validation;
 
 
 import microservice.pacientes.application.domain.model.Paciente;
+import microservice.pacientes.application.domain.port.out.LoggerPort;
 import microservice.pacientes.application.domain.port.out.PacientePortOutRead;
 import microservice.pacientes.application.validation.PacienteValidator;
 import microservice.pacientes.shared.PacienteDuplicadoException;
@@ -23,6 +24,8 @@ public class DniDuplicadoValidatorTest {
 
     @Mock
     private PacientePortOutRead portOutRead;
+    @Mock
+    private LoggerPort logger;
 
     @InjectMocks
     private DniDuplicadoValidator validator;

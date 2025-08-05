@@ -14,6 +14,8 @@ import java.util.Optional;
 @Repository
 public interface PacienteRepository extends JpaRepository<PacienteEntity, Long> {
 
+    List<PacienteEntity> findByEstado(@Param("estado") Boolean estado);
+
     List<PacienteEntity> findByNombreContainingIgnoreCase(String nombre);
 
     @Query(value = "CALL buscar_paciente_por_dni(:dni)", nativeQuery = true)

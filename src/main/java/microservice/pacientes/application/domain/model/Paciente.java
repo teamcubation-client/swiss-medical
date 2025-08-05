@@ -1,13 +1,11 @@
 package microservice.pacientes.application.domain.model;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.Builder;
-import lombok.AllArgsConstructor;
+import lombok.*;
 
 @Setter
 @Getter
 @Builder
 @AllArgsConstructor
+@ToString
 public class Paciente {
     private long id;
     private String nombre;
