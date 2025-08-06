@@ -22,6 +22,13 @@ class PatientSaveFactoryTest {
     private PatientClassifier classifier;
 
     @Mock
+    private YoungPatientSave youngPatientSave;
+    @Mock
+    private AdultPatientSave adultPatientSave;
+    @Mock
+    private SeniorPatientSave seniorPatientSave;
+
+    @Mock
     private PatientRepositoryPort repositoryPort;
 
     private PatientSaveFactory factory;
@@ -29,7 +36,7 @@ class PatientSaveFactoryTest {
 
     @BeforeEach
     void setUp() {
-        factory = new PatientSaveFactory(classifier);
+        factory = new PatientSaveFactory(classifier, youngPatientSave, adultPatientSave, seniorPatientSave);
         patient = Patient.builder()
                 .id(1L)
                 .firstName("Juan")

@@ -2,13 +2,10 @@ package com.tq.pacientes.application.domain.model.patient.processing;
 
 import com.tq.pacientes.application.domain.model.Patient;
 import com.tq.pacientes.application.domain.port.out.PatientRepositoryPort;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public abstract class PatientSaveTemplate {
 
     protected final PatientRepositoryPort patientRepositoryPort;
-    protected final Logger logger = LoggerFactory.getLogger(getClass());
 
     protected PatientSaveTemplate(PatientRepositoryPort patientRepositoryPort) {
         this.patientRepositoryPort = patientRepositoryPort;

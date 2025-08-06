@@ -9,10 +9,17 @@ import org.springframework.stereotype.Component;
 @Component
 public class PatientSaveFactory {
 
+    private final YoungPatientSave youngPatientSave;
+    private final AdultPatientSave adultPatientSave;
+    private final SeniorPatientSave seniorPatientSave;
+
     private final PatientClassifier classifier;
 
-    public PatientSaveFactory(PatientClassifier classifier) {
+    public PatientSaveFactory(PatientClassifier classifier, YoungPatientSave youngPatientSave, AdultPatientSave adultPatientSave, SeniorPatientSave seniorPatientSave) {
         this.classifier = classifier;
+        this.youngPatientSave = youngPatientSave;
+        this.adultPatientSave = adultPatientSave;
+        this.seniorPatientSave = seniorPatientSave;
     }
 
     public PatientSaveTemplate createStrategyFor(Patient patient, PatientRepositoryPort patientRepositoryPort) {
@@ -22,9 +29,9 @@ public class PatientSaveFactory {
         PatientType type = classifier.classify(patient);
 
         return switch (type) {
-            case SENIOR -> new SeniorPatientSave(patientRepositoryPort);
-            case ADULT -> new AdultPatientSave(patientRepositoryPort);
-            case YOUNG -> new YoungPatientSave(patientRepositoryPort);
+            case SENIOR -> seniorPatientSave;
+            case ADULT -> adultPatientSave;
+            case YOUNG -> youngPatientSave;
         };
     }
 }
