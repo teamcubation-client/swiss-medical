@@ -37,6 +37,14 @@ class PatientControllerIntegrationTest {
 
     private PatientRequest patient1;
 
+    private static final String API_PATIENTS_BASE_URL = "/api/patients";
+    private static final String PATIENT_FIRST_NAME = "María";
+    private static final String PATIENT_DNI = "87654321";
+    private static final String PATIENT_HEALTH_INSURANCE = "OSDE";
+
+    private static final String PAGE_SIZE = "10";
+    private static final String PAGE_OFFSET = "0";
+
     @BeforeEach
     void setUp() {
         patient1 = PatientRequest.builder()
@@ -44,7 +52,7 @@ class PatientControllerIntegrationTest {
                 .lastName("González")
                 .dni("87654321")
                 .birthDate(LocalDate.of(1990, 1, 1))
-                .healthInsurance("SWISS")
+                .healthInsurance(PATIENT_HEALTH_INSURANCE)
                 .healthPlan("Basic")
                 .address("Calle 123")
                 .phoneNumber("1234567890")
@@ -54,23 +62,23 @@ class PatientControllerIntegrationTest {
 
     @Test
     void shouldReturnCreatedPatient_whenValidPatientIsPosted() throws Exception {
-        mockMvc.perform(post("/api/patients")
+        mockMvc.perform(post(API_PATIENTS_BASE_URL)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(patient1)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").exists())
-                .andExpect(jsonPath("$.firstName").value("María"));
+                .andExpect(jsonPath("$.firstName").value(PATIENT_FIRST_NAME));
     }
 
     @Test
     void shouldReturnPatientByDni_whenPatientExists() throws Exception {
-        mockMvc.perform(post("/api/patients")
+        mockMvc.perform(post(API_PATIENTS_BASE_URL)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(patient1)));
 
-        mockMvc.perform(get("/api/patients/dni/{dni}", "87654321"))
+        mockMvc.perform(get( API_PATIENTS_BASE_URL + "/dni/{dni}", PATIENT_DNI))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.dni").value("87654321"));
+                .andExpect(jsonPath("$.dni").value(PATIENT_DNI));
     }
 
     @Test
@@ -80,7 +88,7 @@ class PatientControllerIntegrationTest {
                 .healthPlan("Gold")
                 .build();
 
-        mockMvc.perform(patch("/api/patients/{id}", idPatient)
+        mockMvc.perform(patch( API_PATIENTS_BASE_URL + "/{id}", idPatient)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(patientUpdate)))
                 .andExpect(status().isOk())
@@ -89,47 +97,47 @@ class PatientControllerIntegrationTest {
 
     @Test
     void shouldReturnPatientsByHealthInsurance_whenValidParams() throws Exception {
-        mockMvc.perform(post("/api/patients")
+        mockMvc.perform(post(API_PATIENTS_BASE_URL)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(patient1)))
                 .andExpect(status().isCreated());
 
-        mockMvc.perform(get("/api/patients/health-insurance")
-                        .param("healthInsurance", "SWISS")
-                        .param("page", "0")
-                        .param("size", "10"))
+        mockMvc.perform(get( API_PATIENTS_BASE_URL + "/health-insurance")
+                        .param("healthInsurance", PATIENT_HEALTH_INSURANCE)
+                        .param("page", PAGE_OFFSET)
+                        .param("size", PAGE_SIZE))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].healthInsurance").value("SWISS"));
+                .andExpect(jsonPath("$[0].healthInsurance").value(PATIENT_HEALTH_INSURANCE));
     }
 
     @Test
     void shouldDeletePatient_whenValidId() throws Exception {
         Long idPatient = createPatientAndGetId(patient1);
-        mockMvc.perform(delete("/api/patients/{id}", idPatient))
+        mockMvc.perform(delete(API_PATIENTS_BASE_URL + "/{id}", idPatient))
                 .andExpect(status().isNoContent());
     }
 
     @Test
     void shouldReturnNoContent_whenPatientNotFoundById() throws Exception {
-        mockMvc.perform(get("/api/patients/{id}", 9999L))
+        mockMvc.perform(get(API_PATIENTS_BASE_URL + "/{id}", 9999L))
                 .andExpect(status().isNoContent());
     }
 
     @Test
     void shouldActivatePatient_whenValidId() throws Exception {
         Long idPatient = createPatientAndGetId(patient1);
-        mockMvc.perform(delete("/api/patients/{id}", idPatient));
-        mockMvc.perform(patch("/api/patients/{id}/activate", idPatient))
+        mockMvc.perform(delete(API_PATIENTS_BASE_URL + "/{id}", idPatient));
+        mockMvc.perform(patch(API_PATIENTS_BASE_URL + "/{id}/activate", idPatient))
                 .andExpect(status().isOk());
     }
 
     @Test
     void shouldReturnActivatedPatient_whenPatientIsActivated() throws Exception {
         Long idPatient = createPatientAndGetId(patient1);
-        mockMvc.perform(delete("/api/patients/{id}", idPatient));
-        mockMvc.perform(patch("/api/patients/{id}/activate", idPatient))
+        mockMvc.perform(delete(API_PATIENTS_BASE_URL + "/{id}", idPatient));
+        mockMvc.perform(patch(API_PATIENTS_BASE_URL + "/{id}/activate", idPatient))
                 .andExpect(status().isOk());
-        mockMvc.perform(get("/api/patients/{id}", idPatient))
+        mockMvc.perform(get(API_PATIENTS_BASE_URL + "/{id}", idPatient))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(idPatient));
     }
@@ -164,7 +172,7 @@ class PatientControllerIntegrationTest {
         createPatientAndGetId(patient2);
         createPatientAndGetId(patient3);
 
-        mockMvc.perform(get("/api/patients/first-name/{firstName}", "Juan"))
+        mockMvc.perform(get(API_PATIENTS_BASE_URL + "/first-name/{firstName}", "Juan"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$.length()").value(2));
@@ -173,22 +181,22 @@ class PatientControllerIntegrationTest {
     @Test
     void shouldReturnPatientByFirstNameAndDni_whenValidParams() throws Exception {
         createPatientAndGetId(patient1);
-        mockMvc.perform(get("/api/patients")
-                        .param("firstName", "María")
-                        .param("dni", "87654321"))
+        mockMvc.perform(get(API_PATIENTS_BASE_URL)
+                        .param("firstName", PATIENT_FIRST_NAME)
+                        .param("dni", PATIENT_DNI))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].firstName").value("María"))
-                .andExpect(jsonPath("$[0].dni").value("87654321"));
+                .andExpect(jsonPath("$[0].firstName").value(PATIENT_FIRST_NAME))
+                .andExpect(jsonPath("$[0].dni").value(PATIENT_DNI));
     }
 
     @Test
     void shouldReturnNoContent_whenNoPatientsFoundByFirstName() throws Exception {
-        mockMvc.perform(get("/api/patients/first-name/{firstName}", "NoExiste"))
+        mockMvc.perform(get(API_PATIENTS_BASE_URL + "/first-name/{firstName}", "NoExiste"))
                 .andExpect(status().isNoContent());
     }
 
     private Long createPatientAndGetId(PatientRequest patientRequest) throws Exception {
-        MvcResult result = mockMvc.perform(post("/api/patients")
+        MvcResult result = mockMvc.perform(post(API_PATIENTS_BASE_URL)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(patientRequest)))
                 .andExpect(status().isCreated())
