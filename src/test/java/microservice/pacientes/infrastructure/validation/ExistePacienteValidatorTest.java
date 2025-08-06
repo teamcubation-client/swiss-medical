@@ -29,37 +29,39 @@ public class ExistePacienteValidatorTest {
     private ExistePacienteValidator validator;
     private Paciente paciente;
 
+    private static  final Long id = 1L;
+
     @BeforeEach
     void setUp() {
         paciente = Paciente.builder()
-                .id(1L)
+                .id(id)
                 .build();
     }
 
     @Test
     void validate_givenNonexistentId_throwsPacienteNotFoundException()  {
-        when(portOutRead.findById(1L)).thenReturn(Optional.empty());
+        when(portOutRead.findById(id)).thenReturn(Optional.empty());
 
         PacienteNotFoundException ex = assertThrows(
                 PacienteNotFoundException.class,
                 () -> validator.validate(paciente)
         );
-        assertEquals("Paciente no encontrado con id: 1", ex.getMessage());
-        verify(portOutRead).findById(1L);
+        assertEquals("Paciente no encontrado con id: " + paciente.getId(), ex.getMessage());
+        verify(portOutRead).findById(id);
     }
 
     @Test
     void validate_givenExistingPaciente_doesNotThrow(){
-        when(portOutRead.findById(1L)).thenReturn(Optional.of(paciente));
+        when(portOutRead.findById(id)).thenReturn(Optional.of(paciente));
 
         assertDoesNotThrow(() -> validator.validate(paciente));
 
-        verify(portOutRead).findById(1L);
+        verify(portOutRead).findById(id);
     }
 
     @Test
     void validate_withNextValidator_delegatesToNext(){
-        when(portOutRead.findById(1L)).thenReturn(Optional.of(paciente));
+        when(portOutRead.findById(id)).thenReturn(Optional.of(paciente));
         PacienteValidator nextValidator = mock(PacienteValidator.class);
         validator.setNext(nextValidator);
 

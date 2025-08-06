@@ -25,7 +25,7 @@ public class GlobalExceptionHandlerTest {
         handler = null;
     }
     @Test
-    void handlePacienteNotFound() {
+    void shouldReturnNotFoundResponse_whenPacienteNotFoundExceptionIsThrown() {
         long pacienteId = 42L;
         PacienteNotFoundException notFoundException = PacienteNotFoundException.porId(pacienteId);
 
@@ -39,7 +39,7 @@ public class GlobalExceptionHandlerTest {
         assertThat(bodyNotFound.timestamp()).isBeforeOrEqualTo(LocalDateTime.now());
     }
     @Test
-    void handlePacienteDuplicado() {
+    void shouldReturnBadRequestResponse_whenPacienteDuplicadoExceptionIsThrown() {
         String dni = "12345678";
         PacienteDuplicadoException pacienteDuplicadoException = new PacienteDuplicadoException(dni);
 
@@ -55,7 +55,7 @@ public class GlobalExceptionHandlerTest {
     }
 
     @Test
-    void handlePacienteNull() {
+    void shouldReturnBadRequestResponse_whenPacienteNullExceptionIsThrown() {
         PacienteNullException nullException = new PacienteNullException();
         ResponseEntity<ErrorResponse> nullAnswer = handler.handleBadRequest(nullException);
 
@@ -69,7 +69,7 @@ public class GlobalExceptionHandlerTest {
     }
 
     @Test
-    void handleEmailFormat() {
+    void shouldReturnBadRequestResponse_whenInvalidEmailFormatExceptionIsThrown() {
         String mensaje = "Formato de mail invalido";
         InvalidEmailFormatException invalidEmailFormatException = new InvalidEmailFormatException(mensaje);
         ResponseEntity<ErrorResponse> invalidEmailAnswer = handler.handleBadRequest(invalidEmailFormatException);
@@ -84,7 +84,7 @@ public class GlobalExceptionHandlerTest {
     }
 
     @Test
-    void handleFechaAlta() {
+    void shouldReturnBadRequestResponse_whenInvalidFechaAltaExceptionIsThrown() {
         LocalDate fecha = LocalDate.now().plusDays(1);
         InvalidFechaAltaException invalidFechaAltaException = new InvalidFechaAltaException(fecha);
         ResponseEntity<ErrorResponse> invalidFechaAltaAnswer = handler.handleBadRequest(invalidFechaAltaException);
@@ -99,7 +99,7 @@ public class GlobalExceptionHandlerTest {
     }
 
     @Test
-    void handlePacienteActivo() {
+    void shouldReturnBadRequestResponse_whenPacienteActivoExceptionIsThrown() {
         long pacienteId = 1L;
         PacienteActivoException pacienteActivoException= new PacienteActivoException(pacienteId);
         ResponseEntity<ErrorResponse> pacienteActivoAnswer = handler.handleBadRequest(pacienteActivoException);

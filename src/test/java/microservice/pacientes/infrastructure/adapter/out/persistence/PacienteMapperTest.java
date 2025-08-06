@@ -11,21 +11,31 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class PacienteMapperTest {
 
+    private static final Long id = 1L;
+    private static final String dni = "12345678";
+    private static final String nombre = "Ana";
+    private static final String apellido = "Lopez";
+    private static final String obraSocial = "OSDE";
+    private static final String email = "ana@mail.com";
+    private static final String telefono = "112233456";
+    private static final String tipoPlan = "PlanA";
+    private static final LocalDate fechaAlta = LocalDate.of(2025, 7, 30);
+    private static final Boolean estado = true;
+
 
     @Test
     void toEntity_givenValidPaciente_returnsPacienteEntityWithSameFields() {
-        LocalDate fecha = LocalDate.of(2025, 7, 30);
         Paciente paciente = Paciente.builder()
-                .id(1L)
-                .dni("12345678")
-                .nombre("Ana")
-                .apellido("Lopez")
-                .obraSocial("OSDE")
-                .email("ana@mail.com")
-                .telefono("112233456")
-                .tipoPlanObraSocial("PlanA")
-                .fechaAlta(fecha)
-                .estado(true)
+                .id(id)
+                .dni(dni)
+                .nombre(nombre)
+                .apellido(apellido)
+                .obraSocial(obraSocial)
+                .email(email)
+                .telefono(telefono)
+                .tipoPlanObraSocial(tipoPlan)
+                .fechaAlta(fechaAlta)
+                .estado(estado)
                 .build();
 
         PacienteEntity entidad = PacienteMapper.toEntity(paciente);
@@ -45,18 +55,17 @@ public class PacienteMapperTest {
 
     @Test
     void toModel_givenValidPacienteEntity_returnsPacienteModelWithSameFields() {
-        LocalDate fecha = LocalDate.of(2025, 7, 30);
         PacienteEntity entidad = PacienteEntity.builder()
-                .id(1L)
-                .dni("12345678")
-                .nombre("Ana")
-                .apellido("Lopez")
-                .obraSocial("OSDE")
-                .email("ana@mail.com")
-                .telefono("112233456")
-                .tipoPlanObraSocial("PlanA")
-                .fechaAlta(fecha)
-                .estado(true)
+                .id(id)
+                .dni(dni)
+                .nombre(nombre)
+                .apellido(apellido)
+                .obraSocial(obraSocial)
+                .email(email)
+                .telefono(telefono)
+                .tipoPlanObraSocial(tipoPlan)
+                .fechaAlta(fechaAlta)
+                .estado(estado)
                 .build();
 
         Paciente model = PacienteMapper.toModel(entidad);

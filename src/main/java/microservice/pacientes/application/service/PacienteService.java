@@ -13,6 +13,7 @@ import microservice.pacientes.infrastructure.validation.FechaAltaValidator;
 import microservice.pacientes.infrastructure.validation.EmailFormatValidator;
 import microservice.pacientes.infrastructure.validation.ExistePacienteValidator;
 import microservice.pacientes.infrastructure.validation.EstadoInactivoValidator;
+import microservice.pacientes.shared.LoggerHelper;
 import microservice.pacientes.shared.PacienteNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -70,14 +71,14 @@ public class PacienteService implements PacientePortInWrite, PacientePortInRead 
     @Override
     @Transactional
     public Paciente crearPaciente(Paciente paciente) {
-        logger.entrada();
-        logger.info("[PacienteService] Creando paciente con DNI: {}", paciente.getDni());
+        LoggerHelper.entrada(logger, this);
+        LoggerHelper.info(logger, this, "Creando paciente con DNI: {}", paciente.getDni());
 
         createChain.validate(paciente);
-        logger.info("[PacienteService] Validaciones de creacion completadas");
+        LoggerHelper.info(logger, this, "Validaciones de creacion completadas");
 
         Paciente pacienteCreado = pacientePortOutWrite.save(paciente);
-        logger.info("Paciente creado exitosamente con ID: {}", pacienteCreado.getId());
+        LoggerHelper.info(logger, this, "Paciente creado exitosamente con ID: {}", pacienteCreado.getId());
         return pacienteCreado;
     }
 
@@ -90,15 +91,15 @@ public class PacienteService implements PacientePortInWrite, PacientePortInRead 
     @Override
     @Transactional (readOnly = true)
     public Paciente obtenerPacientePorId(Long id) {
-        logger.entrada();
-        logger.info("[PacienteService] Buscando paciente por ID: {}", id);
+        LoggerHelper.entrada(logger, this);
+        LoggerHelper.info(logger, this, "Buscando paciente por ID: {}", id);
 
         Paciente paciente = pacientePortOutRead.findById(id)
                 .orElseGet(() -> {
-                    logger.warn("[PacienteService] No se encontro paciente con ID: {}", id);
+                    LoggerHelper.warn(logger, this, "No se encontro paciente con ID: {}", id);
                     throw PacienteNotFoundException.porId(id);
                 });
-        logger.info("[PacienteService] Paciente encontrado: {}", paciente);
+        LoggerHelper.info(logger, this, "Paciente encontrado: {}", paciente);
         return paciente;
     }
 
@@ -109,8 +110,8 @@ public class PacienteService implements PacientePortInWrite, PacientePortInRead 
     @Override
     @Transactional(readOnly = true)
     public List<Paciente> listarPacientesPorEstado(Boolean estado) {
-        logger.entrada();
-        logger.info("[PacienteService] Listando pacientes con estado: {}", estado);
+        LoggerHelper.entrada(logger, this);
+        LoggerHelper.info(logger, this, "Listando pacientes con estado: {}", estado);
 
         List<Paciente> pacientes;
 
@@ -120,8 +121,8 @@ public class PacienteService implements PacientePortInWrite, PacientePortInRead 
             pacientes = pacientePortOutRead.findByEstado(estado);
         }
 
-        logger.info("[PacienteService] Se encontraron {} pacientes con estado {}", pacientes.size(), estado);
-        logger.info("[PacienteService] Lista completa: {}", pacientes);
+        LoggerHelper.info(logger, this, "Se encontraron {} pacientes con estado {}", pacientes.size(), estado);
+        LoggerHelper.info(logger, this, "Lista completa: {}", pacientes);
         return pacientes;
     }
     /**
@@ -132,22 +133,22 @@ public class PacienteService implements PacientePortInWrite, PacientePortInRead 
     @Override
     @Transactional
     public void eliminarPaciente(Long id) {
-        logger.entrada();
-        logger.info("[PacienteService] Eliminando paciente con ID: {}", id);
+        LoggerHelper.entrada(logger, this);
+        LoggerHelper.info(logger, this, "Eliminando paciente con ID: {}", id);
 
         Paciente paciente = pacientePortOutRead.findById(id)
                 .orElseGet(() -> {
-                    logger.warn("[PacienteService] Paciente con ID {} no encontrado", id);
+                    LoggerHelper.warn(logger, this, "Paciente con ID {} no encontrado", id);
                     throw PacienteNotFoundException.porId(id);
                 });
 
-        logger.info("[PacienteService] Paciente encontrado para eliminación: {}", paciente);
+        LoggerHelper.info(logger, this, "Paciente encontrado para eliminacion: {}", paciente);
 
         deleteChain.validate(paciente);
-        logger.info("[PacienteService] Validaciones de eliminacion completadas");
+        LoggerHelper.info(logger, this, "Validaciones de eliminacion completadas");
 
         pacientePortOutWrite.deleteById(id);
-        logger.info("[PacienteService] Paciente eliminado con éxito: {}", id);
+        LoggerHelper.info(logger, this, "Paciente eliminado con exito: {}", id);
     }
 
     /**
@@ -158,11 +159,11 @@ public class PacienteService implements PacientePortInWrite, PacientePortInRead 
     @Override
     @Transactional (readOnly = true)
     public List<Paciente> buscarPorNombreParcial(String nombre) {
-        logger.entrada();
-        logger.info("[PacienteService] Buscando pacientes por nombre parcial: '{}'", nombre);
+        LoggerHelper.entrada(logger, this);
+        LoggerHelper.info(logger, this, "Buscando pacientes por nombre parcial: '{}'", nombre);
         List<Paciente> pacientes = pacientePortOutRead.findByNombreContainingIgnoreCase(nombre);
-        logger.info("[PacienteService] Se encontraron {} pacientes con nombre parcial '{}'", pacientes.size(), nombre);
-        logger.info("[PacienteService] Pacientes encontradados: {}", pacientes);
+        LoggerHelper.info(logger, this, "Se encontraron {} pacientes con nombre parcial '{}'", pacientes.size(), nombre);
+        LoggerHelper.info(logger, this, "Pacientes encontrados: {}", pacientes);
         return pacientes;
     }
 
@@ -176,97 +177,97 @@ public class PacienteService implements PacientePortInWrite, PacientePortInRead 
     @Override
     @Transactional
     public Paciente actualizarPaciente(Long id, Paciente paciente) {
-        logger.entrada();
-        logger.info("[PacienteService] Actualizando paciente con ID: {}", id);
-        logger.info("[PacienteService] Datos recibidos para actualizacion: {}", paciente);
-        paciente.setId(id);
+        LoggerHelper.entrada(logger, this);
+        LoggerHelper.info(logger, this, "Actualizando paciente con ID: {}", id);
+        LoggerHelper.info(logger, this, "Datos recibidos para actualizacion: {}", paciente);
         updateChain.validate(paciente);
-        logger.info("[PacienteService] Validaciones de actualizacion completadas");
+        LoggerHelper.info(logger, this, "Validaciones de actualizacion completadas");
 
         Paciente pacienteActualizado = pacientePortOutWrite.update(paciente);
-        logger.info("[PacienteService] Paciente actualizado con exito: {}", pacienteActualizado.getId());
+        LoggerHelper.info(logger, this, "Paciente actualizado con exito: {}", pacienteActualizado.getId());
         return pacienteActualizado;
     }
 
     @Override
     @Transactional
     public Paciente desactivarPaciente(Long id) {
-        logger.entrada();
-        logger.info("[PacienteService] Desactivando paciente con ID: {}", id);
+        LoggerHelper.entrada(logger, this);
+        LoggerHelper.info(logger, this, "Desactivando paciente con ID: {}", id);
 
         Paciente paciente = pacientePortOutRead.findById(id)
                 .orElseGet(() -> {
-                    logger.warn("[PacienteService] No se encontro paciente con ID: {}", id);
+                    LoggerHelper.warn(logger, this, "No se encontro paciente con ID: {}", id);
                     throw PacienteNotFoundException.porId(id);
                 });
-        logger.info("[PacienteService] Paciente encontrado: {}", paciente);
+        LoggerHelper.info(logger, this, "Paciente encontrado: {}", paciente);
 
         paciente.setEstado(false);
         Paciente pacienteDesactivado = pacientePortOutWrite.save(paciente);
-        logger.info("[PacienteService] Paciente desactivado: {}", paciente.getId());
+        LoggerHelper.info(logger, this, "Paciente desactivado: {}", paciente.getId());
         return pacienteDesactivado;
     }
 
     @Override
     @Transactional
     public Paciente activarPaciente(Long id) {
-        logger.entrada();
-        logger.info("[PacienteService] Activando paciente con ID: {}", id);
+        LoggerHelper.entrada(logger, this);
+        LoggerHelper.info(logger, this, "Activando paciente con ID: {}", id);
         Paciente paciente = pacientePortOutRead.findById(id)
                 .orElseGet(() -> {
-                    logger.warn("[PacienteService] No se encontro paciente con ID: {}", id);
+                    LoggerHelper.warn(logger, this, "No se encontró paciente con ID: {}", id);
                     throw PacienteNotFoundException.porId(id);
                 });
-        logger.info("[PacienteService] Paciente encontrado: {}", paciente);
+        LoggerHelper.info(logger, this, "Paciente encontrado: {}", paciente);
 
         paciente.setEstado(true);
         Paciente pacienteActivado = pacientePortOutWrite.save(paciente);
-        logger.info("[PacienteService] Paciente activado: {}", paciente.getId());
+        LoggerHelper.info(logger, this, "Paciente activado: {}", paciente.getId());
         return pacienteActivado;
     }
 
     @Override
     @Transactional (readOnly = true)
     public Paciente buscarByDni(String dni) {
-        logger.entrada();
-        logger.info("[PacienteService] Buscando paciente por DNI: {}", dni);
+        LoggerHelper.entrada(logger, this);
+        LoggerHelper.info(logger, this, "Buscando paciente por DNI: {}", dni);
 
 
         Paciente paciente = pacientePortOutRead.buscarByDni(dni)
                 .orElseGet(() -> {
-                    logger.warn("[PacienteService] No se encontro paciente con DNI: {}", dni);
+                    LoggerHelper.warn(logger, this, "No se encontro paciente con DNI: {}", dni);
                     throw PacienteNotFoundException.porDni(dni);
                 });
-        logger.info("[PacienteService] Paciente encontrado: {}", paciente);
+
+        LoggerHelper.info(logger, this, "Paciente encontrado: {}", paciente);
         return paciente;
     }
 
     @Override
     @Transactional (readOnly = true)
     public List<Paciente> buscarByNombre(String nombre) {
-        logger.entrada();
-        logger.info("[PacienteService] Buscando pacientes por nombre: '{}'", nombre);
+        LoggerHelper.entrada(logger, this);
+        LoggerHelper.info(logger, this, "Buscando pacientes por nombre: '{}'", nombre);
         List<Paciente> pacientes = pacientePortOutRead.buscarByNombre(nombre);
         if (pacientes == null || pacientes.isEmpty()) {
-            logger.warn("[PacienteService] No se encontraron pacientes con nombre: '{}'", nombre);
+            LoggerHelper.warn(logger, this, "No se encontraron pacientes con nombre: '{}'", nombre);
             throw PacienteNotFoundException.porNombre(nombre);
         }
-        logger.info("[PacienteService] Se encontraron {} pacientes: {}", pacientes.size(), pacientes);
+        LoggerHelper.info(logger, this, "Se encontraron {} pacientes: {}", pacientes.size(), pacientes);
         return pacientes;
     }
 
     @Override
     @Transactional (readOnly = true)
     public List<Paciente> buscarPorObraSocialPaginado(String obraSocial, int limit, int offset) {
-        logger.entrada();
-        logger.info("[PacienteService] Buscando pacientes por obra social: '{}', limit: {}, offset: {}", obraSocial, limit, offset);
+        LoggerHelper.entrada(logger, this);
+        LoggerHelper.info(logger, this, "Buscando pacientes por obra social: '{}', limit: {}, offset: {}", obraSocial, limit, offset);
 
         List<Paciente> pacientes = pacientePortOutRead.buscarPorObraSocialPaginado(obraSocial, limit, offset);
         if (pacientes == null || pacientes.isEmpty()) {
-            logger.warn("[PacienteService] No se encontraron pacientes con obra social: '{}'", obraSocial);
+            LoggerHelper.warn(logger, this, "No se encontraron pacientes con obra social: '{}'", obraSocial);
             throw PacienteNotFoundException.porObraSocial(obraSocial);
         }
-        logger.info("[PacienteService] Se encontraron {} pacientes: {}", pacientes.size(), pacientes);
+        LoggerHelper.info(logger, this, "Se encontraron {} pacientes: {}", pacientes.size(), pacientes);
         return pacientes;
         }
 

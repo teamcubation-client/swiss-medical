@@ -33,61 +33,72 @@ public class DniDuplicadoValidatorTest {
     private Paciente mismoPaciente;
     private Paciente otroPaciente;
 
+
+    private static final Long id = 1L;
+    private static final String dni = "12345678";
+    private static final String nombre = "Ana";
+    private static final String apellido = "Lopez";
+
+    private static final Long idOtro = 2L;
+    private static final String dniOtro = "12345678";
+    private static final String nombreOtro = "Bruno";
+    private static final String apellidoOtro = "Gomez";
+
     @BeforeEach
     void setUp() {
         paciente = Paciente.builder()
-                .id(1L)
-                .dni("12345678")
-                .nombre("Ana")
-                .apellido("Lopez")
+                .id(id)
+                .dni(dni)
+                .nombre(nombre)
+                .apellido(apellido)
                 .estado(false)
                 .build();
 
         mismoPaciente = Paciente.builder()
-                .id(1L)
-                .dni("12345678")
-                .nombre("Ana")
-                .apellido("Lopez")
+                .id(id)
+                .dni(dni)
+                .nombre(nombre)
+                .apellido(apellido)
                 .estado(true)
                 .build();
 
         otroPaciente = Paciente.builder()
-                .id(2L)
-                .dni("12345678")
-                .nombre("Bruno")
-                .apellido("Gómez")
+                .id(idOtro)
+                .dni(dniOtro)
+                .nombre(nombreOtro)
+                .apellido(apellidoOtro)
                 .build();
     }
 
     @Test
     void validate_givenDniNotExists_doesNotThrow() {
-        when(portOutRead.buscarByDni("12345678"))
+        when(portOutRead.buscarByDni(dni))
                 .thenReturn(Optional.empty());
 
         assertDoesNotThrow(() -> validator.validate(paciente));
-        verify(portOutRead).buscarByDni("12345678");
+        verify(portOutRead).buscarByDni(dni);
     }
 
     @Test
     void validate_givenSamePaciente_doesNotThrow() {
-        when(portOutRead.buscarByDni("12345678"))
+        when(portOutRead.buscarByDni(dni))
                 .thenReturn(Optional.of(mismoPaciente));
 
         assertDoesNotThrow(() -> validator.validate(paciente));
-        verify(portOutRead).buscarByDni("12345678");
+        verify(portOutRead).buscarByDni(dni);
     }
 
     @Test
     void  validate_givenDifferentPacienteSameDni_throwsPacienteDuplicadoException(){
-        when(portOutRead.buscarByDni("12345678"))
+        when(portOutRead.buscarByDni(dni))
                 .thenReturn(Optional.of(otroPaciente));
 
         PacienteDuplicadoException ex = assertThrows(
                 PacienteDuplicadoException.class,
                 () -> validator.validate(paciente)
         );
-        assertTrue(ex.getMessage().contains("12345678"));
-        verify(portOutRead).buscarByDni("12345678");
+        assertTrue(ex.getMessage().contains(dni));
+        verify(portOutRead).buscarByDni(dni);
     }
 
 
@@ -98,7 +109,7 @@ public class DniDuplicadoValidatorTest {
 
         validator.setNext(nextValidator);
 
-        when(portOutRead.buscarByDni("12345678"))
+        when(portOutRead.buscarByDni(dni))
                 .thenReturn(Optional.empty());
 
         assertDoesNotThrow(() -> validator.validate(paciente));

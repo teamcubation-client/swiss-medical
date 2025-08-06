@@ -54,7 +54,7 @@ class PacienteIntegracionTest {
 
     private PacienteDTO pacienteDTO;
     private PacienteEntity pacienteEntity;
-    private String nombrePacienteParcial = "an";
+    private String nombrePacienteParcialExistente = "an";
     private String nombrePacienteInexistente = "zzzz";
     @BeforeEach
     void init() {
@@ -310,7 +310,7 @@ class PacienteIntegracionTest {
     @Transactional
     void buscarPacientesPorNombreParcial_CuandoExistenResultados_Retorna200() throws Exception {
         repository.save(pacienteEntity);
-        mockMvc.perform(get("/api/pacientes/buscar/nombre").param("nombre", nombrePacienteParcial))
+        mockMvc.perform(get("/api/pacientes/buscar/nombre").param("nombre", nombrePacienteParcialExistente))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].nombre").value(pacienteEntity.getNombre()));
     }
@@ -345,7 +345,7 @@ class PacienteIntegracionTest {
     @Transactional
     void buscarPacientesPorNombreExacto_CuandoExisten_Retorna200() throws Exception {
         repository.save(pacienteEntity);
-        mockMvc.perform(get("/api/pacientes/sp/buscar/nombre/{nombre}", nombrePacienteParcial))
+        mockMvc.perform(get("/api/pacientes/sp/buscar/nombre/{nombre}", nombrePacienteParcialExistente))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].nombre").value(pacienteEntity.getNombre()))
                 .andExpect(jsonPath("$.length()").value(1));

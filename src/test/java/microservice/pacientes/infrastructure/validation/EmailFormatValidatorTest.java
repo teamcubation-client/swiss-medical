@@ -27,27 +27,34 @@ public class EmailFormatValidatorTest {
     @Mock
     private LoggerPort logger;
 
+    private static final Long id = 1L;
+    private static final String dni = "12345678";
+    private static final String nombre = "Ana";
+    private static final String apellido = "Lopez";
+    private static final String email = "analopez@gmail.com";
+    private static final String emailSinArroba = "analopezgmail.com";
+
     @BeforeEach
     void setUp() {
         paciente = Paciente.builder()
-                .id(1L)
-                .dni("12345678")
-                .nombre("Ana")
-                .apellido("Lopez")
-                .email("analopez@gmail.com")
+                .id(id)
+                .dni(dni)
+                .nombre(nombre)
+                .apellido(apellido)
+                .email(email)
                 .build();
     }
 
     @Test
     void validate_givenValidEmail_doesNotThrow(){
-        paciente.setEmail("usuario@dominio.com");
+        paciente.setEmail(email);
 
         assertDoesNotThrow(()-> validator.validate(paciente));
     }
 
     @Test
     void validate_givenInvalidEmail_throwsInvalidEmailFormatException(){
-        paciente.setEmail("sin-arroba");
+        paciente.setEmail(emailSinArroba);
 
         InvalidEmailFormatException ex = assertThrows(
                 InvalidEmailFormatException.class,
@@ -72,7 +79,7 @@ public class EmailFormatValidatorTest {
 
     @Test
     void validate_withNextValidator_delegatesToNext() {
-        paciente.setEmail("usuario@dominio.com");
+        paciente.setEmail(email);
         PacienteValidator nextValidator = mock(PacienteValidator.class);
         validator.setNext(nextValidator);
 

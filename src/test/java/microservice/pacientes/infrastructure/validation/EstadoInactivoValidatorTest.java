@@ -11,7 +11,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
@@ -26,15 +28,23 @@ public class EstadoInactivoValidatorTest {
     @Mock
     private LoggerPort logger;
 
+
+    private static final Long id = 1L;
+    private static final String dni = "12345678";
+    private static final String nombre = "Ana";
+    private static final String apellido = "Lopez";
+    private static final String email = "analopez@gmail.com";
+    private static final Boolean estado = true;
+
     @BeforeEach
     void setUp() {
         paciente = Paciente.builder()
-                .id(1L)
-                .dni("12345678")
-                .nombre("Ana")
-                .apellido("Lopez")
-                .email("analopez@gmail.com")
-                .estado(true)
+                .id(id)
+                .dni(dni)
+                .nombre(nombre)
+                .apellido(apellido)
+                .email(email)
+                .estado(estado)
                 .build();
     }
 

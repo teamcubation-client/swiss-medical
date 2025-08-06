@@ -11,20 +11,31 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class PacienteResponseMapperTest {
 
+
+    private static final Long id = 1L;
+    private static final String dni = "12345678";
+    private static final String nombre = "Ana";
+    private static final String apellido = "Lopez";
+    private static final String obraSocial = "OSDE";
+    private static final String email = "ana@mail.com";
+    private static final String telefono = "112233456";
+    private static final String tipoPlan = "PlanA";
+    private static final LocalDate fechaAlta = LocalDate.of(2025, 7, 30);
+    private static final Boolean estado = true;
+
     @Test
     void toDTO_givenValidPaciente_returnsPacienteDTOWithSameFields() {
-        LocalDate fecha = LocalDate.of(2025, 7, 30);
         Paciente model = Paciente.builder()
-                .id(1L)
-                .dni("12345678")
-                .nombre("Ana")
-                .apellido("Lopez")
-                .obraSocial("OSDE")
-                .email("ana@mail.com")
-                .telefono("112233456")
-                .tipoPlanObraSocial("PlanA")
-                .fechaAlta(fecha)
-                .estado(true)
+                .id(id)
+                .dni(dni)
+                .nombre(nombre)
+                .apellido(apellido)
+                .obraSocial(obraSocial)
+                .email(email)
+                .telefono(telefono)
+                .tipoPlanObraSocial(tipoPlan)
+                .fechaAlta(fechaAlta)
+                .estado(estado)
                 .build();
 
         PacienteDTO dto = PacienteResponseMapper.toDTO(model);
@@ -44,17 +55,16 @@ public class PacienteResponseMapperTest {
 
     @Test
     void toModel_givenValidDTO_returnsPacienteWithSameFields() {
-        LocalDate fecha = LocalDate.of(2025, 7, 30);
         PacienteDTO dto = PacienteDTO.builder()
-                .dni("12345678")
-                .nombre("Ana")
-                .apellido("Lopez")
-                .obraSocial("OSDE")
-                .email("ana@mail.com")
-                .telefono("112233456")
-                .tipoPlanObraSocial("PlanA")
-                .fechaAlta(fecha)
-                .estado(true)
+                .dni(dni)
+                .nombre(nombre)
+                .apellido(apellido)
+                .obraSocial(obraSocial)
+                .email(email)
+                .telefono(telefono)
+                .tipoPlanObraSocial(tipoPlan)
+                .fechaAlta(fechaAlta)
+                .estado(estado)
                 .build();
 
         Paciente model = PacienteResponseMapper.toModel(dto);

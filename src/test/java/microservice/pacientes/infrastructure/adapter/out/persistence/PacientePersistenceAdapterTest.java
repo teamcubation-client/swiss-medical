@@ -14,10 +14,15 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatNoException;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 
 @ExtendWith(org.mockito.junit.jupiter.MockitoExtension.class)
 public class PacientePersistenceAdapterTest {
@@ -32,30 +37,54 @@ public class PacientePersistenceAdapterTest {
     private Paciente pacienteActivo, pacienteInactivo;
     private static final LocalDate FIXED_DATE = LocalDate.of(2025, 7, 30);
 
+
+    private static final Long idActivo = 1L;
+    private static final String dniActivo = "12345678";
+    private static final String nombreActivo = "Ana";
+    private static final String apellidoActivo = "Lopez";
+    private static final String obraSocialActivo = "OSDE";
+    private static final String emailActivo = "ana@mail.com";
+    private static final String telefonoActivo = "112233456";
+    private static final String tipoPlanActivo = "PlanA";
+
+    private static final Long idInactivo = 2L;
+    private static final String dniInactivo = "23456789";
+    private static final String nombreInactivo = "Carlos";
+    private static final String apellidoInactivo = "Perez";
+    private static final String obraSocialInactivo = "OSDE";
+    private static final String emailInactivo = "carlos@mail.com";
+    private static final String telefonoInactivo = "22334455";
+    private static final String tipoPlanInactivo = "PlanB";
+
+    private static final String nombreParcialCorrecto = "an";
+    private static final String nombraParcialIncorrecto = "zzz";
+    private static final String dniInexistente = "11111111";
+    private static final Long idInexistente = 999L;
+
     @BeforeEach
     void setUp() {
         entidadActivo = PacienteEntity.builder()
-                .id(1L)
-                .dni("12345678")
-                .nombre("Ana")
-                .apellido("Lopez")
-                .obraSocial("OSDE")
-                .email("ana@mail.com")
-                .telefono("112233456")
-                .tipoPlanObraSocial("PlanA")
+                .id(idActivo)
+                .dni(dniActivo)
+                .nombre(nombreActivo)
+                .apellido(apellidoActivo)
+                .obraSocial(obraSocialActivo)
+                .email(emailActivo)
+                .telefono(telefonoActivo)
+                .tipoPlanObraSocial(tipoPlanActivo)
                 .fechaAlta(FIXED_DATE.minusDays(1))
                 .estado(true)
                 .build();
 
         entidadInactivo = PacienteEntity.builder()
-                .id(2L)
-                .dni("23456789")
-                .nombre("Carlos")
-                .apellido("Perez")
-                .obraSocial("OSDE")
-                .email("carlos@mail.com")
-                .telefono("22334455")
-                .tipoPlanObraSocial("PlanB")
+                .id(idInactivo)
+                .dni(dniInactivo)
+                .nombre(nombreInactivo)
+                .apellido(apellidoInactivo)
+                .obraSocial(obraSocialInactivo)
+                .email(emailInactivo)
+                .telefono(telefonoInactivo)
+                .tipoPlanObraSocial(tipoPlanInactivo)
                 .fechaAlta(FIXED_DATE.minusDays(1))
                 .estado(false)
                 .build();
@@ -66,100 +95,100 @@ public class PacientePersistenceAdapterTest {
 
     @Test
     void findByNombreContainingIgnoreCase() {
-        when(repositorio.findByNombreContainingIgnoreCase("an"))
+        when(repositorio.findByNombreContainingIgnoreCase(nombreParcialCorrecto))
                 .thenReturn(List.of(entidadActivo));
 
-        List<Paciente> out = adaptador.findByNombreContainingIgnoreCase("an");
+        List<Paciente> out = adaptador.findByNombreContainingIgnoreCase(nombreParcialCorrecto);
 
         assertThat(out)
                 .usingRecursiveFieldByFieldElementComparator()
                 .containsExactly(pacienteActivo);
 
-        verify(repositorio).findByNombreContainingIgnoreCase("an");
+        verify(repositorio).findByNombreContainingIgnoreCase(nombreParcialCorrecto);
     }
 
     @Test
     void findByNombreContainingIgnoreCase_vacio() {
-        when(repositorio.findByNombreContainingIgnoreCase("zzz"))
+        when(repositorio.findByNombreContainingIgnoreCase(nombraParcialIncorrecto))
                 .thenReturn(Collections.emptyList());
 
-        assertThat(adaptador.findByNombreContainingIgnoreCase("zzz")).isEmpty();
-        verify(repositorio).findByNombreContainingIgnoreCase("zzz");
+        assertThat(adaptador.findByNombreContainingIgnoreCase(nombraParcialIncorrecto)).isEmpty();
+        verify(repositorio).findByNombreContainingIgnoreCase(nombraParcialIncorrecto);
     }
 
     @Test
     void buscarByDni() {
-        when(repositorio.buscarByDni("12345678"))
+        when(repositorio.buscarByDni(dniActivo))
                 .thenReturn(Optional.of(entidadActivo));
 
-        Optional<Paciente> paciente = adaptador.buscarByDni("12345678");
+        Optional<Paciente> paciente = adaptador.buscarByDni(dniActivo);
 
         assertThat(paciente).isPresent();
         assertThat(paciente.get())
                 .usingRecursiveComparison()
                 .isEqualTo(pacienteActivo);
-        verify(repositorio).buscarByDni("12345678");
+        verify(repositorio).buscarByDni(dniActivo);
     }
 
     @Test
     void buscarByDni_vacio() {
-        when(repositorio.buscarByDni("11111111"))
+        when(repositorio.buscarByDni(dniInexistente))
                 .thenReturn(Optional.empty());
 
-        assertThat(adaptador.buscarByDni("11111111")).isEmpty();
-        verify(repositorio).buscarByDni("11111111");
+        assertThat(adaptador.buscarByDni(dniInexistente)).isEmpty();
+        verify(repositorio).buscarByDni(dniInexistente);
     }
 
     @Test
     void buscarByNombre() {
-        when(repositorio.buscarByNombre("Carlos"))
+        when(repositorio.buscarByNombre(nombreInactivo))
                 .thenReturn(List.of(entidadInactivo));
 
-        List<Paciente> paciente = adaptador.buscarByNombre("Carlos");
+        List<Paciente> paciente = adaptador.buscarByNombre(nombreInactivo);
 
         assertThat(paciente)
                 .usingRecursiveFieldByFieldElementComparator()
                 .containsExactly(pacienteInactivo);
 
-        verify(repositorio).buscarByNombre("Carlos");
+        verify(repositorio).buscarByNombre(nombreInactivo);
     }
 
     @Test
     void buscarPorObraSocialPaginado() {
-        when(repositorio.buscarPorObraSocialPaginado("OSDE", 5, 0))
+        when(repositorio.buscarPorObraSocialPaginado(obraSocialActivo, 5, 0))
                 .thenReturn(List.of(entidadActivo, entidadInactivo));
 
-        List<Paciente> resultado = adaptador.buscarPorObraSocialPaginado("OSDE", 5, 0);
+        List<Paciente> resultado = adaptador.buscarPorObraSocialPaginado(obraSocialActivo, 5, 0);
 
         assertThat(resultado)
                 .hasSize(2)
                 .usingRecursiveFieldByFieldElementComparator()
                 .containsExactly(pacienteActivo, pacienteInactivo);
 
-        verify(repositorio).buscarPorObraSocialPaginado("OSDE", 5, 0);
+        verify(repositorio).buscarPorObraSocialPaginado(obraSocialActivo, 5, 0);
     }
 
 
     @Test
     void findById_existeId() {
-        when(repositorio.findById(2L)).thenReturn(Optional.of(entidadInactivo));
+        when(repositorio.findById(idInactivo)).thenReturn(Optional.of(entidadInactivo));
 
-        Optional<Paciente> opt = adaptador.findById(2L);
+        Optional<Paciente> opt = adaptador.findById(idInactivo);
 
         assertThat(opt).isPresent();
         assertThat(opt.get())
                 .usingRecursiveComparison()
                 .isEqualTo(pacienteInactivo);
 
-        verify(repositorio).findById(2L);
+        verify(repositorio).findById(idInactivo);
     }
 
     @Test
     void findById_vacio() {
-        when(repositorio.findById(99L)).thenReturn(Optional.empty());
+        when(repositorio.findById(idInexistente)).thenReturn(Optional.empty());
 
-        assertThat(adaptador.findById(99L)).isEmpty();
-        verify(repositorio).findById(99L);
+        assertThat(adaptador.findById(idInexistente)).isEmpty();
+        verify(repositorio).findById(idInexistente);
     }
 
 
@@ -206,10 +235,10 @@ public class PacientePersistenceAdapterTest {
 
     @Test
     void update_existePacienteNombreEstado() {
-        when(repositorio.findById(1L)).thenReturn(Optional.of(entidadActivo));
+        when(repositorio.findById(idActivo)).thenReturn(Optional.of(entidadActivo));
 
         Paciente cambios = Paciente.builder()
-                .id(1L).nombre("Ana Modificado")
+                .id(idActivo).nombre("Ana Modificado")
                 .estado(false).build();
 
         Paciente paciente = adaptador.update(cambios);
@@ -221,7 +250,7 @@ public class PacientePersistenceAdapterTest {
     @Test
     void update_pacienteCampos() {
 
-        when(repositorio.findById(2L)).thenReturn(Optional.of(entidadInactivo));
+        when(repositorio.findById(idInactivo)).thenReturn(Optional.of(entidadInactivo));
 
         Paciente cambios = Paciente.builder()
                 .id(2L)
@@ -252,15 +281,15 @@ public class PacientePersistenceAdapterTest {
 
     @Test
     void update_noExistePaciente() {
-        when(repositorio.findById(99L)).thenReturn(Optional.empty());
+        when(repositorio.findById(idInexistente)).thenReturn(Optional.empty());
 
         Paciente paciente = Paciente.builder()
-                .id(99L)
+                .id(idInexistente)
                 .build();
 
         assertThatThrownBy(() -> adaptador.update(paciente))
                 .isInstanceOf(PacienteNotFoundException.class)
-                .hasMessageContaining("99");
+                .hasMessageContaining(String.valueOf(idInexistente));
     }
 
     @Test
@@ -271,8 +300,8 @@ public class PacientePersistenceAdapterTest {
 
     @Test
     void deleteById_NoExisteId() {
-        assertThatNoException().isThrownBy(() -> adaptador.deleteById(99L));
-        verify(repositorio).deleteById(99L);
+        assertThatNoException().isThrownBy(() -> adaptador.deleteById(idInexistente));
+        verify(repositorio).deleteById(idInexistente);
     }
 
     @Test
