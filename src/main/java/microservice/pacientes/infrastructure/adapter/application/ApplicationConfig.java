@@ -1,8 +1,10 @@
 package microservice.pacientes.infrastructure.adapter.application;
 
+import microservice.pacientes.application.domain.port.out.LoggerPort;
 import microservice.pacientes.application.domain.validator.PacienteValidator;
 import microservice.pacientes.application.domain.validator.PacienteValidatorImpl;
 import microservice.pacientes.application.domain.validator.rules.*;
+import microservice.pacientes.infrastructure.adapter.out.logger.LoggerImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -22,5 +24,10 @@ public class ApplicationConfig {
                         new TelefonoValidatorRule()
                 )
         );
+    }
+
+    @Bean
+    public LoggerPort createLoggerPort() {
+        return new LoggerImpl();
     }
 }

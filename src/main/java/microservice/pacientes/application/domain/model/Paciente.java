@@ -18,4 +18,15 @@ public class Paciente {
     private String obraSocial;
     private String email;
     private String telefono;
+
+    public String toString() {
+        return "Paciente{" +
+                "dni='" + dni + '\'' +
+                ", nombre='" + nombre + '\'' +
+                ", apellido='" + apellido + '\'' +
+                ", obraSocial='" + obraSocial + '\'' +
+                ", email='" + email + '\'' +
+                ", telefono='" + telefono + '\'' +
+                '}';
+    }
 }
