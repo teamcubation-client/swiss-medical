@@ -1,23 +1,27 @@
 package com.swissmedical.patients.application.service;
 
+import com.swissmedical.patients.application.domain.command.CreatePatientCommand;
+import com.swissmedical.patients.application.domain.command.UpdatePatientCommand;
+import com.swissmedical.patients.application.domain.command.mapper.CreatePatientMapper;
 import com.swissmedical.patients.application.domain.model.Patient;
 import com.swissmedical.patients.application.domain.ports.in.*;
 import com.swissmedical.patients.application.domain.ports.out.PatientRepositoryPort;
+import com.swissmedical.patients.application.domain.ports.out.PatientUpdater;
 import com.swissmedical.patients.shared.exceptions.PatientDuplicateException;
 import com.swissmedical.patients.shared.exceptions.PatientNotFoundException;
 import com.swissmedical.patients.shared.utils.ErrorMessages;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@AllArgsConstructor
 public class PatientService implements ReadPatientUseCase, CreatePatientUseCase, UpdatePatientUseCase, DeletePatientUseCase {
 
   private final PatientRepositoryPort patientRepository;
-
-  public PatientService(PatientRepositoryPort patientRepository) {
-    this.patientRepository = patientRepository;
-  }
+  private final CreatePatientMapper createPatientMapper;
+  private final PatientUpdater patientUpdater;
 
   @Override
   public List<Patient> getAll(String name, int page, int size) {
@@ -56,7 +60,8 @@ public class PatientService implements ReadPatientUseCase, CreatePatientUseCase,
   }
 
   @Override
-  public Patient create(Patient patient) {
+  public Patient create(CreatePatientCommand command) {
+    Patient patient = createPatientMapper.toPatient(command);
     if (patientRepository.existsByDni(patient.getDni())) {
       throw new PatientDuplicateException(String.format(ErrorMessages.PATIENT_DNI_DUPLICATE, patient.getDni()));
     }
@@ -69,16 +74,11 @@ public class PatientService implements ReadPatientUseCase, CreatePatientUseCase,
   }
 
   @Override
-  public Patient update(Long id, Patient patientDetails) {
+  public Patient update(Long id, UpdatePatientCommand updatePacienteCommand) {
     Patient existingPatient = patientRepository.findById(id)
             .orElseThrow(() -> new PatientNotFoundException(String.format(ErrorMessages.PATIENT_NOT_FOUND_BY_ID, id)));
 
-    existingPatient.setFirstName(patientDetails.getFirstName());
-    existingPatient.setLastName(patientDetails.getLastName());
-    existingPatient.setEmail(patientDetails.getEmail());
-    existingPatient.setPhoneNumber(patientDetails.getPhoneNumber());
-    existingPatient.setDni(patientDetails.getDni());
-    existingPatient.setSocialSecurity(patientDetails.getSocialSecurity());
+    patientUpdater.update(updatePacienteCommand, existingPatient);
 
     return patientRepository.save(existingPatient);
   }

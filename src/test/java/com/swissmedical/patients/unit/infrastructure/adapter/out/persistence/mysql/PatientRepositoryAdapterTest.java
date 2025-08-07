@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
@@ -31,6 +32,9 @@ public class PatientRepositoryAdapterTest {
 
   @InjectMocks
   private PatientRepositoryAdapter patientRepositoryAdapter;
+
+  @Spy
+  private PatientEntityMapper patientEntityMapper;
 
   private Patient patientJohn;
   private Patient patientJane;
@@ -65,8 +69,8 @@ public class PatientRepositoryAdapterTest {
   @Test
   public void testFindAll() {
     when(patientJpaRepository.findAll(anyInt(), anyInt())).thenReturn(List.of(
-            PatientEntityMapper.toEntity(patientJohn),
-            PatientEntityMapper.toEntity(patientJane)
+            patientEntityMapper.toEntity(patientJohn),
+            patientEntityMapper.toEntity(patientJane)
     ));
 
     Deque<Patient> patients = new LinkedList<>(patientRepositoryAdapter.findAll(10, 0));
@@ -90,7 +94,7 @@ public class PatientRepositoryAdapterTest {
   @Test
   public void testFindByFirstName() {
     when(patientJpaRepository.findByFirstName(TestConstants.FIRST_NAME)).thenReturn(List.of(
-            PatientEntityMapper.toEntity(patientJohn)
+            patientEntityMapper.toEntity(patientJohn)
     ));
 
     Deque<Patient> patients = new LinkedList<>(patientRepositoryAdapter.findByFirstName(TestConstants.FIRST_NAME));
@@ -113,7 +117,7 @@ public class PatientRepositoryAdapterTest {
   @Test
   public void testFindBySocialSecurity() {
     when(patientJpaRepository.findBySocialSecurity(TestConstants.SOCIAL_SECURITY, 10, 0)).thenReturn(List.of(
-            PatientEntityMapper.toEntity(patientJohn)
+            patientEntityMapper.toEntity(patientJohn)
     ));
 
     Deque<Patient> patients =
@@ -142,7 +146,7 @@ public class PatientRepositoryAdapterTest {
   @Test
   public void testFindByDni() {
     when(patientJpaRepository.findByDni(TestConstants.DNI)).thenReturn(
-            Optional.of(PatientEntityMapper.toEntity(patientJohn))
+            Optional.of(patientEntityMapper.toEntity(patientJohn))
     );
 
     Optional<Patient> patient = patientRepositoryAdapter.findByDni(TestConstants.DNI);
@@ -165,7 +169,7 @@ public class PatientRepositoryAdapterTest {
   @Test
   public void testFindById() {
     when(patientJpaRepository.findById(TestConstants.ID)).thenReturn(
-            Optional.of(PatientEntityMapper.toEntity(patientJohn))
+            Optional.of(patientEntityMapper.toEntity(patientJohn))
     );
 
     Optional<Patient> patient = patientRepositoryAdapter.findById(TestConstants.ID);
@@ -247,19 +251,19 @@ public class PatientRepositoryAdapterTest {
 
   @Test
   public void testSave() {
-    when(patientJpaRepository.save(PatientEntityMapper.toEntity(patientJohn)))
-            .thenReturn(PatientEntityMapper.toEntity(patientJohn));
+    when(patientJpaRepository.save(patientEntityMapper.toEntity(patientJohn)))
+            .thenReturn(patientEntityMapper.toEntity(patientJohn));
 
     Patient savedPatient = patientRepositoryAdapter.save(patientJohn);
 
     assertEquals(TestConstants.DNI, savedPatient.getDni());
     assertEquals(TestConstants.EMAIL, savedPatient.getEmail());
-    verify(patientJpaRepository, times(1)).save(PatientEntityMapper.toEntity(patientJohn));
+    verify(patientJpaRepository, times(1)).save(patientEntityMapper.toEntity(patientJohn));
   }
 
   @Test
   public void testSaveWithDuplicateDni() {
-    when(patientJpaRepository.save(PatientEntityMapper.toEntity(patientJohn)))
+    when(patientJpaRepository.save(patientEntityMapper.toEntity(patientJohn)))
             .thenThrow(new RuntimeException("Duplicate DNI"));
 
     assertThrows(RuntimeException.class, () -> patientRepositoryAdapter.save(patientJohn));
@@ -269,7 +273,7 @@ public class PatientRepositoryAdapterTest {
   public void testUpdate() {
     when(patientJpaRepository.existsById(anyLong())).thenReturn(true);
     when(patientJpaRepository.save(any()))
-            .thenReturn(PatientEntityMapper.toEntity(patientJohn));
+            .thenReturn(patientEntityMapper.toEntity(patientJohn));
 
     Patient updatedPatient = patientRepositoryAdapter.update(TestConstants.ID, patientJohn);
 

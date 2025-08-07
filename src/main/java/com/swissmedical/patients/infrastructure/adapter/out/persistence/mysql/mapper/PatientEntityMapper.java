@@ -1,26 +1,32 @@
 package com.swissmedical.patients.infrastructure.adapter.out.persistence.mysql.mapper;
 
+import com.swissmedical.patients.application.domain.factory.PatientFactory;
 import com.swissmedical.patients.application.domain.model.Patient;
 import com.swissmedical.patients.infrastructure.adapter.out.persistence.mysql.entity.PatientEntity;
+import lombok.AllArgsConstructor;
+import org.springframework.stereotype.Component;
 
+@AllArgsConstructor
+@Component
 public class PatientEntityMapper {
 
-  public static Patient toDomain(PatientEntity patientEntity) {
-    return Patient.builder()
-            .id(patientEntity.getId())
-            .firstName(patientEntity.getFirstName())
-            .lastName(patientEntity.getLastName())
-            .email(patientEntity.getEmail())
-            .phoneNumber(patientEntity.getPhoneNumber())
-            .dni(patientEntity.getDni())
-            .memberNumber(patientEntity.getMemberNumber())
-            .birthDate(patientEntity.getBirthDate())
-            .isActive(patientEntity.isActive())
-            .socialSecurity(patientEntity.getSocialSecurity())
-            .build();
+  private final PatientFactory patientFactory;
+
+  public Patient toDomain(PatientEntity patientEntity) {
+    return patientFactory.create(
+            patientEntity.getId(),
+            patientEntity.getFirstName(),
+            patientEntity.getLastName(),
+            patientEntity.getEmail(),
+            patientEntity.getPhoneNumber(),
+            patientEntity.getDni(),
+            patientEntity.getMemberNumber(),
+            patientEntity.getBirthDate(),
+            patientEntity.isActive(),
+            patientEntity.getSocialSecurity());
   }
 
-  public static PatientEntity toEntity(Patient patient) {
+  public PatientEntity toEntity(Patient patient) {
     return PatientEntity.builder()
             .id(patient.getId())
             .firstName(patient.getFirstName())

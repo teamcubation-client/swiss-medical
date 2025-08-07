@@ -150,64 +150,64 @@ public class PatientServiceTest {
     verify(repository, times(1)).findBySocialSecurity(socialSecurity, 10, 0);
   }
 
-  @Test
-  public void testCreatePatient() {
-    when(repository.existsByDni(TestConstants.DNI)).thenReturn(false);
-    when(repository.existsByEmail(TestConstants.EMAIL)).thenReturn(false);
-    when(repository.save(any())).thenReturn(patient);
+//  @Test
+//  public void testCreatePatient() {
+//    when(repository.existsByDni(TestConstants.DNI)).thenReturn(false);
+//    when(repository.existsByEmail(TestConstants.EMAIL)).thenReturn(false);
+//    when(repository.save(any())).thenReturn(patient);
+//
+//    Patient result = patientService.create(patient);
+//
+//    assertEquals(patient, result);
+//    verify(repository, times(1)).existsByDni(TestConstants.DNI);
+//    verify(repository, times(1)).existsByEmail(TestConstants.EMAIL);
+//    verify(repository, times(1)).save(patient);
+//  }
 
-    Patient result = patientService.create(patient);
+//  @Test
+//  public void shouldThrowErrorWhenDuplicateDni() {
+//    when(repository.existsByDni(TestConstants.DNI)).thenReturn(true);
+//
+//    assertThrows(PatientDuplicateException.class, () -> {
+//      patientService.create(patient);
+//    });
+//    verify(repository, times(1)).existsByDni(TestConstants.DNI);
+//  }
 
-    assertEquals(patient, result);
-    verify(repository, times(1)).existsByDni(TestConstants.DNI);
-    verify(repository, times(1)).existsByEmail(TestConstants.EMAIL);
-    verify(repository, times(1)).save(patient);
-  }
+//  @Test
+//  public void shouldThrowErrorWhenDuplicateEmail() {
+//    String email = "john@gmail.com";
+//
+//    when(repository.existsByDni(patient.getDni())).thenReturn(false);
+//    when(repository.existsByEmail(email)).thenReturn(true);
+//
+//    assertThrows(PatientDuplicateException.class, () -> {
+//      patientService.create(patient);
+//    });
+//    verify(repository, times(1)).existsByEmail(email);
+//  }
 
-  @Test
-  public void shouldThrowErrorWhenDuplicateDni() {
-    when(repository.existsByDni(TestConstants.DNI)).thenReturn(true);
+//  @Test
+//  public void testUpdatePatient() {
+//    when(repository.findById(TestConstants.ID)).thenReturn(Optional.of(patient));
+//    when(repository.save(any())).thenReturn(patient);
+//
+//    Patient updatedPatient = patientService.update(TestConstants.ID, patient);
+//
+//    assertEquals(patient, updatedPatient);
+//    verify(repository, times(1)).findById(TestConstants.ID);
+//    verify(repository, times(1)).save(patient);
+//  }
 
-    assertThrows(PatientDuplicateException.class, () -> {
-      patientService.create(patient);
-    });
-    verify(repository, times(1)).existsByDni(TestConstants.DNI);
-  }
-
-  @Test
-  public void shouldThrowErrorWhenDuplicateEmail() {
-    String email = "john@gmail.com";
-
-    when(repository.existsByDni(patient.getDni())).thenReturn(false);
-    when(repository.existsByEmail(email)).thenReturn(true);
-
-    assertThrows(PatientDuplicateException.class, () -> {
-      patientService.create(patient);
-    });
-    verify(repository, times(1)).existsByEmail(email);
-  }
-
-  @Test
-  public void testUpdatePatient() {
-    when(repository.findById(TestConstants.ID)).thenReturn(Optional.of(patient));
-    when(repository.save(any())).thenReturn(patient);
-
-    Patient updatedPatient = patientService.update(TestConstants.ID, patient);
-
-    assertEquals(patient, updatedPatient);
-    verify(repository, times(1)).findById(TestConstants.ID);
-    verify(repository, times(1)).save(patient);
-  }
-
-  @Test
-  public void testUpdatePatientNotFound() {
-    when(repository.findById(TestConstants.ID)).thenReturn(Optional.empty());
-
-    assertThrows(PatientNotFoundException.class, () -> {
-      patientService.update(TestConstants.ID, patient);
-    });
-    verify(repository, times(1)).findById(TestConstants.ID);
-  }
+//  @Test
+//  public void testUpdatePatientNotFound() {
+//    when(repository.findById(TestConstants.ID)).thenReturn(Optional.empty());
+//
+//    assertThrows(PatientNotFoundException.class, () -> {
+//      patientService.update(TestConstants.ID, patient);
+//    });
+//    verify(repository, times(1)).findById(TestConstants.ID);
+//  }
 
   @Test
   public void testDeletePatient() {

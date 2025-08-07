@@ -1,11 +1,23 @@
 package com.swissmedical.patients.infrastructure.adapter.in.rest.mapper;
 
+import com.swissmedical.patients.application.domain.command.UpdatePatientCommand;
 import com.swissmedical.patients.application.domain.model.Patient;
 import com.swissmedical.patients.infrastructure.adapter.in.rest.dto.PatientUpdateDto;
 
 import java.time.LocalDate;
 
 public class PatientUpdateMapper {
+
+  public static UpdatePatientCommand toCommand(PatientUpdateDto patientUpdateDto) {
+      return new UpdatePatientCommand(
+              patientUpdateDto.getFirstName(),
+              patientUpdateDto.getLastName(),
+              patientUpdateDto.getEmail(),
+              patientUpdateDto.getPhoneNumber(),
+              patientUpdateDto.getDni(),
+              patientUpdateDto.getSocialSecurity()
+      );
+  }
 
   public static Patient toDomain(PatientUpdateDto patientUpdateDto) {
     return Patient.builder()

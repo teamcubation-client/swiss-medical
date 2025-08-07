@@ -14,15 +14,17 @@ import java.util.Optional;
 public class PatientRepositoryAdapter implements PatientRepositoryPort {
 
   private final PatientJpaRepository patientJpaRepository;
+  private final PatientEntityMapper patientEntityMapper;
 
-  public PatientRepositoryAdapter(PatientJpaRepository patientJpaRepository) {
+  public PatientRepositoryAdapter(PatientJpaRepository patientJpaRepository, PatientEntityMapper patientEntityMapper) {
     this.patientJpaRepository = patientJpaRepository;
+    this.patientEntityMapper = patientEntityMapper;
   }
 
   @Override
   public Patient save(Patient patient) {
-    PatientEntity savedEntity = patientJpaRepository.save(PatientEntityMapper.toEntity(patient));
-    return PatientEntityMapper.toDomain(savedEntity);
+    PatientEntity savedEntity = patientJpaRepository.save(patientEntityMapper.toEntity(patient));
+    return patientEntityMapper.toDomain(savedEntity);
   }
 
   @Override
@@ -31,8 +33,8 @@ public class PatientRepositoryAdapter implements PatientRepositoryPort {
       throw new PatientNotFoundException("Patient with ID " + id + " does not exist.");
     }
     patient.setId(id);
-    PatientEntity updatedEntity = patientJpaRepository.save(PatientEntityMapper.toEntity(patient));
-    return PatientEntityMapper.toDomain(updatedEntity);
+    PatientEntity updatedEntity = patientJpaRepository.save(patientEntityMapper.toEntity(patient));
+    return patientEntityMapper.toDomain(updatedEntity);
   }
 
   @Override
@@ -62,27 +64,27 @@ public class PatientRepositoryAdapter implements PatientRepositoryPort {
   public List<Patient> findAll(int limit, int offset) {
     return patientJpaRepository.findAll(limit, offset)
             .stream()
-            .map(PatientEntityMapper::toDomain)
+            .map(patientEntityMapper::toDomain)
             .toList();
   }
 
   @Override
   public Optional<Patient> findByDni(String dni) {
     return patientJpaRepository.findByDni(dni)
-            .map(PatientEntityMapper::toDomain);
+            .map(patientEntityMapper::toDomain);
   }
 
   @Override
   public Optional<Patient> findById(Long id) {
     return patientJpaRepository.findById(id)
-            .map(PatientEntityMapper::toDomain);
+            .map(patientEntityMapper::toDomain);
   }
 
   @Override
   public List<Patient> findByFirstName(String firstName) {
     return patientJpaRepository.findByFirstName(firstName)
             .stream()
-            .map(PatientEntityMapper::toDomain)
+            .map(patientEntityMapper::toDomain)
             .toList();
   }
 
@@ -90,7 +92,7 @@ public class PatientRepositoryAdapter implements PatientRepositoryPort {
   public List<Patient> findBySocialSecurity(String socialSecurity, int limit, int offset) {
     return patientJpaRepository.findBySocialSecurity(socialSecurity, limit, offset)
             .stream()
-            .map(PatientEntityMapper::toDomain)
+            .map(patientEntityMapper::toDomain)
             .toList();
   }
 }

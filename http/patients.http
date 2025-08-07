@@ -20,7 +20,7 @@ Content-Type: application/json
   "lastName": "Doe",
   "dni": "40128092",
   "email": "john@gmail.com",
-  "phoneNumber": "1234567890",
+  "phoneNumber": "111-2345",
   "socialSecurity": "Swiss Medical",
   "memberNumber": "1234567851",
    "birthDate": "1990-01-01"
@@ -36,7 +36,7 @@ Content-Type: application/json
   "lastName": "Doe",
   "dni": "40128095",
   "email": "john123@gmail.com",
-  "phoneNumber": "1234567890",
+  "phoneNumber": "111-1234",
   "socialSecurity": "Swiss Medical"
 }
 

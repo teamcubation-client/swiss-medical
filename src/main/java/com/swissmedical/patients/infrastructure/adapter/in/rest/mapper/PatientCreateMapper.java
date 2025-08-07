@@ -1,5 +1,6 @@
 package com.swissmedical.patients.infrastructure.adapter.in.rest.mapper;
 
+import com.swissmedical.patients.application.domain.command.CreatePatientCommand;
 import com.swissmedical.patients.application.domain.model.Patient;
 import com.swissmedical.patients.infrastructure.adapter.in.rest.dto.PatientCreateDto;
 
@@ -7,6 +8,19 @@ import java.time.LocalDate;
 
 public class PatientCreateMapper {
 
+  public static CreatePatientCommand toCommand(PatientCreateDto patientCreateDto) {
+    return new CreatePatientCommand(
+            patientCreateDto.getFirstName(),
+            patientCreateDto.getLastName(),
+            patientCreateDto.getEmail(),
+            patientCreateDto.getPhoneNumber(),
+            patientCreateDto.getDni(),
+            patientCreateDto.getMemberNumber(),
+            LocalDate.parse(patientCreateDto.getBirthDate()),
+            patientCreateDto.isActive(),
+            patientCreateDto.getSocialSecurity()
+    );
+  }
   public static Patient toDomain(PatientCreateDto patientCreateDto) {
     return Patient.builder()
             .firstName(patientCreateDto.getFirstName())

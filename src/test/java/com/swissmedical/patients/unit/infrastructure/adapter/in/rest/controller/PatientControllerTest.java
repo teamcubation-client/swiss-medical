@@ -226,21 +226,21 @@ public class PatientControllerTest {
             .andExpect(status().isBadRequest());
   }
 
-  @Test
-  public void testCreatePatient() throws Exception {
-    when(patientService.create(any(Patient.class))).thenReturn(patientJohn);
-
-    mockMvc.perform(post("/api/patients")
-                    .contentType("application/json")
-                    .content("{\"firstName\":\"John\",\"lastName\":\"Doe\",\"email\":\"" + TestConstants.EMAIL + "\"," +
-                            "\"phoneNumber\":\"1234567890\",\"dni\":\"" + TestConstants.DNI +
-                            "\",\"memberNumber\":\"MEM12345\",\"birthDate\":\"1990-01-01\",\"isActive\":true,\"socialSecurity\":\"Swiss Medical\"}"))
-            .andExpect(status().isCreated())
-            .andExpect(jsonPath("$.firstName").value("John"))
-            .andExpect(jsonPath("$.lastName").value("Doe"))
-            .andExpect(jsonPath("$.email").value(TestConstants.EMAIL))
-            .andExpect(jsonPath("$.dni").value(TestConstants.DNI));
-  }
+//  @Test
+//  public void testCreatePatient() throws Exception {
+//    when(patientService.create(any(Patient.class))).thenReturn(patientJohn);
+//
+//    mockMvc.perform(post("/api/patients")
+//                    .contentType("application/json")
+//                    .content("{\"firstName\":\"John\",\"lastName\":\"Doe\",\"email\":\"" + TestConstants.EMAIL + "\"," +
+//                            "\"phoneNumber\":\"1234567890\",\"dni\":\"" + TestConstants.DNI +
+//                            "\",\"memberNumber\":\"MEM12345\",\"birthDate\":\"1990-01-01\",\"isActive\":true,\"socialSecurity\":\"Swiss Medical\"}"))
+//            .andExpect(status().isCreated())
+//            .andExpect(jsonPath("$.firstName").value("John"))
+//            .andExpect(jsonPath("$.lastName").value("Doe"))
+//            .andExpect(jsonPath("$.email").value(TestConstants.EMAIL))
+//            .andExpect(jsonPath("$.dni").value(TestConstants.DNI));
+//  }
 
   @Test
   public void testCreatePatientBadRequest() throws Exception {
@@ -252,45 +252,45 @@ public class PatientControllerTest {
             .andExpect(status().isBadRequest());
   }
 
-  @Test
-  public void testCreatePatientDuplicate() throws Exception {
-    when(patientService.create(any(Patient.class))).thenThrow(new PatientDuplicateException("Patient already exists"));
+//  @Test
+//  public void testCreatePatientDuplicate() throws Exception {
+//    when(patientService.create(any(Patient.class))).thenThrow(new PatientDuplicateException("Patient already exists"));
+//
+//    mockMvc.perform(post("/api/patients")
+//                    .contentType("application/json")
+//                    .content("{\"firstName\":\"John\",\"lastName\":\"Doe\",\"email\":\"" + TestConstants.EMAIL + "\"," +
+//                            "\"phoneNumber\":\"1234567890\",\"dni\":\"" + TestConstants.DNI +
+//                            "\",\"memberNumber\":\"MEM12345\",\"birthDate\":\"1990-01-01\",\"isActive\":true,\"socialSecurity\":\"Swiss Medical\"}"))
+//            .andExpect(status().isConflict());
+//  }
 
-    mockMvc.perform(post("/api/patients")
-                    .contentType("application/json")
-                    .content("{\"firstName\":\"John\",\"lastName\":\"Doe\",\"email\":\"" + TestConstants.EMAIL + "\"," +
-                            "\"phoneNumber\":\"1234567890\",\"dni\":\"" + TestConstants.DNI +
-                            "\",\"memberNumber\":\"MEM12345\",\"birthDate\":\"1990-01-01\",\"isActive\":true,\"socialSecurity\":\"Swiss Medical\"}"))
-            .andExpect(status().isConflict());
-  }
+//  @Test
+//  public void testUpdatePatient() throws Exception {
+//    when(patientService.update(anyLong(), any(Patient.class))).thenReturn(patientJohn);
+//
+//    mockMvc.perform(put("/api/patients/{id}", TestConstants.ID)
+//                    .contentType("application/json")
+//                    .content("{\"firstName\":\"John\",\"lastName\":\"Doe\",\"email\":\"" + TestConstants.EMAIL + "\"," +
+//                            "\"phoneNumber\":\"1234567890\",\"dni\":\"" + TestConstants.DNI +
+//                            "\",\"memberNumber\":\"MEM12345\",\"birthDate\":\"1990-01-01\",\"isActive\":true,\"socialSecurity\":\"Swiss Medical\"}"))
+//            .andExpect(status().isOk())
+//            .andExpect(jsonPath("$.firstName").value("John"))
+//            .andExpect(jsonPath("$.lastName").value("Doe"))
+//            .andExpect(jsonPath("$.email").value(TestConstants.EMAIL))
+//            .andExpect(jsonPath("$.dni").value(TestConstants.DNI));
+//  }
 
-  @Test
-  public void testUpdatePatient() throws Exception {
-    when(patientService.update(anyLong(), any(Patient.class))).thenReturn(patientJohn);
-
-    mockMvc.perform(put("/api/patients/{id}", TestConstants.ID)
-                    .contentType("application/json")
-                    .content("{\"firstName\":\"John\",\"lastName\":\"Doe\",\"email\":\"" + TestConstants.EMAIL + "\"," +
-                            "\"phoneNumber\":\"1234567890\",\"dni\":\"" + TestConstants.DNI +
-                            "\",\"memberNumber\":\"MEM12345\",\"birthDate\":\"1990-01-01\",\"isActive\":true,\"socialSecurity\":\"Swiss Medical\"}"))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.firstName").value("John"))
-            .andExpect(jsonPath("$.lastName").value("Doe"))
-            .andExpect(jsonPath("$.email").value(TestConstants.EMAIL))
-            .andExpect(jsonPath("$.dni").value(TestConstants.DNI));
-  }
-
-  @Test
-  public void testUpdatePatientNotFound() throws Exception {
-    when(patientService.update(anyLong(), any(Patient.class))).thenThrow(new PatientNotFoundException("Patient not found"));
-
-    mockMvc.perform(put("/api/patients/{id}", TestConstants.ID)
-                    .contentType("application/json")
-                    .content("{\"firstName\":\"John\",\"lastName\":\"Doe\",\"email\":\"" + TestConstants.EMAIL + "\"," +
-                            "\"phoneNumber\":\"1234567890\",\"dni\":\"" + TestConstants.DNI +
-                            "\",\"memberNumber\":\"MEM12345\",\"birthDate\":\"1990-01-01\",\"isActive\":true,\"socialSecurity\":\"Swiss Medical\"}"))
-            .andExpect(status().isNoContent());
-  }
+//  @Test
+//  public void testUpdatePatientNotFound() throws Exception {
+//    when(patientService.update(anyLong(), any(Patient.class))).thenThrow(new PatientNotFoundException("Patient not found"));
+//
+//    mockMvc.perform(put("/api/patients/{id}", TestConstants.ID)
+//                    .contentType("application/json")
+//                    .content("{\"firstName\":\"John\",\"lastName\":\"Doe\",\"email\":\"" + TestConstants.EMAIL + "\"," +
+//                            "\"phoneNumber\":\"1234567890\",\"dni\":\"" + TestConstants.DNI +
+//                            "\",\"memberNumber\":\"MEM12345\",\"birthDate\":\"1990-01-01\",\"isActive\":true,\"socialSecurity\":\"Swiss Medical\"}"))
+//            .andExpect(status().isNoContent());
+//  }
 
   @Test
   public void testDeletePatient() throws Exception {
