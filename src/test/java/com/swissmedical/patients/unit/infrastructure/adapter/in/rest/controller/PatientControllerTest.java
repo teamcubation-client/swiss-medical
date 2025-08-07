@@ -3,7 +3,6 @@ package com.swissmedical.patients.unit.infrastructure.adapter.in.rest.controller
 import com.swissmedical.patients.application.domain.model.Patient;
 import com.swissmedical.patients.application.service.PatientService;
 import com.swissmedical.patients.infrastructure.adapter.in.rest.controller.PatientController;
-import com.swissmedical.patients.shared.exceptions.GlobalHandlerException;
 import com.swissmedical.patients.shared.exceptions.PatientDuplicateException;
 import com.swissmedical.patients.shared.exceptions.PatientNotFoundException;
 import com.swissmedical.patients.unit.shared.utils.TestConstants;
@@ -11,9 +10,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
