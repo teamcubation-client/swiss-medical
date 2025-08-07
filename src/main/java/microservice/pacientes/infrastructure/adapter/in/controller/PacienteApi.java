@@ -1,23 +1,43 @@
 package microservice.pacientes.infrastructure.adapter.in.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 import java.util.List;
 import static microservice.pacientes.infrastructure.adapter.in.controller.ApiResponseConst.*;
 
 
 public interface PacienteApi {
-    @Operation(summary = "Listar pacientes", description = "Lista todos los pacientes en el sistema", tags = {"Paciente"})
+    @Operation(
+            summary = "Listar pacientes",
+            description = "Devuelve todos los pacientes registrados en el sistema. " +
+                    "Opcionalmente puede filtrar por estado (activos o inactivos).",
+            tags = {"Paciente"}
+    )
     @ApiResponses(value = {
-        @ApiResponse(responseCode = CODE_OK, description = DESC_LIST),
-        @ApiResponse(responseCode = CODE_INTERNAL_SERVER_ERROR, description = DESC_INTERNAL_ERROR)
+            @ApiResponse(responseCode = CODE_OK, description = DESC_LIST),
+            @ApiResponse(responseCode = CODE_INTERNAL_SERVER_ERROR, description = DESC_INTERNAL_ERROR)
     })
     @GetMapping
-    ResponseEntity<List<PacienteDTO>> listarPacientes();
+    ResponseEntity<List<PacienteDTO>> listarPacientes(
+            @Parameter(
+                    description = "Filtra por estado: true para activos, false para inactivos. Si se omite, devuelve todos.",
+                    example = "true"
+            )
+            @RequestParam(name = "estado", required = false) Boolean estado
+    );
 
 
     @Operation(summary = "Crear un nuevo paciente", description = "Registra un nuevo paciente en el sistema", tags = {"Paciente"})
@@ -89,29 +109,12 @@ public interface PacienteApi {
     ResponseEntity<PacienteDTO> desactivarPaciente(@PathVariable Long id);
 
 
-    @Operation(summary = "Listar pacientes activos", description = "Lista todos los pacientes con estado activo", tags = {"Paciente"})
+    @Operation(summary = "Buscar pacientes por DNI", description = "Buscar a un paciente por dni usando stores procedures", tags = {"Paciente"})
     @ApiResponses(value = {
         @ApiResponse(responseCode = CODE_OK, description = DESC_LIST_ACTIVATED),
         @ApiResponse(responseCode = CODE_INTERNAL_SERVER_ERROR, description =  DESC_INTERNAL_ERROR)
     })
-    @GetMapping("/activos")
-    ResponseEntity<List<PacienteDTO>> listarPacientesActivos();
 
-
-    @Operation(summary = "Listar pacientes inactivos", description = "Lista todos los pacientes con estado inactivo", tags = {"Paciente"})
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = CODE_OK, description = DESC_LIST_DEACTIVATED),
-        @ApiResponse(responseCode = CODE_INTERNAL_SERVER_ERROR, description =  DESC_INTERNAL_ERROR)
-    })
-    @GetMapping("/inactivos")
-    ResponseEntity<List<PacienteDTO>> listarPacientesInactivos();
-
-    @Operation(summary = "Buscar paciente por DNI (SP)", description = "Busca un paciente por DNI usando stored procedure", tags = {"Stored Procedure"})
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = CODE_OK, description = DESC_OK),
-        @ApiResponse(responseCode = CODE_NOT_FOUND, description = DESC_NOT_FOUND_DNI),
-        @ApiResponse(responseCode = CODE_INTERNAL_SERVER_ERROR, description = DESC_INTERNAL_ERROR)
-    })
     @GetMapping("/sp/buscar/dni/{dni}")
     ResponseEntity<PacienteDTO> buscarByDni(@PathVariable String dni);
 

@@ -1,13 +1,17 @@
 package microservice.pacientes.application.domain.model;
-import lombok.Builder;
-import lombok.Data;
 
-/**
- * Modelo que representa a un paciente
- * Contiene informacion personal y de contacto, ademas de la obra social al que pertenece el paciente
- */
-@Data
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+
+@Setter
+@Getter
 @Builder
+@AllArgsConstructor
+@ToString
 public class Paciente {
     private long id;
     private String nombre;
@@ -19,5 +23,4 @@ public class Paciente {
     private String tipoPlanObraSocial;
     private java.time.LocalDate fechaAlta;
     private boolean estado;
-
 } 

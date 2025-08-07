@@ -2,97 +2,118 @@ package microservice.pacientes.infrastructure.validation;
 
 
 import microservice.pacientes.application.domain.model.Paciente;
+import microservice.pacientes.application.domain.port.out.LoggerPort;
 import microservice.pacientes.application.domain.port.out.PacientePortOutRead;
 import microservice.pacientes.application.validation.PacienteValidator;
 import microservice.pacientes.shared.PacienteDuplicadoException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+
+@ExtendWith(MockitoExtension.class)
 public class DniDuplicadoValidatorTest {
 
-    //Crea un mock del puerto de lectura, para controlar cuando existe un paciente en bd
     @Mock
     private PacientePortOutRead portOutRead;
+    @Mock
+    private LoggerPort logger;
 
-    //InjectMocks construye una instancia real de dniduplicadovalidator y le inyecta porOutRead mockeado
     @InjectMocks
     private DniDuplicadoValidator validator;
     private Paciente paciente;
+    private Paciente mismoPaciente;
+    private Paciente otroPaciente;
 
-    //Before each corre este metodo antes de cada test
+
+    private static final Long id = 1L;
+    private static final String dni = "12345678";
+    private static final String nombre = "Ana";
+    private static final String apellido = "Lopez";
+
+    private static final Long idOtro = 2L;
+    private static final String dniOtro = "12345678";
+    private static final String nombreOtro = "Bruno";
+    private static final String apellidoOtro = "Gomez";
+
     @BeforeEach
     void setUp() {
-        //openMock inicializa los mocks y el objeto InjectMock
-        MockitoAnnotations.openMocks(this);
-        //creamos al Paciente con dni 12345678
         paciente = Paciente.builder()
-                .id(1L)
-                .dni("12345678")
-                .nombre("Ana")
-                .apellido("Lopez")
+                .id(id)
+                .dni(dni)
+                .nombre(nombre)
+                .apellido(apellido)
+                .estado(false)
+                .build();
+
+        mismoPaciente = Paciente.builder()
+                .id(id)
+                .dni(dni)
+                .nombre(nombre)
+                .apellido(apellido)
+                .estado(true)
+                .build();
+
+        otroPaciente = Paciente.builder()
+                .id(idOtro)
+                .dni(dniOtro)
+                .nombre(nombreOtro)
+                .apellido(apellidoOtro)
                 .build();
     }
 
-
-    //Primer Test: Caso de DNI duplicado,tiene que lanzar excepcion
     @Test
-    void validate_shouldThrow_whenDniExists() {
-        // Configuramos el mock para que buscarByDni devuelva un Optional con el paciente, simulando que ya hay un paciente registrado con ese DNI.
-        when(portOutRead.buscarByDni("12345678"))
-                .thenReturn(Optional.of(paciente));
+    void validate_givenDniNotExists_doesNotThrow() {
+        when(portOutRead.buscarByDni(dni))
+                .thenReturn(Optional.empty());
 
-        // Ejecutamos la validacion y comprobamos que lance PacienteDuplicadoException
+        assertDoesNotThrow(() -> validator.validate(paciente));
+        verify(portOutRead).buscarByDni(dni);
+    }
+
+    @Test
+    void validate_givenSamePaciente_doesNotThrow() {
+        when(portOutRead.buscarByDni(dni))
+                .thenReturn(Optional.of(mismoPaciente));
+
+        assertDoesNotThrow(() -> validator.validate(paciente));
+        verify(portOutRead).buscarByDni(dni);
+    }
+
+    @Test
+    void  validate_givenDifferentPacienteSameDni_throwsPacienteDuplicadoException(){
+        when(portOutRead.buscarByDni(dni))
+                .thenReturn(Optional.of(otroPaciente));
+
         PacienteDuplicadoException ex = assertThrows(
                 PacienteDuplicadoException.class,
                 () -> validator.validate(paciente)
         );
-
-        // Verificamos que el mensaje de la excepción incluya el DNI duplicado
-        assertTrue(ex.getMessage().contains("12345678"));
-
-        // Aseguramos que el mock fue invocado exactamente con el DNI esperado
-        verify(portOutRead).buscarByDni("12345678");
+        assertTrue(ex.getMessage().contains(dni));
+        verify(portOutRead).buscarByDni(dni);
     }
 
-    //Segundo test:  Caso exitoso sin duplicado, no debe lanzar excepcion
+
+
     @Test
-    void validate_shouldPass_whenDniNotExists() {
-        // Configuramos el mock para que buscarByDni devuelva Optional.empty(), simulando que no existe ningun paciente con ese DNI
-        when(portOutRead.buscarByDni("12345678"))
-                .thenReturn(Optional.empty());
-
-        // Ejecutamos la validacion y comprobamos que NO lance ninguna excepcion
-        assertDoesNotThrow(() -> validator.validate(paciente));
-
-        // Verificamos que se llamo al mock con el DNI correcto
-        verify(portOutRead).buscarByDni("12345678");
-    }
-
-    //Tercer test: la cadena delega al siguiente
-    @Test
-    void validate_shouldDelegateToNextValidator_whenNextIsPresent() {
-        //Creamos un mock de PacienteValidator que actua como el siguiente handler en la cadena
+    void validate_withNextValidator_delegatesToNext(){
         PacienteValidator nextValidator = mock(PacienteValidator.class);
 
-        //Asignamos al validator
         validator.setNext(nextValidator);
 
-        // Simulamos que no hay duplicado para pasar la primera validacion
-        when(portOutRead.buscarByDni("12345678"))
+        when(portOutRead.buscarByDni(dni))
                 .thenReturn(Optional.empty());
 
-        // Ejecutamos la validacion, no debe lanzar ninguna excepcion
         assertDoesNotThrow(() -> validator.validate(paciente));
 
-        // Verificamos la delegacion
         verify(nextValidator).validate(paciente);
     }
 

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <!-- APPENDER de consola -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <!-- timestamp, hilo, nivel, logger y mensaje -->
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- Logger general del microservicio -->
+    <logger name="microservice.pacientes" level="DEBUG" />
+
+    <!-- Logger específico para controller -->
+    <logger name="microservice.pacientes.infrastructure.adapter.in.controller" level="INFO" />
+
+    <!-- Logger específico para services -->
+    <logger name="microservice.pacientes.application.service" level="DEBUG" />
+
+    <!-- Logger específico para validators -->
+    <logger name="microservice.pacientes.infrastructure.validation" level="DEBUG" />
+
+    <!-- Logger para adapter de logs -->
+    <logger name="microservice.pacientes.infrastructure.adapter.out.logging" level="DEBUG" />
+
+    <!-- Si seguís usando un nombre explícito como "PacienteLogger", agregalo también -->
+    <logger name="PacienteLogger" level="DEBUG" />
+
+
+    <!-- Nivel raíz -->
+    <root level="INFO">
+        <appender-ref ref="CONSOLE" />
+    </root>
+
+</configuration>

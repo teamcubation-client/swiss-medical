@@ -9,8 +9,6 @@ import microservice.pacientes.shared.PacienteNullException;
  */
 public final class PacienteResponseMapper {
 
-
-    //impide una instanciacion
     private PacienteResponseMapper() {}
 
     public static PacienteDTO toDTO(Paciente paciente) {
@@ -36,7 +34,6 @@ public final class PacienteResponseMapper {
             throw new PacienteNullException();
         }
         return Paciente.builder()
-                .id(pacienteDTO.getId())
                 .nombre(pacienteDTO.getNombre())
                 .apellido(pacienteDTO.getApellido())
                 .dni(pacienteDTO.getDni())
@@ -45,7 +42,7 @@ public final class PacienteResponseMapper {
                 .telefono(pacienteDTO.getTelefono())
                 .tipoPlanObraSocial(pacienteDTO.getTipoPlanObraSocial())
                 .fechaAlta(pacienteDTO.getFechaAlta())
-                .estado(pacienteDTO.isEstado())
+                .estado(pacienteDTO.getEstado())
                 .build();
     }
 

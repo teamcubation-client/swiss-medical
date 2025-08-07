@@ -2,68 +2,77 @@ package microservice.pacientes.shared;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
-/**
- * Manejador global de excepciones
- * Proporciona respuestas HTTP para las excepciones de los pacientes
- */
+import java.time.LocalDateTime;
+
 @ControllerAdvice
 public class GlobalExceptionHandler {
-    /**
-     * Maneja la excepcion cuando no se encuentra un paciente
-     * @param ex excepcion PacienteNotFoundException
-     * @return respuesta HTTP 404 con el mensaje de error
-     */
+
+
+    public static final String VALIDATION_ERROR_MESSAGE = "Datos de entrada invalidos";
+    public static final String PARAMETER_ERROR_MESSAGE = "El parametro es obligatorio";
+    public static final String UNEXPECTED_ERROR_MESSAGE="Ha ocurrido un error inesperado: ";
+
     @ExceptionHandler(PacienteNotFoundException.class)
-    public ResponseEntity<String> handlePacienteNotFound(PacienteNotFoundException ex) {
-        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
+    public ResponseEntity<ErrorResponse> handlePacienteNotFound(PacienteNotFoundException ex) {
+        ErrorResponse body = new ErrorResponse(
+                HttpStatus.NOT_FOUND.value(),
+                ex.getMessage(),
+                LocalDateTime.now()
+        );
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
     }
 
-    /**
-     * Maneja la excepcion cuando se detecta un paciente duplicado
-     * @param ex excepcion PacienteDuplicadoException
-     * @return respuesta HTTP 400 con el mensaje de error
-     */
-    @ExceptionHandler(PacienteDuplicadoException.class)
-    public ResponseEntity<String> handlePacienteDuplicado(PacienteDuplicadoException ex) {
-        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+    @ExceptionHandler({
+            PacienteDuplicadoException.class,
+            PacienteNullException.class,
+            InvalidEmailFormatException.class,
+            InvalidFechaAltaException.class,
+            PacienteActivoException.class
+    })
+    public ResponseEntity<ErrorResponse> handleBadRequest(RuntimeException ex) {
+        ErrorResponse body = new ErrorResponse(
+                HttpStatus.BAD_REQUEST.value(),
+                ex.getMessage(),
+                LocalDateTime.now()
+        );
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(body);
     }
 
-    /**
-     * Maneja cualquier otra excepción no contemplada
-     * @param ex excepción genérica
-     * @return respuesta HTTP 500 con el mensaje de error
-     */
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorResponse> handleValidationErrors(MethodArgumentNotValidException ex) {
+        ErrorResponse body = new ErrorResponse(
+                HttpStatus.BAD_REQUEST.value(),
+                VALIDATION_ERROR_MESSAGE,
+                LocalDateTime.now()
+        );
+        return ResponseEntity.badRequest().body(body);
+    }
+
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public ResponseEntity<ErrorResponse> handleMissingParams(MissingServletRequestParameterException ex) {
+        ErrorResponse body = new ErrorResponse(
+                HttpStatus.BAD_REQUEST.value(),
+                PARAMETER_ERROR_MESSAGE,
+                LocalDateTime.now()
+        );
+        return ResponseEntity.badRequest().body(body);
+    }
+
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<String> handleGlobalException(Exception ex) {
-        return new ResponseEntity<>("Ha ocurrido un error inesperado: " + ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+    public ResponseEntity<ErrorResponse> handleGlobalException(Exception ex) {
+        ErrorResponse body = new ErrorResponse(
+                HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                UNEXPECTED_ERROR_MESSAGE + ex.getMessage(),
+                LocalDateTime.now()
+        );
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(body);
     }
-
-    /**
-     * Maneja la excepcion cuando se detecta un paciente nulo
-     * @param ex excepcion handlePacienteNull
-     * @return respuesta HTTP 400 con el mensaje de error
-     */
-    @ExceptionHandler(PacienteNullException.class)
-    public ResponseEntity<String> handlePacienteNull(PacienteNullException ex) {
-        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler(InvalidEmailFormatException.class)
-    public ResponseEntity<String> handleEmailFormat(InvalidEmailFormatException ex) {
-        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler(InvalidFechaAltaException.class)
-    public ResponseEntity<String> handleFechaAlta(InvalidFechaAltaException ex) {
-        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler(PacienteActivoException.class)
-    public ResponseEntity<String> handlePacienteActivo(PacienteActivoException ex) {
-        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
-    }
-
 } 
