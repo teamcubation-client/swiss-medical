@@ -23,8 +23,5 @@ COPY --from=build /app/target/*.jar app.jar
 # Copiar el archivo .env desde la etapa de construcción
 COPY --from=build /app/.env ./.env
 
-# Exponer el puerto en el que la aplicación escucha
-EXPOSE 8000
-
 # Comando para ejecutar la aplicación
 CMD ["java", "-jar", "app.jar"]

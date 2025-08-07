@@ -1,18 +1,18 @@
 ### GET Patients
 
-GET http://localhost:8000/api/patients?page=1&size=15
+GET http://localhost:8090/api/patients?page=1&size=15
 
 ### GET Patient by DNI 
 
-GET http://localhost:8000/api/patients/dni/23456789
+GET http://localhost:8090/api/patients/dni/23456789
 
 ### GET Patients by Social Security
 
-GET http://localhost:8000/api/patients/social-security/swiss
+GET http://localhost:8090/api/patients/social-security/swiss
 
 ### POST Create Patient
 
-POST http://localhost:8000/api/patients
+POST http://localhost:8090/api/patients
 Content-Type: application/json
 
 {
@@ -28,7 +28,7 @@ Content-Type: application/json
 
 ### PUT Update Patient
 
-PUT http://localhost:8000/api/patients/1
+PUT http://localhost:8090/api/patients/1
 Content-Type: application/json
 
 {
@@ -42,4 +42,4 @@ Content-Type: application/json
 
 ### DELETE Patient
 
-DELETE http://localhost:8000/api/patients/1
+DELETE http://localhost:8090/api/patients/1
