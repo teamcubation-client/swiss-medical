@@ -528,6 +528,45 @@ src/test/java/com/swissmedical/pacients/
 - Cobertura sólida en lógica de negocio.
 - Separación de responsabilidades probadas.
 
+## 🧩 Fase 10: Logging y Observabilidad
+
+### 🎯 Objetivo
+
+- Agregar logs al microservicio para poder entender su comportamiento, detectar errores y seguir el flujo de ejecución
+  sin depurar con el IDE.
+
+### 🔧 Tecnología sugerida
+
+- Usar el sistema de logs por defecto de Spring Boot: SLF4J + Logback.
+
+Para loggear, usar:
+
+- `Logger logger = LoggerFactory.getLogger(...)`
+- o `@Slf4j` de Lombok.
+
+- 🧪 Actividad
+- Agregá logs en partes clave de tu app (controller, service, repository, excepciones).
+- Usá diferentes niveles de log:
+    - info: eventos normales (ej: "Paciente creado").
+    - warn: situaciones sospechosas.
+    - error: cuando ocurre una excepción.
+- Ejecutá la app y observá los logs en consola.
+
+_Reflexioná_:
+
+- ¿Qué nivel de log usaste más?
+- ¿Te ayudaron los logs a entender el flujo?
+- ¿Qué mejorarías?
+- ¿Qué datos sería mejor no loggear?
+
+### ✅ Requisitos mínimos
+
+- Al menos 2 niveles de log implementados.
+- Logs visibles en consola.
+- Poder explicar por qué se loggea en cada parte.
+
+- 🧠 Sugerencia: explorá cómo cambiar el nivel de logging desde application.yml.
+
 ---
 
 # 📝 Check List
