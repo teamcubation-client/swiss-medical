@@ -4,7 +4,6 @@ import java.util.List;
 
 import com.swissmedical.patients.application.domain.command.CreatePatientCommand;
 import com.swissmedical.patients.application.domain.command.UpdatePatientCommand;
-import com.swissmedical.patients.application.domain.model.Patient;
 import com.swissmedical.patients.application.service.PatientService;
 import com.swissmedical.patients.infrastructure.adapter.in.rest.dto.PatientResponseDto;
 import com.swissmedical.patients.infrastructure.adapter.in.rest.dto.PatientUpdateDto;
@@ -79,7 +78,7 @@ public class PatientController implements PatientApi {
 
   @Override
   @PostMapping()
-  public ResponseEntity<PatientResponseDto> create(@Valid @RequestBody PatientCreateDto patientCreateDto) {
+  public ResponseEntity<BaseResponse<PatientResponseDto>> create(@Valid @RequestBody PatientCreateDto patientCreateDto) {
     CreatePatientCommand patient = PatientCreateMapper.toCommand(patientCreateDto);
     return ResponseEntity.status(HttpStatus.CREATED).body(
             new SuccessResponse<>(PatientResponseMapper.toDto(patientService.create(patient)))
@@ -89,7 +88,7 @@ public class PatientController implements PatientApi {
 
   @Override
   @PutMapping("/{id}")
-  public ResponseEntity<PatientResponseDto> update(@Valid @RequestBody PatientUpdateDto patientUpdateDto, @PathVariable Long id) {
+  public ResponseEntity<BaseResponse<PatientResponseDto>> update(@Valid @RequestBody PatientUpdateDto patientUpdateDto, @PathVariable Long id) {
     UpdatePatientCommand updatePatientCommand = PatientUpdateMapper.toCommand(patientUpdateDto);
     return ResponseEntity.ok().body(
             new SuccessResponse<>(PatientResponseMapper.toDto(patientService.update(id, updatePatientCommand)))
