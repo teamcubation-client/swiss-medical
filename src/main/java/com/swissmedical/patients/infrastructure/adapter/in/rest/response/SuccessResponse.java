@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class SuccessResponse<T> extends ApiResponse<T> {
+public class SuccessResponse<T> extends BaseResponse<T> {
 
     private static final String DEFAULT_SUCCESS_MESSAGE = "Operación exitosa";
     private T data;

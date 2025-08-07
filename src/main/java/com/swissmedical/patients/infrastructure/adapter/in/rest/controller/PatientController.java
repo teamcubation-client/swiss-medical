@@ -9,6 +9,8 @@ import com.swissmedical.patients.infrastructure.adapter.in.rest.dto.PatientUpdat
 import com.swissmedical.patients.infrastructure.adapter.in.rest.mapper.PatientCreateMapper;
 import com.swissmedical.patients.infrastructure.adapter.in.rest.mapper.PatientResponseMapper;
 import com.swissmedical.patients.infrastructure.adapter.in.rest.mapper.PatientUpdateMapper;
+import com.swissmedical.patients.infrastructure.adapter.in.rest.response.BaseResponse;
+import com.swissmedical.patients.infrastructure.adapter.in.rest.response.SuccessResponse;
 import com.swissmedical.patients.shared.utils.DefaultValuesController;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -39,60 +41,63 @@ public class PatientController implements PatientApi {
 
   @Override
   @GetMapping()
-  public ResponseEntity<List<PatientResponseDto>> getAll(
+  public ResponseEntity<BaseResponse<List<PatientResponseDto>>> getAll(
           @RequestParam(defaultValue = DefaultValuesController.NAME) String name,
           @RequestParam(defaultValue = DefaultValuesController.PAGE) int page,
           @RequestParam(defaultValue = DefaultValuesController.SIZE) int size
   ) {
-    return ResponseEntity.ok(patientService.getAll(name, page, size)
+    return ResponseEntity.ok().body(new SuccessResponse<>(patientService.getAll(name, page, size)
             .stream()
             .map(PatientResponseMapper::toDto)
-            .toList());
+            .toList()));
   }
 
   @Override
   @GetMapping("/dni/{dni}")
-  public ResponseEntity<PatientResponseDto> getByDni(@PathVariable String dni) {
-    return ResponseEntity.ok(PatientResponseMapper.toDto(patientService.getByDni(dni)));
+  public ResponseEntity<BaseResponse<PatientResponseDto>> getByDni(@PathVariable String dni) {
+    return ResponseEntity.status(HttpStatus.OK).body(
+            new SuccessResponse<>(PatientResponseMapper.toDto(patientService.getByDni(dni)))
+    );
   }
 
 
   @Override
   @GetMapping("/social-security/{socialSecurity}")
-  public ResponseEntity<List<PatientResponseDto>> getBySocialSecurity(
+  public ResponseEntity<BaseResponse<List<PatientResponseDto>>> getBySocialSecurity(
           @PathVariable String socialSecurity,
           @RequestParam(defaultValue = DefaultValuesController.PAGE) int page,
           @RequestParam(defaultValue = DefaultValuesController.SIZE) int size
   ) {
-    return ResponseEntity.ok(patientService.getBySocialSecurity(socialSecurity, page, size)
+    return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponse<>(patientService.getBySocialSecurity(socialSecurity, page, size)
             .stream()
             .map(PatientResponseMapper::toDto)
-            .toList());
+            .toList()));
   }
 
 
   @Override
   @PostMapping()
-  public ResponseEntity<PatientResponseDto> create(@Valid @RequestBody PatientCreateDto patientCreateDto) {
+  public ResponseEntity<BaseResponse<PatientResponseDto>> create(@Valid @RequestBody PatientCreateDto patientCreateDto) {
     Patient patient = PatientCreateMapper.toDomain(patientCreateDto);
-    return ResponseEntity
-            .status(HttpStatus.CREATED)
-            .body(PatientResponseMapper.toDto(patientService.create(patient)));
+    return ResponseEntity.status(HttpStatus.CREATED).body(
+            new SuccessResponse<>(PatientResponseMapper.toDto(patientService.create(patient)))
+    );
   }
 
 
   @Override
   @PutMapping("/{id}")
-  public ResponseEntity<PatientResponseDto> update(@Valid @RequestBody PatientUpdateDto patientUpdateDto, @PathVariable Long id) {
+  public ResponseEntity<BaseResponse<PatientResponseDto>> update(@Valid @RequestBody PatientUpdateDto patientUpdateDto, @PathVariable Long id) {
     Patient patientDetails = PatientUpdateMapper.toDomain(patientUpdateDto);
-    return ResponseEntity.ok(PatientResponseMapper.toDto(patientService.update(id, patientDetails)));
+    return ResponseEntity.ok().body(
+            new SuccessResponse<>(PatientResponseMapper.toDto(patientService.update(id, patientDetails)))
+    );
   }
 
   @Override
   @DeleteMapping("/{id}")
   public ResponseEntity<Void> delete(@PathVariable Long id) {
     patientService.delete(id);
-
     return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
 
