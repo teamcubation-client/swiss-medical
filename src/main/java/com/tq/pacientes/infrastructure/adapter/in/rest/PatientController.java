@@ -8,11 +8,18 @@ import com.tq.pacientes.infrastructure.adapter.in.rest.dto.PatientResponse;
 import com.tq.pacientes.infrastructure.adapter.in.rest.mapper.PatientRestMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/patients")
@@ -40,39 +47,38 @@ public class PatientController implements PatientControllerAPI {
     ) {
         List<Patient> results;
         if (dni != null && !dni.isEmpty()) {
-            Optional<Patient> patient = patientUseCase.getByDni(dni);
-            results = patient.map(List::of).orElse(List.of());
+            Patient patient = patientUseCase.getByDni(dni);
+            results = List.of(patient);
         } else if (firstName != null && !firstName.isEmpty()) {
-results = patientUseCase.searchByFirstName(firstName);
+            results = patientUseCase.searchByFirstName(firstName);
         } else {
             results = patientUseCase.getAll();
         }
         if (results.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
-        List<PatientResponse> dtos = results.stream()
-                .map(patientRestMapper::toResponse)
-                .collect(Collectors.toList());
-        return ResponseEntity.ok(dtos);
+        return ResponseEntity.ok(toResponseList(results));
     }
 
     @GetMapping("/first-name/{firstName}")
     public ResponseEntity<List<PatientResponse>> searchByFirstName(@PathVariable String firstName) {
+        if (firstName == null || firstName.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
         List<Patient> results = patientUseCase.searchByFirstName(firstName);
         if (results.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
-        List<PatientResponse> dtos = results.stream()
-                .map(patientRestMapper::toResponse)
-                .collect(Collectors.toList());
-        return ResponseEntity.ok(dtos);
+        return ResponseEntity.ok(toResponseList(results));
     }
 
     @GetMapping("/dni/{dni}")
     public ResponseEntity<PatientResponse> findByDni(@PathVariable String dni) {
-        Optional<Patient> patient = patientUseCase.getByDni(dni);
-        return patient.map(value -> ResponseEntity.ok(patientRestMapper.toResponse(value)))
-                .orElse(ResponseEntity.noContent().build());
+        if (dni == null || dni.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        Patient patient = patientUseCase.getByDni(dni);
+        return ResponseEntity.ok(patientRestMapper.toResponse(patient));
     }
 
     @GetMapping("/{id}")
@@ -93,10 +99,7 @@ results = patientUseCase.searchByFirstName(firstName);
         if (patients.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
-        List<PatientResponse> dtos = patients.stream()
-                .map(patientRestMapper::toResponse)
-                .collect(Collectors.toList());
-        return ResponseEntity.ok(dtos);
+        return ResponseEntity.ok(toResponseList(patients));
     }
 
     @PatchMapping("/{id}")
@@ -116,8 +119,14 @@ results = patientUseCase.searchByFirstName(firstName);
     }
 
     @PatchMapping("/{id}/activate")
-    public ResponseEntity<Void> activate(@PathVariable Long id) {
-        patientUseCase.activate(id);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<PatientResponse> activate(@PathVariable Long id) {
+        Patient activatedPatient = patientUseCase.activate(id);
+        return ResponseEntity.ok(patientRestMapper.toResponse(activatedPatient));
+    }
+
+    private List<PatientResponse> toResponseList(List<Patient> patients) {
+        return patients.stream()
+                .map(patientRestMapper::toResponse)
+                .toList();
     }
 } 
