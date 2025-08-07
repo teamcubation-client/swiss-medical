@@ -172,3 +172,17 @@ Este proyecto muestra cómo aplicar de forma combinada el **Principio de Respons
 - ✅ Los componentes están desacoplados entre sí.
 - ✅ El sistema puede extenderse sin necesidad de modificar las clases existentes.
 
+---
+
+# 🩺 Health Check con Spring Boot Actuator
+
+Este microservicio utiliza Spring Boot Actuator para exponer un endpoint de salud que permite verificar si el servicio está funcionando correctamente.
+
+El endpoint principal es: 
+- `GET /actuator/health`
+
+También se exponen métricas de la aplicación a través del endpoint:
+
+- `GET /actuator/metrics`
+
+Esto permite observar información como el uso de CPU, memoria, cantidad de peticiones HTTP, estado del pool de conexiones, entre otros.
