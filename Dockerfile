@@ -11,7 +11,7 @@ COPY src ./src
 COPY .env ./.env
 
 # Construir la aplicación
-RUN mvn clean package -DskipTests
+RUN mvn clean package
 
 # 2. Crear la imagen final con la aplicación
 FROM eclipse-temurin:17-jdk-alpine
